@@ -21,7 +21,7 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +36,7 @@ class _MessageScreenState extends State<MessageScreen> {
                 style: GoogleFonts.barlow(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -50,7 +50,7 @@ class _MessageScreenState extends State<MessageScreen> {
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
@@ -130,7 +130,7 @@ class _MessageScreenState extends State<MessageScreen> {
                         style: GoogleFonts.barlow(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
