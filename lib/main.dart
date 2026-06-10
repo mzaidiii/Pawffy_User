@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pawffy/features/auth/onboardingScreen.dart';
+import 'features/auth/onboardingScreen.dart';
+import 'package:device_preview/device_preview.dart';
 
 final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
   ThemeNotifier.new,
@@ -10,7 +11,7 @@ final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
 
 class ThemeNotifier extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() => ThemeMode.dark;
+  ThemeMode build() => ThemeMode.system; // Changed to system by default
 
   void toggle() {
     state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
@@ -20,7 +21,12 @@ class ThemeNotifier extends Notifier<ThemeMode> {
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(const ProviderScope(child: PawffyApp()));
+  runApp(
+    DevicePreview(
+      enabled: false,
+      builder: (context) => const ProviderScope(child: PawffyApp()),
+    ),
+  );
 }
 
 class PawffyApp extends ConsumerWidget {
@@ -29,8 +35,12 @@ class PawffyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       title: 'Pawffy',
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: _lightTheme(),
