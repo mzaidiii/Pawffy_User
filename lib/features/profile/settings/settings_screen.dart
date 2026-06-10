@@ -1,0 +1,273 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/features/profile/settings/support/help_support_screen.dart';
+import 'accounts/change_password_screen.dart';
+import 'accounts/email_address_screen.dart';
+import 'accounts/mobile_number_screen.dart';
+import 'accounts/personal_information_screen.dart';
+
+import 'preferences/language_screen.dart';
+import 'preferences/app_appearance_screen.dart';
+import 'preferences/location_settings_screen.dart';
+
+import 'widgets/settings_tile.dart';
+import 'widgets/settings_section_title.dart';
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'SETTINGS',
+          style: GoogleFonts.barlow(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: Theme.of(context).colorScheme.onSurface,
+            letterSpacing: 1,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Profile Card
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: isDark
+                            ? const Color(0xFF3A2A2A)
+                            : const Color(0xFFF3E8E2),
+                        child: const Icon(
+                          Icons.person,
+                          color: Color(0xFFE85D04),
+                          size: 28,
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE85D04),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Theme.of(context).cardColor,
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 10,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Andrew Stevens',
+                          style: GoogleFonts.barlow(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'andrew@email.com',
+                          style: GoogleFonts.barlow(
+                            fontSize: 12,
+                            color: isDark
+                                ? Colors.white70
+                                : Colors.grey.shade600,
+                          ),
+                        ),
+                        Text(
+                          '+1 234 567 8910',
+                          style: GoogleFonts.barlow(
+                            fontSize: 12,
+                            color: isDark
+                                ? Colors.white70
+                                : Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE85D04).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                      color: Color(0xFFE85D04),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SettingsSectionTitle(title: 'Accounts'),
+
+            SettingsTile(
+              icon: Icons.person_outline,
+              title: 'Personal Information',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PersonalInformationScreen(),
+                ),
+              ),
+            ),
+            SettingsTile(
+              icon: Icons.lock_outline,
+              title: 'Change Password',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+              ),
+            ),
+            SettingsTile(
+              icon: Icons.phone_android_outlined,
+              title: 'Mobile Number',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MobileNumberScreen()),
+              ),
+            ),
+            SettingsTile(
+              icon: Icons.email_outlined,
+              title: 'Email Address',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EmailAddressScreen()),
+              ),
+            ),
+
+            const SettingsSectionTitle(title: 'Preferences'),
+
+            SettingsTile(
+              icon: Icons.language,
+              title: 'Language',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LanguageScreen()),
+              ),
+            ),
+            SettingsTile(
+              icon: Icons.dark_mode_outlined,
+              title: 'App Appearance',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AppAppearanceScreen()),
+              ),
+            ),
+            SettingsTile(
+              icon: Icons.location_on_outlined,
+              title: 'Location',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LocationSettingsScreen(),
+                ),
+              ),
+            ),
+
+            const SettingsSectionTitle(title: 'Support & More'),
+
+            SettingsTile(
+              icon: Icons.headset_mic_outlined,
+              title: 'Help & Support',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (ctx) => HelpSupportScreen()),
+                );
+              },
+            ),
+            SettingsTile(
+              icon: Icons.description_outlined,
+              title: 'Terms & Conditions',
+              onTap: () {},
+            ),
+            SettingsTile(
+              icon: Icons.privacy_tip_outlined,
+              title: 'Privacy Policy',
+              onTap: () {},
+            ),
+            SettingsTile(
+              icon: Icons.info_outline,
+              title: 'About Pawffy',
+              onTap: () {},
+            ),
+
+            const SizedBox(height: 20),
+
+            // Logout Button
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: OutlinedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.logout, color: Colors.red),
+                label: Text(
+                  'LOG OUT',
+                  style: GoogleFonts.barlow(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+}

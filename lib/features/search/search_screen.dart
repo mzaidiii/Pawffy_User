@@ -12,7 +12,6 @@ class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // ── Dummy Data ───────────────────────────────────────
   final List<Map<String, dynamic>> _allProviders = [
     {
       'name': 'Happy Paws Sitting',
@@ -88,7 +87,6 @@ class _SearchScreenState extends State<SearchScreen> {
     },
   ];
 
-  // ── Filter chips ─────────────────────────────────────
   final List<String> _filters = [
     'All',
     'Pet Sitting',
@@ -101,7 +99,6 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
   String _selectedFilter = 'All';
 
-  // ── Filtered list ────────────────────────────────────
   List<Map<String, dynamic>> get _filteredProviders {
     return _allProviders.where((p) {
       final matchesSearch =
@@ -127,15 +124,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
 
-            // ── Top Bar with back + title ──────────────
+            // Top Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -146,7 +145,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -155,9 +154,9 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 18,
                       ),
                     ),
@@ -168,7 +167,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     style: GoogleFonts.barlow(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -178,13 +177,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
             const SizedBox(height: 16),
 
-            // ── Search Bar ────────────────────────────
+            // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
@@ -199,18 +198,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   autofocus: true,
                   onChanged: (val) => setState(() => _searchQuery = val),
                   style: GoogleFonts.barlow(
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search providers or services...',
                     hintStyle: GoogleFonts.barlow(
-                      color: const Color(0xFF888888),
+                      color: isDark ? Colors.white60 : const Color(0xFF888888),
                       fontSize: 14,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search_rounded,
-                      color: Color(0xFF888888),
+                      color: isDark ? Colors.white60 : const Color(0xFF888888),
                       size: 20,
                     ),
                     suffixIcon: _searchQuery.isNotEmpty
@@ -219,15 +218,17 @@ class _SearchScreenState extends State<SearchScreen> {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
                             },
-                            child: const Icon(
+                            child: Icon(
                               Icons.close_rounded,
-                              color: Color(0xFF888888),
+                              color: isDark
+                                  ? Colors.white60
+                                  : const Color(0xFF888888),
                               size: 18,
                             ),
                           )
                         : null,
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Theme.of(context).cardColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -246,7 +247,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
             const SizedBox(height: 14),
 
-            // ── Filter Chips (placeholder) ────────────
+            // Filter Chips
             SizedBox(
               height: 36,
               child: ListView.separated(
@@ -267,7 +268,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? const Color(0xFFE85D04)
-                            : Colors.white,
+                            : Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -283,7 +284,9 @@ class _SearchScreenState extends State<SearchScreen> {
                           fontWeight: FontWeight.w600,
                           color: isSelected
                               ? Colors.white
-                              : const Color(0xFF888888),
+                              : (isDark
+                                    ? Colors.white70
+                                    : const Color(0xFF888888)),
                         ),
                       ),
                     ),
@@ -294,7 +297,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
             const SizedBox(height: 16),
 
-            // ── Results count ─────────────────────────
+            // Results count
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -302,14 +305,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 style: GoogleFonts.barlow(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF888888),
+                  color: isDark ? Colors.white70 : const Color(0xFF888888),
                 ),
               ),
             ),
 
             const SizedBox(height: 10),
 
-            // ── Provider List ─────────────────────────
+            // Provider List
             Expanded(
               child: _filteredProviders.isEmpty
                   ? _buildEmptyState()
@@ -328,9 +331,9 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // ── Provider Card ─────────────────────────────────────
   Widget _buildProviderCard(Map<String, dynamic> provider) {
     final bool isAvailable = provider['available'] as bool;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return InkWell(
       onTap: () {},
@@ -338,7 +341,7 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -351,7 +354,6 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Left Icon ───────────────────────────
             Container(
               width: 52,
               height: 52,
@@ -367,37 +369,31 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             const SizedBox(width: 14),
 
-            // ── Middle Content ───────────────────────
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // provider name — heading
                   Text(
                     provider['name'],
                     style: GoogleFonts.barlow(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 2),
-
-                  // service type
                   Text(
                     provider['service'],
                     style: GoogleFonts.barlow(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
-                      color: const Color(0xFF888888),
+                      color: isDark ? Colors.white70 : const Color(0xFF888888),
                     ),
                   ),
                   const SizedBox(height: 8),
 
-                  // rating + distance row
                   Row(
                     children: [
-                      // ⭐ rating
                       const Icon(
                         Icons.star_rounded,
                         color: Color(0xFFFFA500),
@@ -409,35 +405,34 @@ class _SearchScreenState extends State<SearchScreen> {
                         style: GoogleFonts.barlow(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-
                       const SizedBox(width: 14),
-
-                      // 📍 distance
-                      const Icon(
+                      Icon(
                         Icons.location_on_outlined,
                         size: 13,
-                        color: Color(0xFF888888),
+                        color: isDark
+                            ? Colors.white60
+                            : const Color(0xFF888888),
                       ),
                       const SizedBox(width: 2),
                       Text(
                         provider['distance'],
                         style: GoogleFonts.barlow(
                           fontSize: 12,
-                          color: const Color(0xFF888888),
+                          color: isDark
+                              ? Colors.white60
+                              : const Color(0xFF888888),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
 
-                  // price + availability row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // price
                       Text(
                         provider['price'],
                         style: GoogleFonts.barlow(
@@ -446,8 +441,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           color: const Color(0xFFE85D04),
                         ),
                       ),
-
-                      // availability badge — bottom right
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -456,12 +449,18 @@ class _SearchScreenState extends State<SearchScreen> {
                         decoration: BoxDecoration(
                           color: isAvailable
                               ? const Color(0xFF22C55E).withOpacity(0.12)
-                              : const Color(0xFF888888).withOpacity(0.12),
+                              : (isDark
+                                    ? Colors.white10
+                                    : const Color(
+                                        0xFF888888,
+                                      ).withOpacity(0.12)),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isAvailable
                                 ? const Color(0xFF22C55E)
-                                : const Color(0xFF888888),
+                                : (isDark
+                                      ? Colors.white38
+                                      : const Color(0xFF888888)),
                             width: 1,
                           ),
                         ),
@@ -475,7 +474,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                 shape: BoxShape.circle,
                                 color: isAvailable
                                     ? const Color(0xFF22C55E)
-                                    : const Color(0xFF888888),
+                                    : (isDark
+                                          ? Colors.white38
+                                          : const Color(0xFF888888)),
                               ),
                             ),
                             const SizedBox(width: 5),
@@ -486,7 +487,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: isAvailable
                                     ? const Color(0xFF22C55E)
-                                    : const Color(0xFF888888),
+                                    : (isDark
+                                          ? Colors.white38
+                                          : const Color(0xFF888888)),
                               ),
                             ),
                           ],
@@ -503,8 +506,9 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // ── Empty State ───────────────────────────────────────
   Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -512,7 +516,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Icon(
             Icons.search_off_rounded,
             size: 60,
-            color: Colors.grey.withOpacity(0.4),
+            color: isDark ? Colors.white38 : Colors.grey.withOpacity(0.4),
           ),
           const SizedBox(height: 16),
           Text(
@@ -520,7 +524,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: GoogleFonts.barlow(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.black54,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 6),
@@ -528,7 +532,7 @@ class _SearchScreenState extends State<SearchScreen> {
             'Try a different search or filter',
             style: GoogleFonts.barlow(
               fontSize: 13,
-              color: const Color(0xFF888888),
+              color: isDark ? Colors.white60 : const Color(0xFF888888),
             ),
           ),
         ],
