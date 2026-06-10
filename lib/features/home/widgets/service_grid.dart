@@ -37,7 +37,7 @@ class ServiceGrid extends StatelessWidget {
               style: GoogleFonts.barlow(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 letterSpacing: 0.5,
               ),
             ),
@@ -79,7 +79,7 @@ class ServiceGrid extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -104,7 +104,7 @@ class ServiceGrid extends StatelessWidget {
                     style: GoogleFonts.barlow(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,

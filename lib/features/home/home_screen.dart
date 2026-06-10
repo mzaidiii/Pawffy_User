@@ -59,7 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final locationAsync = ref.watch(locationTextProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -94,7 +94,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     style: GoogleFonts.barlow(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                                   ),
                                   loading: () => Text(
@@ -108,7 +110,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     'Location unavailable',
                                     style: GoogleFonts.barlow(
                                       fontSize: 13,
-                                      color: Colors.black54,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
@@ -129,18 +133,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: Theme.of(
+                                    context,
+                                  ).scaffoldBackgroundColor,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.07),
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                       blurRadius: 8,
                                     ),
                                   ],
                                 ),
                                 child: const Icon(
                                   Icons.notifications_outlined,
-                                  color: Colors.black87,
+                                  color: Color.fromARGB(221, 233, 228, 228),
                                   size: 20,
                                 ),
                               ),
@@ -169,7 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         style: GoogleFonts.barlow(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
-                          color: Colors.black54,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
@@ -177,7 +185,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         style: GoogleFonts.barlow(
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -195,7 +203,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
@@ -398,7 +406,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: GoogleFonts.barlow(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 letterSpacing: 0.5,
               ),
             ),
@@ -449,7 +457,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
