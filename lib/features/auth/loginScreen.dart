@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pawffy/features/auth/signUpScreen.dart';
 import 'package:pawffy/features/home/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawffy/features/auth/providers/auth_controller.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = true;
@@ -26,6 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final authState = ref.watch(authControllerProvider);
+    print(authState);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -114,13 +118,48 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // ── LOG IN Button ─────────────────────────
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (ctx) => const HomeScreen(),
-                            ),
-                          );
+                        onPressed: () async {
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text.trim();
+
+                          if (email.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please fill all fields'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          final success = await ref
+                              .read(authControllerProvider.notifier)
+                              .login(email: email, password: password);
+
+                          if (!mounted) return;
+
+                          if (success) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HomeScreen(),
+                              ),
+                            );
+                          } else {
+                            final error = ref.read(authControllerProvider);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  error.hasError
+                                      ? error.error.toString().replaceFirst(
+                                          'Exception: ',
+                                          '',
+                                        )
+                                      : 'Login failed',
+                                ),
+                              ),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFE85D04),
@@ -130,21 +169,30 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'LOG IN',
-                              style: GoogleFonts.barlow(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.5,
+                        child: authState.isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'LOG IN',
+                                    style: GoogleFonts.barlow(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_outward, size: 18),
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.arrow_outward, size: 18),
-                          ],
-                        ),
                       ),
                       const SizedBox(height: 20),
 
