@@ -1,36 +1,43 @@
+import 'package:pawffy/features/auth/providers/auth_controller.dart';
+import 'package:pawffy/features/home/home_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileSetupScreen extends StatefulWidget {
-  const ProfileSetupScreen({super.key});
+class ProfileSetupScreen extends ConsumerStatefulWidget {
+  final String name;
+  final String email;
+  final String password;
+
+  const ProfileSetupScreen({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.password,
+  });
 
   @override
-  State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
+  ConsumerState<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
 }
 
-class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
-  final _usernameController = TextEditingController();
-  final _bioController = TextEditingController();
-  int _bioCharCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _bioController.addListener(() {
-      setState(() => _bioCharCount = _bioController.text.length);
-    });
-  }
+class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
+  final _phoneController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _bioController.dispose();
+    _phoneController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -122,75 +129,120 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
                     // ── Username Field ────────────────────────
                     _buildTextField(
-                      controller: _usernameController,
-                      hint: 'Username',
-                      icon: Icons.person_outline,
+                      controller: _phoneController,
+                      hint: 'Phone Number',
+                      icon: Icons.phone_outlined,
                     ),
                     const SizedBox(height: 12),
 
-                    // ── Bio Field ─────────────────────────────
-                    Stack(
-                      children: [
-                        TextField(
-                          controller: _bioController,
-                          maxLines: 5,
-                          maxLength: 150,
-                          style: GoogleFonts.barlow(color: Colors.white),
-                          buildCounter:
-                              (
-                                context, {
-                                required currentLength,
-                                required isFocused,
-                                maxLength,
-                              }) => null,
-                          decoration: InputDecoration(
-                            hintText: 'Bio',
-                            hintStyle: GoogleFonts.barlow(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(bottom: 60),
-                              child: Icon(
-                                Icons.menu_book_outlined,
-                                color: Colors.grey,
-                                size: 20,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: const Color(0xFF232323),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE85D04),
-                                width: 1.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 10,
-                          right: 14,
-                          child: Text(
-                            '$_bioCharCount/150',
-                            style: GoogleFonts.barlow(
-                              color: Colors.grey,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
+                    _buildTextField(
+                      controller: _cityController,
+                      hint: 'City',
+                      icon: Icons.location_city_outlined,
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildTextField(
+                      controller: _stateController,
+                      hint: 'State',
+                      icon: Icons.map_outlined,
                     ),
                     const SizedBox(height: 28),
-
                     // ── SAVE CHANGES Button ───────────────────
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final phone = _phoneController.text.trim();
+                        final city = _cityController.text.trim();
+                        final userState = _stateController.text.trim();
+
+                        if (phone.isEmpty ||
+                            city.isEmpty ||
+                            userState.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fill all fields'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (phone.length < 10) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Enter a valid phone number'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        try {
+                          // STEP 1: Register User
+                          final registerSuccess = await ref
+                              .read(authControllerProvider.notifier)
+                              .register(
+                                name: widget.name,
+                                email: widget.email,
+                                password: widget.password,
+                              );
+
+                          if (!registerSuccess) {
+                            final error = ref.read(authControllerProvider);
+
+                            if (!mounted) return;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  error.hasError
+                                      ? error.error.toString().replaceFirst(
+                                          'Exception: ',
+                                          '',
+                                        )
+                                      : 'Registration failed',
+                                ),
+                              ),
+                            );
+
+                            return;
+                          }
+
+                          // STEP 2: Update Profile
+                          final profileSuccess = await ref
+                              .read(authControllerProvider.notifier)
+                              .updateProfile(
+                                name: widget.name,
+                                phone: phone,
+                                city: city,
+                                userState: userState,
+                              );
+
+                          if (!mounted) return;
+
+                          if (!profileSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to update profile'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // STEP 3: Go Home
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const HomeScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        } catch (e) {
+                          if (!mounted) return;
+
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(e.toString())));
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFE85D04),
                         foregroundColor: Colors.white,
@@ -199,21 +251,30 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'SAVE CHANGES',
-                            style: GoogleFonts.barlow(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.5,
+                      child: authState.isLoading
+                          ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Complete Profile',
+                                  style: GoogleFonts.barlow(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_outward, size: 18),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.arrow_outward, size: 18),
-                        ],
-                      ),
                     ),
 
                     // ── keyboard padding ──────────────────────

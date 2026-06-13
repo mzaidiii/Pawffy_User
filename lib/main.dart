@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'features/auth/onboardingScreen.dart';
+import 'package:pawffy/features/auth/auth_gate_screen.dart';
 import 'package:device_preview/device_preview.dart';
 
 final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
@@ -45,7 +45,7 @@ class PawffyApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: _lightTheme(),
       darkTheme: _darkTheme(),
-      home: const OnboardingScreen(),
+      home: const AuthGateScreen(),
     );
   }
 }

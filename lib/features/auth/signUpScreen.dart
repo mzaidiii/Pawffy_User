@@ -162,10 +162,50 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     // ── SIGN UP Button ────────────────────────
                     ElevatedButton(
                       onPressed: () {
+                        final name = _nameController.text.trim();
+                        final email = _emailController.text.trim();
+                        final password = _passwordController.text.trim();
+                        final confirmPassword = _confirmPasswordController.text
+                            .trim();
+
+                        if (name.isEmpty ||
+                            email.isEmpty ||
+                            password.isEmpty ||
+                            confirmPassword.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fill all fields'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (password != confirmPassword) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Passwords do not match'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (!_agreeToTerms) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please accept Terms & Conditions'),
+                            ),
+                          );
+                          return;
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ProfileSetupScreen(),
+                            builder: (_) => ProfileSetupScreen(
+                              name: name,
+                              email: email,
+                              password: password,
+                            ),
                           ),
                         );
                       },
