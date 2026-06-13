@@ -63,7 +63,7 @@ class AuthService {
   }) async {
     try {
       final response = await _dio.put(
-        '/api/users/me',
+        ApiConstants.updateMe,
         data: {'name': name, 'phone': phone, 'city': city, 'state': state},
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );

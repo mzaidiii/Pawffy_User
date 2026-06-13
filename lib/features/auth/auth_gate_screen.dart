@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/storage/storage_service.dart';
 import '../home/home_screen.dart';
 import 'onboardingScreen.dart';
 import 'providers/auth_controller.dart';
@@ -22,13 +21,6 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
 
   Future<void> _checkAuth() async {
     try {
-      final token = await StorageService.getToken();
-
-      if (token == null) {
-        _goToOnboarding();
-        return;
-      }
-
       final user = await ref.read(authControllerProvider.notifier).getMe();
 
       if (!mounted) return;
@@ -39,14 +31,10 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
           MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
       } else {
-        await StorageService.clearAll();
         _goToOnboarding();
       }
     } catch (_) {
-      await StorageService.clearAll();
-
       if (!mounted) return;
-
       _goToOnboarding();
     }
   }
