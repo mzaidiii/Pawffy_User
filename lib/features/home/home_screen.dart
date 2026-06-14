@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../core/utils/location_provider.dart';
 import 'widgets/service_grid.dart';
 import 'widgets/provider_card.dart';
@@ -9,6 +10,8 @@ import 'widgets/ad_banner.dart';
 import '../search/search_screen.dart';
 import '../message/message_screen.dart';
 import '../profile/profile_screen.dart';
+import 'package:pawffy/features/vets/providers/vet_controller.dart';
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -19,37 +22,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
-
-  final List<Map<String, dynamic>> _providers = [
-    {
-      'name': 'Happy Paws Sitting',
-      'service': 'Pet Sitting',
-      'distance': '0.8 mi',
-      'price': '\$22/walk',
-      'rating': 4.9,
-    },
-    {
-      'name': 'Furry Friends Care',
-      'service': 'Dog Walking',
-      'distance': '1.2 mi',
-      'price': '\$18/walk',
-      'rating': 4.7,
-    },
-    {
-      'name': 'Paws & Claws',
-      'service': 'Grooming',
-      'distance': '2.0 mi',
-      'price': '\$35/session',
-      'rating': 4.8,
-    },
-    {
-      'name': 'The Pet Trainer',
-      'service': 'Training',
-      'distance': '1.5 mi',
-      'price': '\$50/hr',
-      'rating': 4.6,
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -133,31 +105,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).scaffoldBackgroundColor,
+                                  color: Theme.of(context).colorScheme.surface,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                      blurRadius: 8,
+                                      color: Colors.black.withOpacity(0.08),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.notifications_outlined,
-                                  color: Color.fromARGB(221, 233, 228, 228),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                   size: 20,
                                 ),
                               ),
                               Positioned(
-                                top: 6,
-                                right: 6,
+                                top: 8,
+                                right: 8,
                                 child: Container(
-                                  width: 9,
-                                  height: 9,
+                                  width: 8,
+                                  height: 8,
                                   decoration: const BoxDecoration(
                                     color: Color(0xFFE85D04),
                                     shape: BoxShape.circle,
@@ -180,15 +151,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      Text(
-                        'AMIT PATEL',
-                        style: GoogleFonts.barlow(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      ref
+                          .watch(currentUserProvider)
+                          .when(
+                            data: (user) => Text(
+                              (user?.name ?? 'there').toUpperCase(),
+                              style: GoogleFonts.barlow(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            loading: () => Container(
+                              height: 32,
+                              width: 160,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            error: (_, __) => Text(
+                              'THERE',
+                              style: GoogleFonts.barlow(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
 
                       const SizedBox(height: 18),
 
@@ -396,6 +387,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildNearbyProviders() {
+    final vetsAsync = ref.watch(vetControllerProvider);
+
     return Column(
       children: [
         Row(
@@ -424,23 +417,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         const SizedBox(height: 14),
-        SizedBox(
-          height: 230,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: _providers.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final p = _providers[index];
-              return ProviderCard(
-                name: p['name'],
-                service: p['service'],
-                distance: p['distance'],
-                price: p['price'],
-                rating: p['rating'],
-              );
-            },
+        vetsAsync.when(
+          loading: () => const SizedBox(
+            height: 230,
+            child: Center(child: CircularProgressIndicator()),
           ),
+          error: (e, _) => SizedBox(
+            height: 230,
+            child: Center(
+              child: Text(
+                'Could not load providers',
+                style: GoogleFonts.barlow(color: Colors.grey),
+              ),
+            ),
+          ),
+          data: (vets) {
+            if (vets.isEmpty) {
+              return SizedBox(
+                height: 230,
+                child: Center(
+                  child: Text(
+                    'No providers available yet',
+                    style: GoogleFonts.barlow(color: Colors.grey),
+                  ),
+                ),
+              );
+            }
+            return SizedBox(
+              height: 230,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: vets.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final vet = vets[index];
+                  return ProviderCard(
+                    name: vet.clinicName,
+                    service: vet.specialization,
+                    location: '${vet.city}, ${vet.state}',
+                    price: '\$${vet.consultationFee}',
+                    rating: vet.rating,
+                  );
+                },
+              ),
+            );
+          },
         ),
       ],
     );

@@ -4,17 +4,17 @@ import 'package:google_fonts/google_fonts.dart';
 class ProviderCard extends StatefulWidget {
   final String name;
   final String service;
-  final String distance;
+  final String location;
   final String price;
-  final double rating;
+  final double? rating;
 
   const ProviderCard({
     super.key,
     required this.name,
     required this.service,
-    required this.distance,
+    required this.location,
     required this.price,
-    required this.rating,
+    this.rating,
   });
 
   @override
@@ -88,7 +88,9 @@ class _ProviderCardState extends State<ProviderCard> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          widget.rating.toString(),
+                          widget.rating != null
+                              ? widget.rating!.toStringAsFixed(1)
+                              : 'New',
                           style: GoogleFonts.barlow(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -168,7 +170,7 @@ class _ProviderCardState extends State<ProviderCard> {
                       ),
                       const SizedBox(width: 2),
                       Text(
-                        widget.distance,
+                        widget.location,
                         style: GoogleFonts.barlow(
                           fontSize: 11,
                           color: const Color(0xFF888888),
