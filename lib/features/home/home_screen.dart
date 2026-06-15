@@ -12,6 +12,8 @@ import '../message/message_screen.dart';
 import '../profile/profile_screen.dart';
 import 'package:pawffy/features/vets/providers/vet_controller.dart';
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
+import 'package:pawffy/features/notification/notification_screen.dart';
+import 'package:pawffy/features/notification/provider/notification_controller.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -99,43 +101,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
 
                           // notification bell
-                          Stack(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.08),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.notifications_outlined,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                  size: 20,
-                                ),
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const NotificationScreen(),
                               ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFE85D04),
+                            ),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
                                     shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.08),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.notifications_outlined,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    size: 20,
                                   ),
                                 ),
-                              ),
-                            ],
+
+                                // Unread dot — only shows when unread count > 0
+                                if (ref.watch(unreadCountProvider) > 0)
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFE85D04),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
