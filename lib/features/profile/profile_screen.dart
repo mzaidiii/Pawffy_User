@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pawffy/features/profile/address/address_screen.dart';
-import 'package:pawffy/features/profile/settings/settings_screen.dart';
-import 'package:pawffy/features/profile/settings/support/help_support_screen.dart';
+import 'package:pawffy/features/pets/pets_screen.dart';
+import 'package:pawffy/features/pets/providers/pet_controller.dart';
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+import 'address/address_screen.dart';
+import 'settings/settings_screen.dart';
+import 'settings/support/help_support_screen.dart';
+
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final userAsync = ref.watch(currentUserProvider);
+    final petsAsync = ref.watch(petControllerProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -68,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-
+                        // Notification bell (already wired in home, can keep placeholder)
                         Stack(
                           children: [
                             Container(
@@ -112,7 +119,7 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Profile Info
+              // Profile Info (Dynamic)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -159,7 +166,6 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(width: 16),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,18 +173,19 @@ class ProfileScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Amit Patel',
-                                style: GoogleFonts.barlow(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
+                              userAsync.when(
+                                data: (user) => Text(
+                                  user?.name ?? 'Pet Parent',
+                                  style: GoogleFonts.barlow(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
+                                loading: () => const Text('Loading...'),
+                                error: (_, __) => const Text('Pet Parent'),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {}, // TODO: Edit Profile
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -218,45 +225,20 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'amit.patel@gmail.com',
-                            style: GoogleFonts.barlow(
-                              fontSize: 12,
-                              color: isDark
-                                  ? Colors.white70
-                                  : const Color(0xFF888888),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '+1 234 567 8900',
-                            style: GoogleFonts.barlow(
-                              fontSize: 12,
-                              color: isDark
-                                  ? Colors.white70
-                                  : const Color(0xFF888888),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.location_on_outlined,
-                                size: 13,
-                                color: Color(0xFF888888),
+                          userAsync.when(
+                            data: (user) => Text(
+                              user?.email ?? '',
+                              style: GoogleFonts.barlow(
+                                fontSize: 12,
+                                color: isDark
+                                    ? Colors.white70
+                                    : const Color(0xFF888888),
                               ),
-                              const SizedBox(width: 3),
-                              Text(
-                                'New York, USA',
-                                style: GoogleFonts.barlow(
-                                  fontSize: 12,
-                                  color: isDark
-                                      ? Colors.white70
-                                      : const Color(0xFF888888),
-                                ),
-                              ),
-                            ],
+                            ),
+                            loading: () => const SizedBox(),
+                            error: (_, __) => const SizedBox(),
                           ),
+                          // Add phone/location if available later
                         ],
                       ),
                     ),
@@ -266,81 +248,69 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // My Pets
+              // === MY PETS SECTION ===
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  'My Pets',
-                  style: GoogleFonts.barlow(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              SizedBox(
-                height: 130,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Text(
+                      'My Pets',
+                      style: GoogleFonts.barlow(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 110,
-                        margin: const EdgeInsets.only(right: 12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF444444)
-                                : const Color(0xFFDDDDDD),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE85D04).withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.add_rounded,
-                                color: Color(0xFFE85D04),
-                                size: 22,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Add your\nPet',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.barlow(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? Colors.white70
-                                    : const Color(0xFF888888),
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PetsScreen()),
+                      ),
+                      child: Text(
+                        'See All',
+                        style: GoogleFonts.barlow(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFFE85D04),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 24),
+              SizedBox(
+                height: 138,
+                child: petsAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (_, __) =>
+                      const Center(child: Text('Failed to load pets')),
+                  data: (pets) {
+                    if (pets.isEmpty) {
+                      return _buildAddPetCard(context);
+                    }
 
-              // Menu Items
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: pets.length + 1, // +1 for Add button
+                      itemBuilder: (context, index) {
+                        if (index == pets.length) {
+                          return _buildAddPetCard(context);
+                        }
+                        final pet = pets[index];
+                        return _buildPetCard(context, pet);
+                      },
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // Rest of your menu items (unchanged)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
@@ -376,14 +346,12 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.location_on_outlined,
                         title: 'Addresses',
                         subtitle: 'Manage your saved addresses',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AddressScreen(),
-                            ),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddressScreen(),
+                          ),
+                        ),
                         showDivider: true,
                       ),
                       _buildMenuItem(
@@ -391,14 +359,12 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.settings_outlined,
                         title: 'Settings',
                         subtitle: 'Notification, Privacy and more',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const SettingsScreen(),
-                            ),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SettingsScreen(),
+                          ),
+                        ),
                         showDivider: true,
                       ),
                       _buildMenuItem(
@@ -406,106 +372,13 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.headset_mic_outlined,
                         title: 'Help and Support',
                         subtitle: 'Get help and contact support',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (ctx) => HelpSupportScreen(),
-                            ),
-                          );
-                        },
-                        showDivider: false,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Recent Bookings
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Recent Bookings',
-                              style: GoogleFonts.barlow(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {},
-                              child: Text(
-                                'View all',
-                                style: GoogleFonts.barlow(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFFE85D04),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Divider(height: 1, color: Color(0xFFEEEEEE)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 36),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                size: 40,
-                                color: isDark
-                                    ? Colors.white38
-                                    : Colors.grey.withOpacity(0.4),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'No bookings yet',
-                                style: GoogleFonts.barlow(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: isDark
-                                      ? Colors.white70
-                                      : Colors.black54,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Your recent bookings will appear here',
-                                style: GoogleFonts.barlow(
-                                  fontSize: 12,
-                                  color: isDark
-                                      ? Colors.white60
-                                      : const Color(0xFF888888),
-                                ),
-                              ),
-                            ],
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HelpSupportScreen(),
                           ),
                         ),
+                        showDivider: false,
                       ),
                     ],
                   ),
@@ -520,7 +393,99 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Fixed: Passing context as parameter
+  Widget _buildAddPetCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const PetsScreen()),
+      ),
+      child: Container(
+        width: 110,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE85D04).withOpacity(0.3)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE85D04).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: Color(0xFFE85D04),
+                size: 22,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add your\nPet',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.barlow(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPetCard(BuildContext context, dynamic pet) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PetsScreen()),
+      ), // Will open list, can improve later to direct detail
+      child: Container(
+        width: 110,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE85D04).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.pets, color: Color(0xFFE85D04), size: 26),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              pet.name,
+              style: GoogleFonts.barlow(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              pet.species,
+              style: GoogleFonts.barlow(fontSize: 11, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Keep your existing _buildMenuItem method unchanged
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
@@ -565,7 +530,6 @@ class ProfileScreen extends StatelessWidget {
                         style: GoogleFonts.barlow(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 2),
