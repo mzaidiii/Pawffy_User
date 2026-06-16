@@ -3,7 +3,6 @@ import 'package:pawffy/core/networks/dio_client.dart';
 import 'package:pawffy/core/networks/api_constants.dart';
 import 'package:pawffy/core/storage/storage_service.dart';
 import '../models/notification_model.dart';
-import 'package:flutter/material.dart';
 
 class NotificationService {
   final Dio _dio = DioClient.dio;
@@ -16,7 +15,6 @@ class NotificationService {
   Future<List<NotificationModel>> getNotifications({bool? unreadOnly}) async {
     try {
       final token = await StorageService.getToken();
-      debugPrint('TOKEN: $token');
 
       final response = await _dio.get(
         ApiConstants.notifications,
@@ -24,12 +22,9 @@ class NotificationService {
         options: await _authHeader,
       );
 
-      debugPrint('NOTIF RESPONSE: ${response.data}');
-
       final List<dynamic> data = response.data['data'];
       return data.map((json) => NotificationModel.fromJson(json)).toList();
     } on DioException catch (e) {
-      debugPrint('NOTIF ERROR: ${e.response?.data}');
       throw Exception(
         e.response?.data['message'] ?? 'Failed to fetch notifications',
       );
