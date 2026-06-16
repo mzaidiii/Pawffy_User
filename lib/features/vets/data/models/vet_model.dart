@@ -12,6 +12,9 @@ class VetModel {
   final bool availableStatus;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? clinicAddress;
+  final String? clinicCity;
+  final String? phone;
 
   VetModel({
     required this.id,
@@ -27,6 +30,9 @@ class VetModel {
     required this.availableStatus,
     required this.createdAt,
     required this.updatedAt,
+    this.clinicAddress,
+    this.clinicCity,
+    this.phone,
   });
 
   factory VetModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +49,9 @@ class VetModel {
           : null,
       city: json['city'] ?? '',
       state: json['state'] ?? '',
+      clinicAddress: json['clinicAddress'],
+      clinicCity: json['clinicCity'],
+      phone: json['phone'],
       availableStatus: json['availableStatus'] ?? false,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
