@@ -23,6 +23,8 @@ class ApiConstants {
   static const String vets = '/api/vets';
   static String vetById(String id) => '/api/vets/$id';
   static String vetAvailability(String id) => '/api/vets/$id/availability';
+  static String vetSlots(String id) => '/api/vets/$id/slots';
+  static String vetServices(String id) => '/api/vets/$id/services';
   static String vetReviews(String id) => '/api/vets/$id/reviews';
 
   // ── Bookings ──────────────────────────────────────
@@ -33,10 +35,17 @@ class ApiConstants {
   // ── Messages ──────────────────────────────────────
   static const String conversations = '/api/messages/conversations';
   static const String sendMessage = '/api/messages';
+  static String startChat(String receiverId) =>
+      '/api/messages/conversation/with/$receiverId';
   static String messagesByConversation(String id) => '/api/messages/$id';
+  static String markConversationRead(String id) => '/api/messages/$id/read';
 
   // ── Payments ──────────────────────────────────────
-  static const String createCheckout = '/api/payments/checkout';
+  static const String createPaymentIntent = '/api/payments/create-intent';
+  static const String confirmWalletPayment = '/api/payments/confirm';
+  static const String verifyStripePayment = '/api/payments/verify';
+  static const String applyCoupon = '/api/payments/apply-coupon';
+  static String paymentSummary(String id) => '/api/payments/summary/$id';
   static String paymentByBooking(String id) => '/api/payments/booking/$id';
 
   // ── Medical Records ───────────────────────────────
