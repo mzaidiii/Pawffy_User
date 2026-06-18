@@ -7,6 +7,7 @@ class ProviderCard extends StatefulWidget {
   final String location;
   final String price;
   final double? rating;
+  final VoidCallback? onTap; // ← added
 
   const ProviderCard({
     super.key,
@@ -15,6 +16,7 @@ class ProviderCard extends StatefulWidget {
     required this.location,
     required this.price,
     this.rating,
+    this.onTap, // ← added
   });
 
   @override
@@ -27,7 +29,7 @@ class _ProviderCardState extends State<ProviderCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: widget.onTap, // ← wired
       borderRadius: BorderRadius.circular(16),
       child: Container(
         width: 160,
@@ -48,13 +50,12 @@ class _ProviderCardState extends State<ProviderCard> {
             // ── Image Placeholder + badges ──────────────
             Stack(
               children: [
-                // image placeholder
                 Container(
                   height: 120,
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE0E0E0),
-                    borderRadius: const BorderRadius.only(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE0E0E0),
+                    borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                     ),
@@ -66,7 +67,7 @@ class _ProviderCardState extends State<ProviderCard> {
                   ),
                 ),
 
-                // ── Rating badge top left ───────────────
+                // Rating badge
                 Positioned(
                   top: 8,
                   left: 8,
@@ -102,7 +103,7 @@ class _ProviderCardState extends State<ProviderCard> {
                   ),
                 ),
 
-                // ── Heart icon top right ────────────────
+                // Heart icon
                 Positioned(
                   top: 6,
                   right: 6,
@@ -111,7 +112,7 @@ class _ProviderCardState extends State<ProviderCard> {
                     child: Container(
                       width: 28,
                       height: 28,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
@@ -136,7 +137,6 @@ class _ProviderCardState extends State<ProviderCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // name
                   Text(
                     widget.name,
                     style: GoogleFonts.barlow(
@@ -148,19 +148,14 @@ class _ProviderCardState extends State<ProviderCard> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
-
-                  // service type
                   Text(
                     widget.service,
                     style: GoogleFonts.barlow(
                       fontSize: 11,
-                      fontWeight: FontWeight.w400,
                       color: const Color(0xFF888888),
                     ),
                   ),
                   const SizedBox(height: 2),
-
-                  // distance
                   Row(
                     children: [
                       const Icon(
@@ -179,8 +174,6 @@ class _ProviderCardState extends State<ProviderCard> {
                     ],
                   ),
                   const SizedBox(height: 6),
-
-                  // price
                   Text(
                     widget.price,
                     style: GoogleFonts.barlow(
