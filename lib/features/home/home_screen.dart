@@ -14,6 +14,8 @@ import 'package:pawffy/features/vets/providers/vet_controller.dart';
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 import 'package:pawffy/features/notification/notification_screen.dart';
 import 'package:pawffy/features/notification/provider/notification_controller.dart';
+import 'package:pawffy/features/vets/vet_list_screen.dart';
+import 'package:pawffy/features/vets/vet_detail_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -259,7 +261,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(height: 24),
 
                       // ── Popular Services ───────────────
-                      ServiceGrid(onSeeAll: () {}),
+                      ServiceGrid(
+                        onSeeAll: () {},
+                        onServiceTap: (service) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => VetListScreen(
+                                serviceType: service.serviceType,
+                                serviceLabel: service.label,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
 
                       const SizedBox(height: 24),
 
@@ -472,6 +487,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     location: '${vet.city}, ${vet.state}',
                     price: '\$${vet.consultationFee}',
                     rating: vet.rating,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => VetDetailScreen(
+                          vetId: vet.id,
+                          heroClinicName: vet.clinicName,
+                        ),
+                      ),
+                    ),
                   );
                 },
               ),
