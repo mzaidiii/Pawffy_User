@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'data/models/pet_model.dart';
 import 'providers/pet_controller.dart';
 import 'widgets/add_edit_pet_sheet.dart';
@@ -14,9 +16,50 @@ class PetDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
+  bool _isLoading = false;
+
+  Future<void> _pickAndUploadImage(String petId) async {
+    final source = await ImagePickerHelper.showSourceBottomSheet(context);
+    if (source == null) return;
+    if (!mounted) return;
+
+    final pickedFile = await ImagePickerHelper.pickImageWithPermission(
+      context: context,
+      source: source,
+    );
+
+    if (pickedFile != null) {
+      setState(() => _isLoading = true);
+      final updatedPet = await ref
+          .read(petControllerProvider.notifier)
+          .uploadPetImage(petId, pickedFile.path);
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              updatedPet != null
+                  ? 'Pet image updated successfully!'
+                  : 'Failed to upload pet image.',
+              style: GoogleFonts.barlow(),
+            ),
+            backgroundColor: updatedPet != null ? Colors.green : Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pet = widget.pet; // we'll refresh if needed later
+    final petsAsync = ref.watch(petControllerProvider);
+    final pet = petsAsync.asData?.value.firstWhere(
+          (p) => p.id == widget.pet.id,
+          orElse: () => widget.pet,
+        ) ??
+        widget.pet;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -63,18 +106,64 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
           children: [
             // Hero image / icon
             Center(
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE85D04).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _iconForSpecies(pet.species),
-                  size: 60,
-                  color: const Color(0xFFE85D04),
-                ),
+              child: Stack(
+                children: [
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE85D04).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                      image: pet.imageUrl != null && pet.imageUrl!.isNotEmpty
+                          ? DecorationImage(
+                              image: ImagePickerHelper.getImageProvider(pet.imageUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: pet.imageUrl == null || pet.imageUrl!.isEmpty
+                        ? Icon(
+                            _iconForSpecies(pet.species),
+                            size: 60,
+                            color: const Color(0xFFE85D04),
+                          )
+                        : null,
+                  ),
+                  if (_isLoading)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.black26,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFE85D04),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: () => _pickAndUploadImage(pet.id),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFE85D04),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt_outlined,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),
