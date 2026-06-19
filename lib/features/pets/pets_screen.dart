@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'providers/pet_controller.dart';
 import 'data/models/pet_model.dart';
 import 'widgets/add_edit_pet_sheet.dart';
@@ -168,12 +170,20 @@ class _PetCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFE85D04).withOpacity(0.1),
                 shape: BoxShape.circle,
+                image: pet.imageUrl != null && pet.imageUrl!.isNotEmpty
+                    ? DecorationImage(
+                        image: ImagePickerHelper.getImageProvider(pet.imageUrl!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              child: Icon(
-                _iconForSpecies(pet.species),
-                color: const Color(0xFFE85D04),
-                size: 28,
-              ),
+              child: pet.imageUrl == null || pet.imageUrl!.isEmpty
+                  ? Icon(
+                      _iconForSpecies(pet.species),
+                      color: const Color(0xFFE85D04),
+                      size: 28,
+                    )
+                  : null,
             ),
             const SizedBox(width: 14),
 
