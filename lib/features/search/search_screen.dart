@@ -1,91 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/main.dart';
+import 'package:pawffy/features/vets/data/models/vet_model.dart';
+import 'package:pawffy/features/vets/vet_detail_screen.dart';
+import 'providers/search_controller.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
-
-  final List<Map<String, dynamic>> _allProviders = [
-    {
-      'name': 'Happy Paws Sitting',
-      'service': 'Pet Sitting',
-      'icon': Icons.home_outlined,
-      'rating': 4.9,
-      'distance': '0.8 mi',
-      'price': '\$22/walk',
-      'available': true,
-    },
-    {
-      'name': 'Furry Friends Care',
-      'service': 'Dog Walking',
-      'icon': Icons.directions_walk,
-      'rating': 4.7,
-      'distance': '1.2 mi',
-      'price': '\$18/walk',
-      'available': true,
-    },
-    {
-      'name': 'Pawfection Grooming',
-      'service': 'Grooming',
-      'icon': Icons.content_cut_outlined,
-      'rating': 4.8,
-      'distance': '2.0 mi',
-      'price': '\$35/session',
-      'available': false,
-    },
-    {
-      'name': 'The Pet Trainer',
-      'service': 'Training',
-      'icon': Icons.fitness_center_outlined,
-      'rating': 4.6,
-      'distance': '1.5 mi',
-      'price': '\$50/hr',
-      'available': true,
-    },
-    {
-      'name': 'City Vet Clinic',
-      'service': 'Vet',
-      'icon': Icons.medical_services_outlined,
-      'rating': 4.9,
-      'distance': '3.1 mi',
-      'price': '\$40/visit',
-      'available': false,
-    },
-    {
-      'name': 'Cozy Pet Boarding',
-      'service': 'Boarding',
-      'icon': Icons.night_shelter_outlined,
-      'rating': 4.5,
-      'distance': '2.8 mi',
-      'price': '\$60/night',
-      'available': true,
-    },
-    {
-      'name': 'QuickPaws Transport',
-      'service': 'Transport',
-      'icon': Icons.directions_car_outlined,
-      'rating': 4.3,
-      'distance': '1.9 mi',
-      'price': '\$25/trip',
-      'available': false,
-    },
-    {
-      'name': 'Buddy\'s Pet Care',
-      'service': 'Pet Sitting',
-      'icon': Icons.home_outlined,
-      'rating': 4.7,
-      'distance': '0.5 mi',
-      'price': '\$20/walk',
-      'available': true,
-    },
-  ];
 
   final List<String> _filters = [
     'All',
@@ -99,32 +29,76 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
   String _selectedFilter = 'All';
 
-  List<Map<String, dynamic>> get _filteredProviders {
-    return _allProviders.where((p) {
-      final matchesSearch =
-          p['name'].toString().toLowerCase().contains(
-            _searchQuery.toLowerCase(),
-          ) ||
-          p['service'].toString().toLowerCase().contains(
-            _searchQuery.toLowerCase(),
-          );
-
-      final matchesFilter =
-          _selectedFilter == 'All' || p['service'] == _selectedFilter;
-
-      return matchesSearch && matchesFilter;
-    }).toList();
-  }
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
 
+  void _onSearchChanged(String val) {
+    setState(() {
+      _searchQuery = val;
+    });
+    ref
+        .read(searchControllerProvider.notifier)
+        .updateSearch(val, _selectedFilter);
+  }
+
+  void _onFilterChanged(String filter) {
+    setState(() {
+      _selectedFilter = filter;
+    });
+    ref
+        .read(searchControllerProvider.notifier)
+        .updateSearch(_searchQuery, filter);
+  }
+
+  IconData _iconForService(String serviceType) {
+    switch (serviceType.toLowerCase()) {
+      case 'groomer':
+        return Icons.content_cut_outlined;
+      case 'walker':
+        return Icons.directions_walk_rounded;
+      case 'trainer':
+        return Icons.fitness_center_outlined;
+      case 'sitter':
+        return Icons.home_outlined;
+      case 'poop_scooper':
+        return Icons.cleaning_services_outlined;
+      case 'boarding':
+        return Icons.night_shelter_outlined;
+      case 'transport':
+        return Icons.directions_car_outlined;
+      default:
+        return Icons.medical_services_outlined;
+    }
+  }
+
+  String _friendlyServiceLabel(String serviceType) {
+    switch (serviceType.toLowerCase()) {
+      case 'groomer':
+        return 'Groomer';
+      case 'walker':
+        return 'Dog Walker';
+      case 'trainer':
+        return 'Trainer';
+      case 'sitter':
+        return 'Pet Sitter';
+      case 'poop_scooper':
+        return 'Scooper';
+      case 'boarding':
+        return 'Boarding';
+      case 'transport':
+        return 'Transport';
+      default:
+        return 'Vet Care';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final searchState = ref.watch(searchControllerProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -145,11 +119,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
+                        color: isDark ? AppColors.darkCard : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.07),
+                            color: Colors.black.withValues(alpha: 0.07),
                             blurRadius: 8,
                           ),
                         ],
@@ -183,11 +157,11 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
+                  color: isDark ? AppColors.darkCard : Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -196,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: TextField(
                   controller: _searchController,
                   autofocus: true,
-                  onChanged: (val) => setState(() => _searchQuery = val),
+                  onChanged: _onSearchChanged,
                   style: GoogleFonts.barlow(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
@@ -216,7 +190,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ? GestureDetector(
                             onTap: () {
                               _searchController.clear();
-                              setState(() => _searchQuery = '');
+                              _onSearchChanged('');
                             },
                             child: Icon(
                               Icons.close_rounded,
@@ -228,7 +202,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           )
                         : null,
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: isDark ? AppColors.darkCard : Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
@@ -236,7 +210,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: const BorderSide(
-                        color: Color(0xFFE85D04),
+                        color: AppColors.orange,
                         width: 1.5,
                       ),
                     ),
@@ -259,7 +233,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   final filter = _filters[index];
                   final isSelected = _selectedFilter == filter;
                   return GestureDetector(
-                    onTap: () => setState(() => _selectedFilter = filter),
+                    onTap: () => _onFilterChanged(filter),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -267,12 +241,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFE85D04)
-                            : Theme.of(context).cardColor,
+                            ? AppColors.orange
+                            : (isDark ? AppColors.darkCard : Colors.white),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
+                            color: Colors.black.withValues(alpha: 0.06),
                             blurRadius: 6,
                           ),
                         ],
@@ -297,33 +271,89 @@ class _SearchScreenState extends State<SearchScreen> {
 
             const SizedBox(height: 16),
 
-            // Results count
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                '${_filteredProviders.length} providers found',
-                style: GoogleFonts.barlow(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white70 : const Color(0xFF888888),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // Provider List
+            // Results count & Dynamic Body
             Expanded(
-              child: _filteredProviders.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _filteredProviders.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return _buildProviderCard(_filteredProviders[index]);
-                      },
+              child: searchState.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.orange),
+                ),
+                error: (err, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: AppColors.error,
+                          size: 44,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Error loading search results',
+                          style: GoogleFonts.barlow(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          err.toString(),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.barlow(
+                            fontSize: 13,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => ref
+                              .read(searchControllerProvider.notifier)
+                              .retry(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+                data: (vets) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          '${vets.length} provider${vets.length != 1 ? 's' : ''} found',
+                          style: GoogleFonts.barlow(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? Colors.white70
+                                : const Color(0xFF888888),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: vets.isEmpty
+                            ? _buildEmptyState()
+                            : ListView.separated(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                itemCount: vets.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 12),
+                                itemBuilder: (context, index) {
+                                  return _buildProviderCard(vets[index]);
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -331,21 +361,28 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildProviderCard(Map<String, dynamic> provider) {
-    final bool isAvailable = provider['available'] as bool;
+  Widget _buildProviderCard(VetModel provider) {
+    final bool isAvailable = provider.availableStatus;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VetDetailScreen(vetId: provider.id),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: isDark ? AppColors.darkCard : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -358,14 +395,26 @@ class _SearchScreenState extends State<SearchScreen> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: const Color(0xFFE85D04).withOpacity(0.1),
+                color: AppColors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
+                image:
+                    provider.profileImage != null &&
+                        provider.profileImage!.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(provider.profileImage!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              child: Icon(
-                provider['icon'] as IconData,
-                color: const Color(0xFFE85D04),
-                size: 26,
-              ),
+              child:
+                  provider.profileImage == null ||
+                      provider.profileImage!.isEmpty
+                  ? Icon(
+                      _iconForService(provider.serviceType),
+                      color: AppColors.orange,
+                      size: 26,
+                    )
+                  : null,
             ),
             const SizedBox(width: 14),
 
@@ -374,7 +423,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    provider['name'],
+                    provider.name,
                     style: GoogleFonts.barlow(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -383,7 +432,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    provider['service'],
+                    _friendlyServiceLabel(provider.serviceType),
                     style: GoogleFonts.barlow(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
@@ -401,7 +450,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        provider['rating'].toString(),
+                        provider.rating != null
+                            ? provider.rating!.toStringAsFixed(1)
+                            : 'New',
                         style: GoogleFonts.barlow(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -417,13 +468,16 @@ class _SearchScreenState extends State<SearchScreen> {
                             : const Color(0xFF888888),
                       ),
                       const SizedBox(width: 2),
-                      Text(
-                        provider['distance'],
-                        style: GoogleFonts.barlow(
-                          fontSize: 12,
-                          color: isDark
-                              ? Colors.white60
-                              : const Color(0xFF888888),
+                      Expanded(
+                        child: Text(
+                          '${provider.city}, ${provider.state}',
+                          style: GoogleFonts.barlow(
+                            fontSize: 12,
+                            color: isDark
+                                ? Colors.white60
+                                : const Color(0xFF888888),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -434,11 +488,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        provider['price'],
+                        '\$${provider.consultationFee}',
                         style: GoogleFonts.barlow(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFFE85D04),
+                          color: AppColors.orange,
                         ),
                       ),
                       Container(
@@ -448,12 +502,12 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isAvailable
-                              ? const Color(0xFF22C55E).withOpacity(0.12)
+                              ? const Color(0xFF22C55E).withValues(alpha: 0.12)
                               : (isDark
                                     ? Colors.white10
                                     : const Color(
                                         0xFF888888,
-                                      ).withOpacity(0.12)),
+                                      ).withValues(alpha: 0.12)),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isAvailable
@@ -516,7 +570,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Icon(
             Icons.search_off_rounded,
             size: 60,
-            color: isDark ? Colors.white38 : Colors.grey.withOpacity(0.4),
+            color: isDark ? Colors.white38 : Colors.grey.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 16),
           Text(
