@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 import '../providers/pet_controller.dart';
 import '../data/models/pet_model.dart';
 
@@ -38,6 +41,8 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
     'Unknown',
   ];
 
+  String? _localImagePath;
+
   bool get _isEditMode => widget.pet != null;
 
   @override
@@ -71,6 +76,23 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final source = await ImagePickerHelper.showSourceBottomSheet(context);
+    if (source == null) return;
+    if (!mounted) return;
+
+    final pickedFile = await ImagePickerHelper.pickImageWithPermission(
+      context: context,
+      source: source,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _localImagePath = pickedFile.path;
+      });
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -95,12 +117,32 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
       final updated = await ref
           .read(petControllerProvider.notifier)
           .updatePet(widget.pet!.id, body);
-      success = updated != null;
+      
+      if (updated != null) {
+        if (_localImagePath != null) {
+          final updatedWithImage = await ref
+              .read(petControllerProvider.notifier)
+              .uploadPetImage(widget.pet!.id, _localImagePath!);
+          success = updatedWithImage != null;
+        } else {
+          success = true;
+        }
+      }
     } else {
       final created = await ref
           .read(petControllerProvider.notifier)
           .createPet(body);
-      success = created != null;
+      
+      if (created != null) {
+        if (_localImagePath != null) {
+          final updatedWithImage = await ref
+              .read(petControllerProvider.notifier)
+              .uploadPetImage(created.id, _localImagePath!);
+          success = updatedWithImage != null;
+        } else {
+          success = true;
+        }
+      }
     }
 
     if (!mounted) return;
@@ -176,6 +218,66 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
                   fontWeight: FontWeight.w800,
                   color: Theme.of(context).colorScheme.onSurface,
                   letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Image Picker Area
+              Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE85D04).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                        image: _localImagePath != null
+                            ? DecorationImage(
+                                image: FileImage(File(_localImagePath!)),
+                                fit: BoxFit.cover,
+                              )
+                            : (widget.pet?.imageUrl != null &&
+                                    widget.pet!.imageUrl!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: ImagePickerHelper.getImageProvider(
+                                        widget.pet!.imageUrl!,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                : null),
+                      ),
+                      child: _localImagePath == null &&
+                              (widget.pet?.imageUrl == null ||
+                                  widget.pet!.imageUrl!.isEmpty)
+                          ? const Icon(
+                              Icons.pets_rounded,
+                              size: 50,
+                              color: Color(0xFFE85D04),
+                            )
+                          : null,
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE85D04),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt_outlined,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
