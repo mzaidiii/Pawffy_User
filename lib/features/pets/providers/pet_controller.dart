@@ -65,4 +65,19 @@ class PetController extends AsyncNotifier<List<PetModel>> {
       return false;
     }
   }
+
+  Future<PetModel?> uploadPetImage(String petId, String filePath) async {
+    try {
+      final service = ref.read(petServiceProvider);
+      final updated = await service.uploadPetImage(petId, filePath);
+
+      // Replace locally
+      state = AsyncData(
+        state.value!.map((p) => p.id == petId ? updated : p).toList(),
+      );
+      return updated;
+    } catch (e) {
+      return null;
+    }
+  }
 }

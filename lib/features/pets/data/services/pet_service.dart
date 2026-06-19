@@ -84,4 +84,33 @@ class PetService {
       throw Exception(e.response?.data['message'] ?? 'Failed to delete pet');
     }
   }
+
+  // POST /api/pets/:petId/image
+  Future<PetModel> uploadPetImage(String petId, String filePath) async {
+    try {
+      final formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+      });
+
+      final authOpts = await _authHeader;
+      final Map<String, dynamic> headers = Map<String, dynamic>.from(authOpts.headers ?? {});
+      headers['Content-Type'] = 'multipart/form-data';
+
+      final response = await _dio.post(
+        ApiConstants.uploadPetImage(petId),
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      return PetModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      debugPrint('UPLOAD PET IMAGE ERROR: ${e.response?.data}');
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to upload pet image',
+      );
+    }
+  }
 }
