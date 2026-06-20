@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pawffy/features/pets/pets_screen.dart';
+import 'package:pawffy/features/pets/pet_detail_screen.dart';
 import 'package:pawffy/features/pets/providers/pet_controller.dart';
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 
 import 'address/address_screen.dart';
 import 'settings/settings_screen.dart';
 import 'settings/support/help_support_screen.dart';
+import 'settings/accounts/personal_information_screen.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -16,6 +19,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.asData?.value;
     final petsAsync = ref.watch(petControllerProvider);
 
     return Scaffold(
@@ -125,45 +129,67 @@ class ProfileScreen extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Stack(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isDark
-                                ? const Color(0xFF3A3A3A)
-                                : const Color(0xFFE0E0E0),
-                            border: Border.all(
-                              color: const Color(0xFFE85D04),
-                              width: 2,
-                            ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PersonalInformationScreen(),
                           ),
-                          child: const Icon(
-                            Icons.person_outline,
-                            color: Colors.grey,
-                            size: 36,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 26,
-                            height: 26,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFE85D04),
+                        );
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
+                              color: isDark
+                                  ? const Color(0xFF3A3A3A)
+                                  : const Color(0xFFE0E0E0),
+                              border: Border.all(
+                                color: const Color(0xFFE85D04),
+                                width: 2,
+                              ),
+                              image: user?.profileImage != null &&
+                                      user!.profileImage!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: ImagePickerHelper.getImageProvider(
+                                        user.profileImage!,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
                             ),
-                            child: const Icon(
-                              Icons.camera_alt_outlined,
-                              color: Colors.white,
-                              size: 14,
+                            child: user?.profileImage == null ||
+                                    user!.profileImage!.isEmpty
+                                ? const Icon(
+                                    Icons.person_outline,
+                                    color: Colors.grey,
+                                    size: 36,
+                                  )
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              width: 26,
+                              height: 26,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFE85D04),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt_outlined,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -173,19 +199,31 @@ class ProfileScreen extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              userAsync.when(
-                                data: (user) => Text(
-                                  user?.name ?? 'Pet Parent',
-                                  style: GoogleFonts.barlow(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
+                              Expanded(
+                                child: userAsync.when(
+                                  data: (user) => Text(
+                                    user?.name ?? 'Pet Parent',
+                                    style: GoogleFonts.barlow(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                  loading: () => const Text('Loading...'),
+                                  error: (_, __) => const Text('Pet Parent'),
                                 ),
-                                loading: () => const Text('Loading...'),
-                                error: (_, __) => const Text('Pet Parent'),
                               ),
+                              const SizedBox(width: 8),
                               GestureDetector(
-                                onTap: () {}, // TODO: Edit Profile
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const PersonalInformationScreen(),
+                                    ),
+                                  );
+                                },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -443,8 +481,8 @@ class ProfileScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => PetsScreen()),
-      ), // Will open list, can improve later to direct detail
+        MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
+      ),
       child: Container(
         width: 110,
         margin: const EdgeInsets.only(right: 12),
@@ -461,8 +499,16 @@ class ProfileScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFE85D04).withOpacity(0.1),
                 shape: BoxShape.circle,
+                image: pet.imageUrl != null && pet.imageUrl.isNotEmpty
+                    ? DecorationImage(
+                        image: ImagePickerHelper.getImageProvider(pet.imageUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              child: const Icon(Icons.pets, color: Color(0xFFE85D04), size: 26),
+              child: pet.imageUrl == null || pet.imageUrl.isEmpty
+                  ? const Icon(Icons.pets, color: Color(0xFFE85D04), size: 26)
+                  : null,
             ),
             const SizedBox(height: 8),
             Text(
