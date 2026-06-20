@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/features/booking/presentation/my_bookings_screen.dart';
 
 import '../../core/utils/location_provider.dart';
 import 'widgets/service_grid.dart';
@@ -539,6 +540,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const SearchScreen()),
+                    );
+                  } else if (index == 2) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (ctx) => MyBookingsScreen()),
                     );
                   } else if (index == 3) {
                     Navigator.push(
