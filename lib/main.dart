@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pawffy/features/auth/auth_gate_screen.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:pawffy/core/config/app_config.dart';
 
 final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
   ThemeNotifier.new,
@@ -11,7 +13,7 @@ final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
 
 class ThemeNotifier extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() => ThemeMode.system; // Changed to system by default
+  ThemeMode build() => ThemeMode.system; 
 
   void toggle() {
     state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
@@ -20,6 +22,7 @@ class ThemeNotifier extends Notifier<ThemeMode> {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = AppConfig.stripePublishableKey;
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(
     DevicePreview(
