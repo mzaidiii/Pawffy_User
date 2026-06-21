@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/settings_appbar.dart';
 import '../widgets/settings_button.dart';
@@ -9,8 +10,10 @@ class MobileOtpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: const SettingsAppBar(title: 'Mobile Number'),
 
@@ -24,16 +27,26 @@ class MobileOtpScreen extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            const Text(
+            Text(
               'Update your Mobile Number\nWe will send a verification code\nto your new number.',
               textAlign: TextAlign.center,
+              style: GoogleFonts.barlow(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
 
             const SizedBox(height: 30),
 
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
-              child: Text('Enter OTP'),
+              child: Text(
+                'Enter OTP',
+                style: GoogleFonts.barlow(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             ),
 
             const SizedBox(height: 12),
@@ -47,10 +60,20 @@ class MobileOtpScreen extends StatelessWidget {
                   height: 45,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF232323) : Colors.white,
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                    ),
                   ),
-                  child: const Text('X'),
+                  child: Text(
+                    'X',
+                    style: GoogleFonts.barlow(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 ),
               ),
             ),
