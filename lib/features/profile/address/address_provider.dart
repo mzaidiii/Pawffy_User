@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
+import 'package:pawffy/features/auth/providers/auth_controller.dart';
 
 class AddressModel {
   final String id;
@@ -58,11 +60,33 @@ class AddressModel {
 
 class AddressNotifier extends Notifier<List<AddressModel>> {
   @override
-  List<AddressModel> build() => []; // ← empty, no hardcoded data
+  List<AddressModel> build() {
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.asData?.value;
+    final List<AddressModel> list = [];
+
+    if (user != null && user.address != null && user.address!.isNotEmpty) {
+      list.add(
+        AddressModel(
+          id: 'primary',
+          label: 'Primary / Home',
+          fullName: user.name,
+          mobile: user.phone ?? '',
+          addressLine1: user.address!,
+          city: user.city ?? '',
+          state: user.state ?? '',
+          pinCode: '110001',
+          isDefault: true,
+        ),
+      );
+    }
+    return list;
+  }
 
   void addAddress(AddressModel address) {
     if (address.isDefault) {
       state = state.map((a) => a.copyWith(isDefault: false)).toList();
+      _syncToProfile(address);
     }
     state = [...state, address];
   }
@@ -72,14 +96,46 @@ class AddressNotifier extends Notifier<List<AddressModel>> {
       state = state.map((a) => a.copyWith(isDefault: false)).toList();
     }
     state = state.map((a) => a.id == updated.id ? updated : a).toList();
+
+    if (updated.id == 'primary' || updated.isDefault) {
+      _syncToProfile(updated);
+    }
   }
 
   void deleteAddress(String id) {
+    final toDelete = state.firstWhere((a) => a.id == id, orElse: () => AddressModel(id: '', label: '', fullName: '', mobile: '', addressLine1: '', city: '', state: '', pinCode: ''));
     state = state.where((a) => a.id != id).toList();
+    
+    if (id == 'primary' || toDelete.isDefault) {
+      ref.read(authControllerProvider.notifier).updateProfile(
+        name: '',
+        phone: '',
+        city: '',
+        userState: '',
+        address: '',
+      );
+    }
   }
 
   void setDefault(String id) {
     state = state.map((a) => a.copyWith(isDefault: a.id == id)).toList();
+    final defaultAddress = state.firstWhere((a) => a.isDefault, orElse: () => AddressModel(id: '', label: '', fullName: '', mobile: '', addressLine1: '', city: '', state: '', pinCode: ''));
+    if (defaultAddress.id.isNotEmpty) {
+      _syncToProfile(defaultAddress);
+    }
+  }
+
+  void _syncToProfile(AddressModel address) {
+    final user = ref.read(currentUserProvider).asData?.value;
+    if (user != null) {
+      ref.read(authControllerProvider.notifier).updateProfile(
+        name: address.fullName.isNotEmpty ? address.fullName : user.name,
+        phone: address.mobile.isNotEmpty ? address.mobile : (user.phone ?? ''),
+        city: address.city,
+        userState: address.state,
+        address: address.addressLine1,
+      );
+    }
   }
 }
 
