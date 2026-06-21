@@ -18,17 +18,17 @@ class HelpContactScreen extends StatelessWidget {
     {
       'icon': Icons.call_outlined,
       'title': 'Call Us',
-      'subtitle': '+1 800 PAWFFY',
+      'subtitle': '+91-XXXXXXXXXX',
     },
     {
       'icon': Icons.chat_outlined,
       'title': 'WhatsApp Us',
-      'subtitle': 'Chat with us on WhatsApp',
+      'subtitle': 'wa.me/91XXXXXXXXXX',
     },
     {
       'icon': Icons.language_outlined,
       'title': 'Visit Website',
-      'subtitle': 'www.pawffy.com',
+      'subtitle': 'pawffy.com/help',
     },
   ];
 
