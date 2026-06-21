@@ -112,6 +112,7 @@ class AddressScreen extends ConsumerWidget {
     WidgetRef ref,
     AddressModel address,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -205,9 +206,9 @@ class AddressScreen extends ConsumerWidget {
 
           // ── 3-dot Menu ────────────────────────────
           PopupMenuButton<String>(
-            icon: const Icon(
+            icon: Icon(
               Icons.more_vert_rounded,
-              color: Colors.black54,
+              color: isDark ? Colors.white60 : Colors.black54,
               size: 20,
             ),
             shape: RoundedRectangleBorder(
@@ -249,10 +250,10 @@ class AddressScreen extends ConsumerWidget {
                 value: 'edit',
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.edit_outlined,
                       size: 16,
-                      color: Colors.black54,
+                      color: isDark ? Colors.white60 : Colors.black54,
                     ),
                     const SizedBox(width: 8),
                     Text('Edit', style: GoogleFonts.barlow(fontSize: 13)),
