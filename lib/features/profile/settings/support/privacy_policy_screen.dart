@@ -52,48 +52,59 @@ class PrivacyPolicyScreen extends StatelessWidget {
             Center(
               child: Text(
                 'Last updated: 15 May 2026',
-                style: GoogleFonts.barlow(fontSize: 12, color: Colors.black45),
+                style: GoogleFonts.barlow(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                ),
               ),
             ),
 
             const SizedBox(height: 28),
 
             _buildSection(
+              context,
               '1. Information We Collect',
               'We collect information you provide directly such as name, email, phone number, and address. We also collect usage data, device identifiers, and location information when you use our services.',
             ),
 
             _buildSection(
+              context,
               '2. How We Use Information',
               'We use your information to provide and improve our services, personalize your experience, process bookings and payments, and send service notifications.',
             ),
 
             _buildSection(
+              context,
               '3. Information Sharing',
               'We do not sell your personal information. We may share it with trusted service providers and partners required to fulfill your orders.',
             ),
 
             _buildSection(
+              context,
               '4. Data Security',
               'We implement industry-standard security measures to protect your information from unauthorized access.',
             ),
 
             _buildSection(
+              context,
               '5. Your Choices',
               'You can access, update, or delete your account information at any time through the app settings. You may also request deletion of your account.',
             ),
 
             _buildSection(
+              context,
               '6. Cookies & Tracking',
               'We use cookies and similar technologies to enhance your experience and collect usage analytics. You can manage cookie preferences through your device settings.',
             ),
 
             _buildSection(
+              context,
               '7. Children\'s Privacy',
               'Our services are not directed to children under 13. We do not knowingly collect personal information from children.',
             ),
 
             _buildSection(
+              context,
               '8. Changes to Policy',
               'We may update this Privacy Policy periodically. We will notify you of significant changes via the app or email.',
             ),
@@ -103,7 +114,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E332A)
+                    : const Color(0xFFECFDF5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -119,7 +132,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       'Your data is encrypted and never sold to third parties.',
                       style: GoogleFonts.barlow(
                         fontSize: 13,
-                        color: Colors.black87,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white70
+                            : Colors.black87,
                       ),
                     ),
                   ),
@@ -134,7 +149,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, String body) {
+  Widget _buildSection(BuildContext context, String title, String body) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Column(
@@ -145,7 +160,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             style: GoogleFonts.barlow(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 6),
@@ -153,7 +168,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             body,
             style: GoogleFonts.barlow(
               fontSize: 13,
-              color: Colors.black54,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               height: 1.6,
             ),
           ),
