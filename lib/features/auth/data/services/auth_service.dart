@@ -59,12 +59,19 @@ class AuthService {
     required String phone,
     required String city,
     required String state,
+    required String address,
     required String token,
   }) async {
     try {
       final response = await _dio.put(
         ApiConstants.updateMe,
-        data: {'name': name, 'phone': phone, 'city': city, 'state': state},
+        data: {
+          'name': name,
+          'phone': phone,
+          'city': city,
+          'state': state,
+          'address': address,
+        },
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
@@ -73,6 +80,71 @@ class AuthService {
       throw Exception(
         e.response?.data['message'] ?? 'Failed to update profile',
       );
+    }
+  }
+
+  Future<UserModel> uploadAvatar({
+    required String filePath,
+    required String token,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'avatar': await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+      });
+
+      final response = await _dio.post(
+        ApiConstants.uploadAvatar,
+        data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+
+      return UserModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to upload avatar',
+      );
+    }
+  }
+
+  Future<String> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String token,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.changePassword,
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      return response.data['data']['token'] as String;
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to change password',
+      );
+    }
+  }
+
+  Future<void> logout(String token) async {
+    try {
+      await _dio.post(
+        ApiConstants.logout,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Logout failed');
     }
   }
 }
