@@ -71,6 +71,8 @@ class PetModel {
     String? medicalNotes,
     String? vaccinationStatus,
     String? imageUrl,
+    int? bookingCount,
+    int? medicalRecordCount,
   }) {
     return PetModel(
       id: id,
@@ -87,8 +89,8 @@ class PetModel {
       imageUrl: imageUrl ?? this.imageUrl,
       createdAt: createdAt,
       updatedAt: DateTime.now(),
-      bookingCount: bookingCount,
-      medicalRecordCount: medicalRecordCount,
+      bookingCount: bookingCount ?? this.bookingCount,
+      medicalRecordCount: medicalRecordCount ?? this.medicalRecordCount,
     );
   }
 }
