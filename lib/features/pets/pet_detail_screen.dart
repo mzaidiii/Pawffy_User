@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'data/models/pet_model.dart';
 import 'providers/pet_controller.dart';
+import 'providers/medical_record_controller.dart';
+import 'providers/vaccination_controller.dart';
 import 'widgets/add_edit_pet_sheet.dart';
+import 'widgets/add_edit_medical_record_sheet.dart';
+import 'widgets/add_edit_vaccination_sheet.dart';
+import '../vets/providers/vet_controller.dart';
+
 
 class PetDetailScreen extends ConsumerStatefulWidget {
   final PetModel pet;
@@ -16,41 +23,7 @@ class PetDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
-  bool _isLoading = false;
-
-  Future<void> _pickAndUploadImage(String petId) async {
-    final source = await ImagePickerHelper.showSourceBottomSheet(context);
-    if (source == null) return;
-    if (!mounted) return;
-
-    final pickedFile = await ImagePickerHelper.pickImageWithPermission(
-      context: context,
-      source: source,
-    );
-
-    if (pickedFile != null) {
-      setState(() => _isLoading = true);
-      final updatedPet = await ref
-          .read(petControllerProvider.notifier)
-          .uploadPetImage(petId, pickedFile.path);
-
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              updatedPet != null
-                  ? 'Pet image updated successfully!'
-                  : 'Failed to upload pet image.',
-              style: GoogleFonts.barlow(),
-            ),
-            backgroundColor: updatedPet != null ? Colors.green : Colors.redAccent,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    }
-  }
+  int _selectedTab = 0; // 0 for Medical Records, 1 for Vaccinations
 
   @override
   Widget build(BuildContext context) {
@@ -129,40 +102,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                           )
                         : null,
                   ),
-                  if (_isLoading)
-                    Positioned.fill(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.black26,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFE85D04),
-                          ),
-                        ),
-                      ),
-                    ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: GestureDetector(
-                      onTap: () => _pickAndUploadImage(pet.id),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE85D04),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt_outlined,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ),
+
                 ],
               ),
             ),
@@ -225,23 +165,142 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
 
             const SizedBox(height: 32),
 
-            // Future sections (placeholders for medical/vaccination tabs)
-            Text(
-              'MEDICAL RECORDS & VACCINATIONS',
-              style: GoogleFonts.barlow(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey,
-                letterSpacing: 0.5,
+            // Tabs Segment Switcher
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedTab = 0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: _selectedTab == 0
+                              ? const Color(0xFFE85D04)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Medical Records',
+                          style: GoogleFonts.barlow(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: _selectedTab == 0
+                                ? Colors.white
+                                : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedTab = 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: _selectedTab == 1
+                              ? const Color(0xFFE85D04)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Vaccinations',
+                          style: GoogleFonts.barlow(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: _selectedTab == 1
+                                ? Colors.white
+                                : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Header Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _selectedTab == 0 ? 'PET MEDICAL HISTORY' : 'VACCINATION LOGS',
+                  style: GoogleFonts.barlow(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.grey,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (_selectedTab == 0) {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => AddEditMedicalRecordSheet(petId: pet.id),
+                      );
+                    } else {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => AddEditVaccinationSheet(petId: pet.id),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE85D04).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.add_rounded,
+                          size: 14,
+                          color: Color(0xFFE85D04),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _selectedTab == 0 ? 'Add Record' : 'Log Vaccine',
+                          style: GoogleFonts.barlow(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFFE85D04),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
-            const Center(
-              child: Text(
-                'Coming soon...',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
+
+            // Content List
+            _selectedTab == 0
+                ? _buildMedicalRecordsSection(context, ref, pet)
+                : _buildVaccinationsSection(context, ref, pet),
           ],
         ),
       ),
@@ -302,6 +361,576 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                 if (mounted) {
                   Navigator.pop(context);
                 }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicalRecordsSection(BuildContext context, WidgetRef ref, PetModel pet) {
+    final recordsAsync = ref.watch(medicalRecordControllerProvider(pet.id));
+
+    return recordsAsync.when(
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+        ),
+      ),
+      error: (err, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            'Error: ${err.toString()}',
+            style: GoogleFonts.barlow(color: Colors.redAccent),
+          ),
+        ),
+      ),
+      data: (records) {
+        if (records.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.folder_open_outlined,
+                    size: 48,
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No Medical Records yet.',
+                    style: GoogleFonts.barlow(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: records.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final record = records[index];
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          record.diagnosis ?? 'General Checkup',
+                          style: GoogleFonts.barlow(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            DateFormat('MMM dd, yyyy').format(record.createdAt),
+                            style: GoogleFonts.barlow(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onSelected: (val) {
+                              if (val == 'edit') {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => AddEditMedicalRecordSheet(
+                                    petId: pet.id,
+                                    record: record,
+                                  ),
+                                );
+                              } else if (val == 'delete') {
+                                _confirmDeleteMedicalRecord(context, ref, pet.id, record.id);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  if (record.symptoms != null && record.symptoms!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.barlow(
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        children: [
+                          const TextSpan(
+                            text: 'Symptoms: ',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                          ),
+                          TextSpan(text: record.symptoms),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (record.prescription != null && record.prescription!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.barlow(
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        children: [
+                          const TextSpan(
+                            text: 'Prescription: ',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                          ),
+                          TextSpan(text: record.prescription),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (record.allergies != null && record.allergies!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.barlow(
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        children: [
+                          const TextSpan(
+                            text: 'Allergies: ',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                          ),
+                          TextSpan(text: record.allergies),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (record.createdByVet != null && record.createdByVet!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.verified_user_outlined, size: 14, color: Color(0xFFE85D04)),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Created by Veterinarian',
+                          style: GoogleFonts.barlow(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFE85D04),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (record.reportUrl != null && record.reportUrl!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: record.reportUrl!));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Report link copied to clipboard!',
+                              style: GoogleFonts.barlow(),
+                            ),
+                            backgroundColor: const Color(0xFFE85D04),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE85D04).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFE85D04).withOpacity(0.2)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.picture_as_pdf_outlined, size: 16, color: Color(0xFFE85D04)),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Copy Lab Report URL',
+                              style: GoogleFonts.barlow(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFFE85D04),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildVaccinationsSection(BuildContext context, WidgetRef ref, PetModel pet) {
+    final vaccinationsAsync = ref.watch(vaccinationControllerProvider(pet.id));
+    final vetsAsync = ref.watch(vetControllerProvider);
+
+    return vaccinationsAsync.when(
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+        ),
+      ),
+      error: (err, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            'Error: ${err.toString()}',
+            style: GoogleFonts.barlow(color: Colors.redAccent),
+          ),
+        ),
+      ),
+      data: (vaccinations) {
+        if (vaccinations.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.vaccines_outlined,
+                    size: 48,
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No Vaccination records yet.',
+                    style: GoogleFonts.barlow(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: vaccinations.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final vaccination = vaccinations[index];
+            
+            Color statusColor = Colors.grey;
+            String statusText = '';
+            
+            if (vaccination.nextDueDate != null) {
+              final difference = vaccination.nextDueDate!.difference(DateTime.now()).inDays;
+              if (difference < 0) {
+                statusColor = Colors.redAccent;
+                statusText = 'Overdue';
+              } else if (difference <= 30) {
+                statusColor = const Color(0xFFE85D04);
+                statusText = 'Due Soon';
+              } else {
+                statusColor = Colors.green;
+                statusText = 'Upcoming';
+              }
+            }
+
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          vaccination.vaccineName,
+                          style: GoogleFonts.barlow(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            DateFormat('MMM dd, yyyy').format(vaccination.vaccinationDate),
+                            style: GoogleFonts.barlow(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onSelected: (val) {
+                              if (val == 'edit') {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => AddEditVaccinationSheet(
+                                    petId: pet.id,
+                                    vaccination: vaccination,
+                                  ),
+                                );
+                              } else if (val == 'delete') {
+                                _confirmDeleteVaccination(context, ref, pet.id, vaccination.id);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  if (vaccination.nextDueDate != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text(
+                          'Next Due Date: ${DateFormat('MMM dd, yyyy').format(vaccination.nextDueDate!)}',
+                          style: GoogleFonts.barlow(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            statusText,
+                            style: GoogleFonts.barlow(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: statusColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (vaccination.vet != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.person_outline, size: 14, color: Colors.grey.shade500),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Administered by: Dr. ${vaccination.vet!.name} (${vaccination.vet!.clinicName ?? 'Clinic'})',
+                          style: GoogleFonts.barlow(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else if (vaccination.vetId != null && vaccination.vetId!.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.person_outline, size: 14, color: Colors.grey.shade500),
+                        const SizedBox(width: 4),
+                        Builder(
+                          builder: (context) {
+                            final vets = vetsAsync.asData?.value ?? [];
+                            final matchingVets = vets.where((v) => v.id == vaccination.vetId);
+                            final String vetText = matchingVets.isNotEmpty
+                                ? 'Dr. ${matchingVets.first.name} (${matchingVets.first.clinicName})'
+                                : 'Registered Veterinarian';
+                            return Text(
+                              'Administered by: $vetText',
+                              style: GoogleFonts.barlow(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (vaccination.notes != null && vaccination.notes!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
+                      ),
+                      child: Text(
+                        vaccination.notes!,
+                        style: GoogleFonts.barlow(
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteMedicalRecord(BuildContext context, WidgetRef ref, String petId, String recordId) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Medical Record?'),
+        content: const Text('Are you sure you want to delete this record? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final success = await ref
+                  .read(medicalRecordControllerProvider(petId).notifier)
+                  .deleteRecord(recordId);
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Medical record deleted'
+                          : 'Failed to delete medical record',
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.redAccent,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteVaccination(BuildContext context, WidgetRef ref, String petId, String vaccinationId) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Vaccination Log?'),
+        content: const Text('Are you sure you want to delete this vaccination record? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final success = await ref
+                  .read(vaccinationControllerProvider(petId).notifier)
+                  .deleteVaccination(vaccinationId);
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Vaccination record deleted'
+                          : 'Failed to delete vaccination record',
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.redAccent,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
