@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     'Getting location...',
                                     style: GoogleFonts.barlow(
                                       fontSize: 13,
-                                      color: Colors.black54,
+                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                     ),
                                   ),
                                   error: (_, __) => Text(
@@ -94,9 +94,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                const Icon(
+                                Icon(
                                   Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.black54,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                   size: 18,
                                 ),
                               ],
@@ -212,7 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
