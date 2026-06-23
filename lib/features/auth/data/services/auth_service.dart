@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 import 'package:pawffy/core/networks/dio_client.dart';
 import 'package:pawffy/core/networks/api_constants.dart';
@@ -55,7 +56,7 @@ class AuthService {
   }
 
   Future<UserModel> updateProfile({
-    required String name,
+    String? name,
     required String phone,
     required String city,
     required String state,
@@ -63,20 +64,29 @@ class AuthService {
     required String token,
   }) async {
     try {
+      final data = <String, dynamic>{
+        'phone': phone,
+        'city': city,
+        'state': state,
+        'address': address,
+      };
+      if (name != null && name.isNotEmpty) {
+        data['name'] = name;
+      }
+
       final response = await _dio.put(
         ApiConstants.updateMe,
-        data: {
-          'name': name,
-          'phone': phone,
-          'city': city,
-          'state': state,
-          'address': address,
-        },
+        data: data,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
+      debugPrint('[AuthService] updateProfile raw response: ${response.data}');
+
       return UserModel.fromJson(response.data['data']);
     } on DioException catch (e) {
+      debugPrint(
+        '[AuthService] updateProfile error response: ${e.response?.data}',
+      );
       throw Exception(
         e.response?.data['message'] ?? 'Failed to update profile',
       );
@@ -108,9 +118,7 @@ class AuthService {
 
       return UserModel.fromJson(response.data['data']);
     } on DioException catch (e) {
-      throw Exception(
-        e.response?.data['message'] ?? 'Failed to upload avatar',
-      );
+      throw Exception(e.response?.data['message'] ?? 'Failed to upload avatar');
     }
   }
 
@@ -122,10 +130,7 @@ class AuthService {
     try {
       final response = await _dio.post(
         ApiConstants.changePassword,
-        data: {
-          'currentPassword': currentPassword,
-          'newPassword': newPassword,
-        },
+        data: {'currentPassword': currentPassword, 'newPassword': newPassword},
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
