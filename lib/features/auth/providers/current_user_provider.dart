@@ -16,4 +16,11 @@ class CurrentUserNotifier extends AsyncNotifier<UserModel?> {
   void clear() {
     state = const AsyncData(null);
   }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      return await ref.read(authControllerProvider.notifier).getMe();
+    });
+  }
 }
