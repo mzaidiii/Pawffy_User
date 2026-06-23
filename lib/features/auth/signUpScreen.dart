@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'profile_setup_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawffy/features/auth/providers/auth_controller.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -24,8 +25,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   bool _agreeToTerms = true;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
-  // ── Validation state ───────────────────────────────────────────────────────
   String? _nameError;
   String? _emailError;
   String? _passwordError;
@@ -44,12 +45,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     super.dispose();
   }
 
-  // ── Validators ─────────────────────────────────────────────────────────────
   String? _validateName(String value) {
     if (value.isEmpty) return 'Full name is required';
-    if (value.trim().length < 2) return 'Name must be at least 2 characters';
-    // Must contain at least first + last name (US standard)
-    if (!value.trim().contains(' ')) return 'Please enter your full name';
+    if (value.trim().length < 4) return 'Name must be at least 4 characters';
     return null;
   }
 
@@ -98,8 +96,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         confirmErr == null;
   }
 
-  // ── Sign Up handler ────────────────────────────────────────────────────────
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     if (!_validateAll()) return;
 
     if (!_agreeToTerms) {
@@ -109,17 +106,36 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       return;
     }
 
-    final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
+    setState(() => _isLoading = true);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            ProfileSetupScreen(name: name, email: email, password: password),
-      ),
-    );
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .register(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (success) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProfileSetupScreen()),
+      );
+    } else {
+      final error = ref.read(authControllerProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error.hasError
+                ? error.error.toString().replaceFirst('Exception: ', '')
+                : 'Registration failed',
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -140,7 +156,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Back Button ────────────────────────────────────────────────
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
@@ -172,8 +187,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Subtitle — Inter 16px medium
               Text(
                 "Let's get started with your details",
                 style: TextStyle(
@@ -188,7 +201,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
               SizedBox(height: size.height * 0.04),
 
-              // ── Name Field ─────────────────────────────────────────────────
               _buildTextField(
                 controller: _nameController,
                 focusNode: _nameFocus,
@@ -211,7 +223,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
 
-              // ── Email Field ────────────────────────────────────────────────
               _buildTextField(
                 controller: _emailController,
                 focusNode: _emailFocus,
@@ -233,7 +244,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
 
-              // ── Password Field ─────────────────────────────────────────────
               _buildTextField(
                 controller: _passwordController,
                 focusNode: _passwordFocus,
@@ -265,7 +275,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
 
-              // ── Confirm Password Field ─────────────────────────────────────
               _buildTextField(
                 controller: _confirmPasswordController,
                 focusNode: _confirmPasswordFocus,
@@ -290,8 +299,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 onSubmitted: (_) => _handleSignUp(),
               ),
               const SizedBox(height: 16),
-
-              // ── Terms & Conditions ─────────────────────────────────────────
               Row(
                 children: [
                   SizedBox(
@@ -334,10 +341,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-
-              // ── SIGN UP Button ─────────────────────────────────────────────
               ElevatedButton(
-                onPressed: _handleSignUp,
+                onPressed: _isLoading ? null : _handleSignUp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFE85D04),
                   foregroundColor: Colors.white,
@@ -346,25 +351,33 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'SIGN UP',
-                      style: GoogleFonts.barlow(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'SIGN UP',
+                            style: GoogleFonts.barlow(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_outward, size: 18),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_outward, size: 18),
-                  ],
-                ),
               ),
               const SizedBox(height: 20),
 
-              // ── Or Sign Up With ────────────────────────────────────────────
               Center(
                 child: Text(
                   'Or Sign Up With',
@@ -377,7 +390,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 16),
 
-              // ── Social Buttons ─────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -403,7 +415,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Already have account ───────────────────────────────────────
               Center(
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -439,7 +450,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
-  // ── Reusable Text Field ────────────────────────────────────────────────────
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
@@ -533,7 +543,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
-  // ── Social Button ──────────────────────────────────────────────────────────
   Widget _buildSocialButton(
     String label,
     Color color, {
