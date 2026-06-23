@@ -86,7 +86,6 @@ class AuthController extends AsyncNotifier<void> {
         await authService.logout(token);
       }
     } catch (e) {
-      // Ignore API logout error so we always clear local storage successfully
     } finally {
       await StorageService.clearAll();
       ref.read(currentUserProvider.notifier).clear();
@@ -94,7 +93,7 @@ class AuthController extends AsyncNotifier<void> {
   }
 
   Future<bool> updateProfile({
-    required String name,
+    String? name,
     required String phone,
     required String city,
     required String userState,
@@ -118,7 +117,6 @@ class AuthController extends AsyncNotifier<void> {
         token: token,
       );
 
-      // Refresh current user state
       await ref.read(currentUserProvider.notifier).refresh();
 
       return true;
@@ -136,12 +134,8 @@ class AuthController extends AsyncNotifier<void> {
       }
 
       final authService = ref.read(authServiceProvider);
-      await authService.uploadAvatar(
-        filePath: filePath,
-        token: token,
-      );
+      await authService.uploadAvatar(filePath: filePath, token: token);
 
-      // Refresh current user state
       await ref.read(currentUserProvider.notifier).refresh();
 
       return true;
@@ -169,7 +163,6 @@ class AuthController extends AsyncNotifier<void> {
         token: token,
       );
 
-      // Save the new token immediately
       await StorageService.saveToken(newToken);
       state = const AsyncData(null);
       return true;
