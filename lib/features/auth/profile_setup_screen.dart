@@ -9,16 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
-  final String name;
-  final String email;
-  final String password;
-
-  const ProfileSetupScreen({
-    super.key,
-    required this.name,
-    required this.email,
-    required this.password,
-  });
+  const ProfileSetupScreen({super.key});
 
   @override
   ConsumerState<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -28,36 +19,37 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _phoneController = TextEditingController();
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
+  final _addressController = TextEditingController();
 
   final _phoneFocus = FocusNode();
   final _cityFocus = FocusNode();
   final _stateFocus = FocusNode();
+  final _addressFocus = FocusNode();
 
   String? _selectedImagePath;
   bool _isUploadingImage = false;
 
-  // ── Validation state ───────────────────────────────────────────────────────
   String? _phoneError;
   String? _cityError;
   String? _stateError;
+  String? _addressError;
 
   @override
   void dispose() {
     _phoneController.dispose();
     _cityController.dispose();
     _stateController.dispose();
+    _addressController.dispose();
     _phoneFocus.dispose();
     _cityFocus.dispose();
     _stateFocus.dispose();
+    _addressFocus.dispose();
     super.dispose();
   }
 
-  // ── US-specific validators ─────────────────────────────────────────────────
   String? _validatePhone(String value) {
     if (value.isEmpty) return 'Phone number is required';
-    // Strip formatting characters before checking
     final digits = value.replaceAll(RegExp(r'[\s\-\(\)]'), '');
-    // US numbers: 10 digits, or 11 digits starting with 1
     if (!RegExp(r'^1?\d{10}$').hasMatch(digits)) {
       return 'Enter a valid US phone number (e.g. 555-867-5309)';
     }
@@ -75,7 +67,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   String? _validateState(String value) {
     if (value.isEmpty) return 'State is required';
-    // Accept full state name or 2-letter abbreviation
     final trimmed = value.trim();
     if (trimmed.length < 2) return 'Enter a valid US state';
     if (!RegExp(r"^[a-zA-Z\s]{2,50}$").hasMatch(trimmed)) {
@@ -84,19 +75,29 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     return null;
   }
 
+  String? _validateAddress(String value) {
+    if (value.isEmpty) return 'Address is required';
+    if (value.trim().length < 5) return 'Enter a valid address';
+    return null;
+  }
+
   bool _validateAll() {
     final phoneErr = _validatePhone(_phoneController.text.trim());
     final cityErr = _validateCity(_cityController.text.trim());
     final stateErr = _validateState(_stateController.text.trim());
+    final addressErr = _validateAddress(_addressController.text.trim());
     setState(() {
       _phoneError = phoneErr;
       _cityError = cityErr;
       _stateError = stateErr;
+      _addressError = addressErr;
     });
-    return phoneErr == null && cityErr == null && stateErr == null;
+    return phoneErr == null &&
+        cityErr == null &&
+        stateErr == null &&
+        addressErr == null;
   }
 
-  // ── Avatar picker ──────────────────────────────────────────────────────────
   Future<void> _pickAvatar() async {
     final source = await ImagePickerHelper.showSourceBottomSheet(context);
     if (source == null) return;
@@ -114,83 +115,56 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     }
   }
 
-  // ── Submit handler — all original logic preserved ──────────────────────────
   Future<void> _handleSubmit() async {
     if (!_validateAll()) return;
 
     final phone = _phoneController.text.trim();
     final city = _cityController.text.trim();
     final userState = _stateController.text.trim();
-
+    final address = _addressController.text.trim();
     try {
-      // STEP 1: Register User
-      final registerSuccess = await ref
-          .read(authControllerProvider.notifier)
-          .register(
-            name: widget.name,
-            email: widget.email,
-            password: widget.password,
-          );
-
-      if (!registerSuccess) {
-        final error = ref.read(authControllerProvider);
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              error.hasError
-                  ? error.error.toString().replaceFirst('Exception: ', '')
-                  : 'Registration failed',
-            ),
-          ),
-        );
-        return;
-      }
-
-      // STEP 2: Update Profile
       final profileSuccess = await ref
           .read(authControllerProvider.notifier)
           .updateProfile(
-            name: widget.name,
             phone: phone,
             city: city,
             userState: userState,
-            address: '',
+            address: address,
           );
 
       if (!mounted) return;
-
       if (!profileSuccess) {
+        final error = ref.read(authControllerProvider);
+        debugPrint('[ProfileSetup] updateProfile error: ${error.error}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to update profile')),
         );
         return;
       }
-
-      // STEP 3: Upload Avatar (if selected)
       if (_selectedImagePath != null) {
         setState(() => _isUploadingImage = true);
+
         final uploadSuccess = await ref
             .read(authControllerProvider.notifier)
             .uploadAvatar(_selectedImagePath!);
 
         if (!mounted) return;
         setState(() => _isUploadingImage = false);
-
         if (!uploadSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to upload profile image')),
           );
         }
+      } else {
+        debugPrint('[ProfileSetup] No avatar selected, skipping upload.');
       }
-
-      // STEP 4: Go Home
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
         (route) => false,
       );
     } catch (e) {
+      debugPrint('[ProfileSetup] Exception caught: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -217,7 +191,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Back Button ────────────────────────────────────────────────
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
@@ -230,8 +203,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
               SizedBox(height: size.height * 0.04),
 
-              // ── Hero Heading ───────────────────────────────────────────────
-              // "TELL US" white, "ABOUT YOU" orange — Archivo Black
               Text(
                 'TELL US',
                 style: GoogleFonts.archivoBlack(
@@ -252,7 +223,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
               const SizedBox(height: 10),
 
-              // Subtitle
               Text(
                 'Complete your profile',
                 style: TextStyle(
@@ -266,8 +236,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
 
               SizedBox(height: size.height * 0.04),
-
-              // ── Avatar Upload ──────────────────────────────────────────────
               Center(
                 child: Stack(
                   children: [
@@ -293,7 +261,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             : null,
                       ),
                       child: _selectedImagePath == null
-                          ? Icon(
+                          ? const Icon(
                               Icons.person_outline,
                               color: Colors.grey,
                               size: 44,
@@ -326,7 +294,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
               const SizedBox(height: 28),
 
-              // ── Phone Number Field ─────────────────────────────────────────
               _buildTextField(
                 controller: _phoneController,
                 focusNode: _phoneFocus,
@@ -352,7 +319,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
               const SizedBox(height: 14),
 
-              // ── City Field ─────────────────────────────────────────────────
               _buildTextField(
                 controller: _cityController,
                 focusNode: _cityFocus,
@@ -374,8 +340,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 onSubmitted: (_) => _stateFocus.requestFocus(),
               ),
               const SizedBox(height: 14),
-
-              // ── State Field ────────────────────────────────────────────────
               _buildTextField(
                 controller: _stateController,
                 focusNode: _stateFocus,
@@ -394,12 +358,33 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     );
                   }
                 },
+                onSubmitted: (_) => _addressFocus.requestFocus(),
+              ),
+
+              const SizedBox(height: 14),
+
+              _buildTextField(
+                controller: _addressController,
+                focusNode: _addressFocus,
+                hint: 'Street Address',
+                icon: Icons.home_outlined,
+                errorText: _addressError,
+                keyboardType: TextInputType.streetAddress,
+                isDark: isDark,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (_) {
+                  if (_addressError != null) {
+                    setState(
+                      () => _addressError = _validateAddress(
+                        _addressController.text.trim(),
+                      ),
+                    );
+                  }
+                },
                 onSubmitted: (_) => _handleSubmit(),
               ),
 
               const SizedBox(height: 28),
-
-              // ── Complete Profile Button ────────────────────────────────────
               ElevatedButton(
                 onPressed: (authState.isLoading || _isUploadingImage)
                     ? null
@@ -449,7 +434,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     );
   }
 
-  // ── Reusable Text Field ────────────────────────────────────────────────────
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
