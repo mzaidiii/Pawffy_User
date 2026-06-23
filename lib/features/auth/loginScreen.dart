@@ -21,7 +21,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _rememberMe = true;
   bool _obscurePassword = true;
 
-  // Validation state
   String? _emailError;
   String? _passwordError;
 
@@ -34,7 +33,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  // ── US-specific validators ─────────────────────────────────────────────────
   String? _validateEmail(String value) {
     if (value.isEmpty) return 'Email is required';
     final emailRegex = RegExp(r'^[\w\.\+\-]+@([\w\-]+\.)+[\w\-]{2,}$');
@@ -58,7 +56,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return emailErr == null && passErr == null;
   }
 
-  // ── Login handler ──────────────────────────────────────────────────────────
   Future<void> _handleLogin() async {
     if (!_validateAll()) return;
 
@@ -108,7 +105,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ── Top spacer ─────────────────────────────────────────────────
                 SizedBox(height: size.height * 0.12),
 
                 SizedBox(
@@ -116,7 +112,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Line 1: HELLO, + dog image as inline badge
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -130,7 +125,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          // Dog image in a rounded orange pill/badge
                           ClipRRect(
                             borderRadius: BorderRadius.circular(20),
                             child: Image.asset(
@@ -151,7 +145,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ],
                       ),
                       SizedBox(height: 18),
-                      // Line 2: WELCOME BACK! full width
                       Text(
                         'WELCOME BACK!',
                         style: GoogleFonts.archivoBlack(
@@ -167,7 +160,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 SizedBox(height: size.height * 0.10),
 
-                // ── Email Field ────────────────────────────────────────────────
                 _buildTextField(
                   controller: _emailController,
                   focusNode: _emailFocus,
@@ -189,7 +181,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── Password Field ─────────────────────────────────────────────
                 _buildTextField(
                   controller: _passwordController,
                   focusNode: _passwordFocus,
@@ -211,7 +202,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── Remember Me + Forgot Password ──────────────────────────────
                 Row(
                   children: [
                     SizedBox(
@@ -255,7 +245,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 22),
 
-                // ── LOG IN Button ──────────────────────────────────────────────
                 ElevatedButton(
                   onPressed: authState.isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
@@ -296,7 +285,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 22),
 
-                // ── Or Log In With ─────────────────────────────────────────────
                 Text(
                   'Or Log In With',
                   style: GoogleFonts.barlow(
@@ -307,7 +295,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // ── Social Buttons ─────────────────────────────────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -333,7 +320,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                // ── Create Account Link ────────────────────────────────────────
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -373,7 +359,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // ── Reusable Text Field ────────────────────────────────────────────────────
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
@@ -464,7 +449,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // ── Social Button ──────────────────────────────────────────────────────────
   Widget _buildSocialButton(
     String label,
     Color color, {
