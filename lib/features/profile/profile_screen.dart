@@ -11,6 +11,8 @@ import 'settings/settings_screen.dart';
 import 'settings/support/help_support_screen.dart';
 import 'settings/accounts/personal_information_screen.dart';
 import 'package:pawffy/core/utils/image_picker_helper.dart';
+import 'package:pawffy/features/booking/presentation/my_bookings_screen.dart';
+import 'wallet_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -152,7 +154,8 @@ class ProfileScreen extends ConsumerWidget {
                                 color: const Color(0xFFE85D04),
                                 width: 2,
                               ),
-                              image: user?.profileImage != null &&
+                              image:
+                                  user?.profileImage != null &&
                                       user!.profileImage!.isNotEmpty
                                   ? DecorationImage(
                                       image: ImagePickerHelper.getImageProvider(
@@ -162,7 +165,8 @@ class ProfileScreen extends ConsumerWidget {
                                     )
                                   : null,
                             ),
-                            child: user?.profileImage == null ||
+                            child:
+                                user?.profileImage == null ||
                                     user!.profileImage!.isEmpty
                                 ? const Icon(
                                     Icons.person_outline,
@@ -220,7 +224,8 @@ class ProfileScreen extends ConsumerWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const PersonalInformationScreen(),
+                                      builder: (_) =>
+                                          const PersonalInformationScreen(),
                                     ),
                                   );
                                 },
@@ -370,6 +375,12 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.calendar_today_outlined,
                         title: 'My Bookings',
                         subtitle: 'View your upcoming and past bookings',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MyBookingsScreen(),
+                          ),
+                        ),
                         showDivider: true,
                       ),
                       _buildMenuItem(
@@ -377,6 +388,12 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.credit_card_outlined,
                         title: 'Payments and Wallets',
                         subtitle: 'Manage payments and refunds',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const WalletScreen(),
+                          ),
+                        ),
                         showDivider: true,
                       ),
                       _buildMenuItem(
