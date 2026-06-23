@@ -59,8 +59,16 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
     );
 
     if (p != null) {
-      _species = p.species;
-      _gender = p.gender;
+      final capSpecies = p.species.isNotEmpty
+          ? '${p.species[0].toUpperCase()}${p.species.substring(1).toLowerCase()}'
+          : 'Dog';
+      _species = _speciesList.contains(capSpecies) ? capSpecies : 'Other';
+
+      final capGender = p.gender.isNotEmpty
+          ? '${p.gender[0].toUpperCase()}${p.gender.substring(1).toLowerCase()}'
+          : 'Male';
+      _gender = _genderList.contains(capGender) ? capGender : 'Male';
+
       _vaccinationStatus = p.vaccinationStatus;
     }
   }
@@ -100,9 +108,9 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
 
     final body = {
       'name': _nameController.text.trim(),
-      'species': _species,
+      'species': _species.toLowerCase(),
       'breed': _breedController.text.trim(),
-      'gender': _gender,
+      'gender': _gender.toLowerCase(),
       'age': int.tryParse(_ageController.text.trim()) ?? 0,
       'weight': double.tryParse(_weightController.text.trim()) ?? 0.0,
       'color': _colorController.text.trim(),
