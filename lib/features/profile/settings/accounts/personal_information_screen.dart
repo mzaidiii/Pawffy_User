@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 
-import '../../../../core/utils/location_provider.dart';
-import '../../../../core/utils/location_states.dart';
+import 'package:pawffy/core/utils/location_provider.dart';
+import 'package:pawffy/core/utils/location_states.dart';
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
+import 'package:pawffy/features/auth/providers/auth_controller.dart';
+import 'package:pawffy/features/auth/data/models/user_model.dart';
 import '../widgets/settings_appbar.dart';
 import '../widgets/settings_button.dart';
 
@@ -17,20 +21,26 @@ class PersonalInformationScreen extends ConsumerStatefulWidget {
 
 class _PersonalInformationScreenState
     extends ConsumerState<PersonalInformationScreen> {
-  final _nameController = TextEditingController(text: 'Ankita Sharma');
-
-  final _addressController = TextEditingController(
-    text: '123, 4th Cross, Koramangala,\nBangalore, Karnataka',
-  );
-
-  final _cityController = TextEditingController(text: 'Bangalore');
-
-  final _pinCodeController = TextEditingController(text: '560014');
+  late final TextEditingController _nameController;
+  late final TextEditingController _addressController;
+  late final TextEditingController _cityController;
+  late final TextEditingController _pinCodeController;
 
   String _selectedGender = 'Female';
-  String _selectedState = 'Karnataka';
-
+  String _selectedState = '';
   DateTime? _selectedDate = DateTime(1995, 5, 12);
+  
+  bool _isInitialized = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _addressController = TextEditingController();
+    _cityController = TextEditingController();
+    _pinCodeController = TextEditingController();
+  }
 
   @override
   void dispose() {
@@ -39,6 +49,15 @@ class _PersonalInformationScreenState
     _cityController.dispose();
     _pinCodeController.dispose();
     super.dispose();
+  }
+
+  void _initializeFields(UserModel user) {
+    if (_isInitialized) return;
+    _nameController.text = user.name;
+    _addressController.text = user.address ?? '';
+    _cityController.text = user.city ?? '';
+    _selectedState = user.state ?? '';
+    _isInitialized = true;
   }
 
   Future<void> _pickDate() async {
@@ -53,6 +72,38 @@ class _PersonalInformationScreenState
       setState(() {
         _selectedDate = picked;
       });
+    }
+  }
+
+  Future<void> _pickAndUploadAvatar() async {
+    final source = await ImagePickerHelper.showSourceBottomSheet(context);
+    if (source == null) return;
+    if (!mounted) return;
+
+    final pickedFile = await ImagePickerHelper.pickImageWithPermission(
+      context: context,
+      source: source,
+    );
+
+    if (pickedFile != null) {
+      setState(() => _isLoading = true);
+      final success = await ref
+          .read(authControllerProvider.notifier)
+          .uploadAvatar(pickedFile.path);
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success ? 'Avatar updated successfully!' : 'Failed to upload avatar.',
+              style: GoogleFonts.barlow(),
+            ),
+            backgroundColor: success ? Colors.green : Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -73,6 +124,7 @@ class _PersonalInformationScreenState
       'Oct',
       'Nov',
       'Dec',
+      'User',
     ];
 
     return '${_selectedDate!.day} '
@@ -83,26 +135,66 @@ class _PersonalInformationScreenState
   @override
   Widget build(BuildContext context) {
     final countryAsync = ref.watch(countryProvider);
+    final userAsync = ref.watch(currentUserProvider);
 
-    return countryAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (_, __) => _buildScreen(usStates),
-      data: (country) {
-        final states = getStatesForCountry(country);
-
-        if (!states.contains(_selectedState)) {
-          _selectedState = states.first;
+    return userAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+      ),
+      error: (_, __) => Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(child: Text('Error loading profile')),
+      ),
+      data: (user) {
+        if (user == null) {
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: const Center(child: Text('User not found')),
+          );
         }
 
-        return _buildScreen(states);
+        _initializeFields(user);
+
+        return countryAsync.when(
+          loading: () => Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+          ),
+          error: (_, __) {
+            var activeCountry = 'United States';
+            if (user.state != null && indiaStates.contains(user.state)) {
+              activeCountry = 'India';
+            }
+            final states = getStatesForCountry(activeCountry);
+            if (_selectedState.isEmpty || !states.contains(_selectedState)) {
+              _selectedState = states.isNotEmpty ? states.first : '';
+            }
+            return _buildScreen(states, user);
+          },
+          data: (country) {
+            var activeCountry = country;
+            if (user.state != null && indiaStates.contains(user.state)) {
+              activeCountry = 'India';
+            } else if (user.state != null && usStates.contains(user.state)) {
+              activeCountry = 'United States';
+            }
+            final states = getStatesForCountry(activeCountry);
+
+            if (_selectedState.isEmpty || !states.contains(_selectedState)) {
+              _selectedState = states.isNotEmpty ? states.first : '';
+            }
+
+            return _buildScreen(states, user);
+          },
+        );
       },
     );
   }
 
-  Widget _buildScreen(List<String> states) {
+  Widget _buildScreen(List<String> states, UserModel user) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: const SettingsAppBar(title: 'Personal Information'),
 
@@ -123,22 +215,55 @@ class _PersonalInformationScreenState
                           Container(
                             width: 140,
                             height: 140,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
                               shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                              image: user.profileImage != null &&
+                                      user.profileImage!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: ImagePickerHelper.getImageProvider(
+                                        user.profileImage!,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
                             ),
-                            child: const Icon(
-                              Icons.person,
-                              size: 70,
-                              color: Colors.grey,
-                            ),
+                            child: user.profileImage == null ||
+                                    user.profileImage!.isEmpty
+                                ? const Icon(
+                                    Icons.person,
+                                    size: 70,
+                                    color: Colors.grey,
+                                  )
+                                : null,
                           ),
+                          if (_isLoading)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.black26,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFFE85D04),
+                                  ),
+                                ),
+                              ),
+                            ),
 
                           Positioned(
                             right: 10,
                             bottom: 10,
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: _pickAndUploadAvatar,
                               child: Container(
                                 width: 42,
                                 height: 42,
@@ -204,19 +329,40 @@ class _PersonalInformationScreenState
 
             Container(
               padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
-              color: const Color(0xFFF5F5F5),
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: SettingsButton(
                 text: 'Save Changes',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Changes saved',
-                        style: GoogleFonts.barlow(),
-                      ),
-                    ),
-                  );
-                },
+                onTap: () async {
+                  if (_isLoading) return;
+                  setState(() => _isLoading = true);
+                  final success = await ref
+                      .read(authControllerProvider.notifier)
+                      .updateProfile(
+                        name: _nameController.text.trim(),
+                        phone: user.phone ?? '',
+                        city: _cityController.text.trim(),
+                        userState: _selectedState,
+                        address: _addressController.text.trim(),
+                      );
+                        if (mounted) {
+                          setState(() => _isLoading = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Changes saved successfully!'
+                                    : 'Failed to save changes.',
+                                style: GoogleFonts.barlow(),
+                              ),
+                              backgroundColor: success ? Colors.green : Colors.redAccent,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          if (success) {
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
               ),
             ),
           ],
@@ -233,7 +379,7 @@ class _PersonalInformationScreenState
         style: GoogleFonts.barlow(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: Colors.black,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
@@ -249,10 +395,10 @@ class _PersonalInformationScreenState
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: GoogleFonts.barlow(fontSize: 16),
+        style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).colorScheme.surface,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 18,
@@ -260,7 +406,11 @@ class _PersonalInformationScreenState
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
           ),
         ),
       ),
@@ -273,15 +423,19 @@ class _PersonalInformationScreenState
       child: TextField(
         controller: _addressController,
         maxLines: 3,
-        style: GoogleFonts.barlow(fontSize: 16),
+        style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).colorScheme.surface,
           contentPadding: const EdgeInsets.all(16),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
           ),
         ),
       ),
@@ -296,19 +450,19 @@ class _PersonalInformationScreenState
         margin: const EdgeInsets.only(top: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE0E0E0)),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
         ),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 _formattedDate,
-                style: GoogleFonts.barlow(fontSize: 16),
+                style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
-            const Icon(Icons.calendar_today_outlined),
+            Icon(Icons.calendar_today_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
           ],
         ),
       ),
@@ -320,14 +474,16 @@ class _PersonalInformationScreenState
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedGender,
           isExpanded: true,
+          dropdownColor: Theme.of(context).colorScheme.surface,
+          style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
           items: const [
             DropdownMenuItem(value: 'Male', child: Text('Male')),
             DropdownMenuItem(value: 'Female', child: Text('Female')),
@@ -348,17 +504,19 @@ class _PersonalInformationScreenState
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedState,
           isExpanded: true,
+          dropdownColor: Theme.of(context).colorScheme.surface,
+          style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
           items: states
               .map(
-                (state) => DropdownMenuItem(value: state, child: Text(state)),
+                (state) => DropdownMenuItem(value: state, child: Text(state, style: GoogleFonts.barlow(color: Theme.of(context).colorScheme.onSurface))),
               )
               .toList(),
           onChanged: (value) {
