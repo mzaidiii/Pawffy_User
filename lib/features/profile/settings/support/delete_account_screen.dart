@@ -31,14 +31,23 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         ),
         content: Text(
           'Your account will be permanently deleted. This action cannot be undone.',
-          style: GoogleFonts.barlow(fontSize: 13, color: Colors.black54),
+          style: GoogleFonts.barlow(
+            fontSize: 13,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white70
+                : Colors.black54,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.barlow(color: Colors.black54),
+              style: GoogleFonts.barlow(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black54,
+              ),
             ),
           ),
           TextButton(
@@ -167,12 +176,18 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
-                    style: GoogleFonts.barlow(fontSize: 14),
+                    style: GoogleFonts.barlow(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     decoration: InputDecoration(
                       hintText: '••••••••••',
-                      hintStyle: GoogleFonts.barlow(fontSize: 18),
+                      hintStyle: GoogleFonts.barlow(
+                        fontSize: 18,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Theme.of(context).colorScheme.surface,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                         vertical: 14,
@@ -190,11 +205,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
