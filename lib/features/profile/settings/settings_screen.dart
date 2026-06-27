@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
+
 import 'package:pawffy/features/profile/settings/support/help_support_screen.dart';
+import 'package:pawffy/features/profile/settings/support/terms_screen.dart';
+import 'package:pawffy/features/profile/settings/support/privacy_policy_screen.dart';
+import 'package:pawffy/features/profile/settings/support/about_pawffy_screen.dart';
 import 'accounts/change_password_screen.dart';
 import 'accounts/email_address_screen.dart';
 import 'accounts/mobile_number_screen.dart';
@@ -13,12 +19,18 @@ import 'preferences/location_settings_screen.dart';
 import 'widgets/settings_tile.dart';
 import 'widgets/settings_section_title.dart';
 
-class SettingsScreen extends StatelessWidget {
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
+import 'package:pawffy/features/auth/providers/auth_controller.dart';
+import 'package:pawffy/features/auth/onboardingScreen.dart';
+
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.asData?.value;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -64,11 +76,18 @@ class SettingsScreen extends StatelessWidget {
                         backgroundColor: isDark
                             ? const Color(0xFF3A2A2A)
                             : const Color(0xFFF3E8E2),
-                        child: const Icon(
-                          Icons.person,
-                          color: Color(0xFFE85D04),
-                          size: 28,
-                        ),
+                        backgroundImage: user?.profileImage != null &&
+                                user!.profileImage!.isNotEmpty
+                            ? ImagePickerHelper.getImageProvider(user.profileImage!)
+                            : null,
+                        child: user?.profileImage == null ||
+                                user!.profileImage!.isEmpty
+                            ? const Icon(
+                                Icons.person,
+                                color: Color(0xFFE85D04),
+                                size: 28,
+                              )
+                            : null,
                       ),
                       Positioned(
                         right: 0,
@@ -99,7 +118,7 @@ class SettingsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Andrew Stevens',
+                          user?.name ?? 'Loading...',
                           style: GoogleFonts.barlow(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -108,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'andrew@email.com',
+                          user?.email ?? '',
                           style: GoogleFonts.barlow(
                             fontSize: 12,
                             color: isDark
@@ -116,28 +135,39 @@ class SettingsScreen extends StatelessWidget {
                                 : Colors.grey.shade600,
                           ),
                         ),
-                        Text(
-                          '+1 234 567 8910',
-                          style: GoogleFonts.barlow(
-                            fontSize: 12,
-                            color: isDark
-                                ? Colors.white70
-                                : Colors.grey.shade600,
+                        if (user?.phone != null && user!.phone!.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            user.phone!,
+                            style: GoogleFonts.barlow(
+                              fontSize: 12,
+                              color: isDark
+                                  ? Colors.white70
+                                  : Colors.grey.shade600,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE85D04).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PersonalInformationScreen(),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.edit_outlined,
-                      size: 18,
-                      color: Color(0xFFE85D04),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE85D04).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                        color: Color(0xFFE85D04),
+                      ),
                     ),
                   ),
                 ],
@@ -225,17 +255,32 @@ class SettingsScreen extends StatelessWidget {
             SettingsTile(
               icon: Icons.description_outlined,
               title: 'Terms & Conditions',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TermsScreen()),
+                );
+              },
             ),
             SettingsTile(
               icon: Icons.privacy_tip_outlined,
               title: 'Privacy Policy',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                );
+              },
             ),
             SettingsTile(
               icon: Icons.info_outline,
               title: 'About Pawffy',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AboutPawffyScreen()),
+                );
+              },
             ),
 
             const SizedBox(height: 20),
@@ -245,7 +290,50 @@ class SettingsScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Log Out?'),
+                      content: const Text('Are you sure you want to log out?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, true),
+                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          child: const Text('Log Out'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true && context.mounted) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (ctx) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFE85D04),
+                        ),
+                      ),
+                    );
+
+                    await ref.read(authControllerProvider.notifier).logout();
+
+                    if (context.mounted) {
+                      // Close loading dialog
+                      Navigator.pop(context); 
+                      // Redirect to Onboarding
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                        (route) => false,
+                      );
+                    }
+                  }
+                },
                 icon: const Icon(Icons.logout, color: Colors.red),
                 label: Text(
                   'LOG OUT',
