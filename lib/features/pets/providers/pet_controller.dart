@@ -43,11 +43,21 @@ class PetController extends AsyncNotifier<List<PetModel>> {
       final service = ref.read(petServiceProvider);
       final updated = await service.updatePet(petId, body);
 
+      final existingPet = state.value?.firstWhere((p) => p.id == petId, orElse: () => updated);
+      final merged = existingPet != null
+          ? updated.copyWith(
+              imageUrl: (updated.imageUrl == null || updated.imageUrl!.isEmpty) ? existingPet.imageUrl : updated.imageUrl,
+              bookingCount: updated.bookingCount == 0 ? existingPet.bookingCount : updated.bookingCount,
+              medicalRecordCount: updated.medicalRecordCount == 0 ? existingPet.medicalRecordCount : updated.medicalRecordCount,
+            )
+          : updated;
+
       // Replace locally
       state = AsyncData(
-        state.value!.map((p) => p.id == petId ? updated : p).toList(),
+        state.value!.map((p) => p.id == petId ? merged : p).toList(),
       );
-      return updated;
+      refreshBackground();
+      return merged;
     } catch (e) {
       return null;
     }
@@ -71,13 +81,41 @@ class PetController extends AsyncNotifier<List<PetModel>> {
       final service = ref.read(petServiceProvider);
       final updated = await service.uploadPetImage(petId, filePath);
 
+      final existingPet = state.value?.firstWhere((p) => p.id == petId, orElse: () => updated);
+      final merged = existingPet != null
+          ? updated.copyWith(
+              name: updated.name.isEmpty ? existingPet.name : updated.name,
+              species: updated.species.isEmpty ? existingPet.species : updated.species,
+              breed: updated.breed.isEmpty ? existingPet.breed : updated.breed,
+              gender: updated.gender.isEmpty ? existingPet.gender : updated.gender,
+              age: updated.age == 0 ? existingPet.age : updated.age,
+              weight: (updated.weight == '0' || updated.weight.isEmpty) ? existingPet.weight : updated.weight,
+              color: updated.color.isEmpty ? existingPet.color : updated.color,
+              medicalNotes: (updated.medicalNotes == null || updated.medicalNotes!.isEmpty) ? existingPet.medicalNotes : updated.medicalNotes,
+              vaccinationStatus: updated.vaccinationStatus.isEmpty ? existingPet.vaccinationStatus : updated.vaccinationStatus,
+              bookingCount: updated.bookingCount == 0 ? existingPet.bookingCount : updated.bookingCount,
+              medicalRecordCount: updated.medicalRecordCount == 0 ? existingPet.medicalRecordCount : updated.medicalRecordCount,
+            )
+          : updated;
+
       // Replace locally
       state = AsyncData(
-        state.value!.map((p) => p.id == petId ? updated : p).toList(),
+        state.value!.map((p) => p.id == petId ? merged : p).toList(),
       );
-      return updated;
+      refreshBackground();
+      return merged;
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<void> refreshBackground() async {
+    try {
+      final service = ref.read(petServiceProvider);
+      final pets = await service.getMyPets();
+      state = AsyncData(pets);
+    } catch (_) {
+      // Ignore background errors
     }
   }
 }
