@@ -38,8 +38,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
               child: Container(
                 width: 84,
                 height: 84,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF1E8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF2A2A2A)
+                      : const Color(0xFFFFF1E8),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -65,7 +67,12 @@ class _LanguageScreenState extends State<LanguageScreen> {
               child: Text(
                 'Select your preferred language\nfor the app',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.barlow(fontSize: 13, color: Colors.black54),
+                style: GoogleFonts.barlow(
+                  fontSize: 13,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white70
+                      : Colors.black54,
+                ),
               ),
             ),
 
@@ -76,7 +83,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               style: GoogleFonts.barlow(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
 
@@ -91,13 +98,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
   Widget _buildLanguageTile(Map<String, String> lang) {
     final isSelected = _selectedLanguage == lang['name'];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => setState(() => _selectedLanguage = lang['name']!),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF232323) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? const Color(0xFFE85D04) : Colors.transparent,
@@ -115,13 +123,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
                     style: GoogleFonts.barlow(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Text(
                     lang['native']!,
                     style: GoogleFonts.barlow(
                       fontSize: 13,
-                      color: Colors.black54,
+                      color: isDark ? Colors.white70 : Colors.black54,
                     ),
                   ),
                 ],
