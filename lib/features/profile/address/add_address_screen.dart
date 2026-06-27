@@ -404,6 +404,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
@@ -424,9 +425,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
             dropdownColor: Theme.of(
               context,
             ).colorScheme.surfaceContainerHighest,
-            icon: const Icon(
+            icon: Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: Colors.black54,
+              color: isDark ? Colors.white70 : Colors.black54,
             ),
             style: GoogleFonts.barlow(
               fontSize: 13,
