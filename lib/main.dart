@@ -13,7 +13,7 @@ final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
 
 class ThemeNotifier extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() => ThemeMode.system; 
+  ThemeMode build() => ThemeMode.system;
 
   void toggle() {
     state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
@@ -155,7 +155,7 @@ ThemeData _lightTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.darkCard,
+      fillColor: const Color(0xFFF2F2F7),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
