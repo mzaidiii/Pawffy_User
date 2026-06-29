@@ -400,15 +400,33 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
               child: TextFormField(
                 controller: _couponController,
                 enabled: _appliedCoupon == null,
+                style: GoogleFonts.barlow(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Enter coupon code (e.g. SAVE20)',
                   hintStyle: GoogleFonts.barlow(
                     color: Colors.grey,
                     fontSize: 13,
                   ),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF232323) : Colors.white,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: isDark ? BorderSide.none : BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: isDark ? BorderSide.none : BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Color(0xFFE85D04), width: 1.5),
                   ),
                 ),
               ),
