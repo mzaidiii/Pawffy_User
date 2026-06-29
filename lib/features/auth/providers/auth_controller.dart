@@ -171,4 +171,17 @@ class AuthController extends AsyncNotifier<void> {
       return false;
     }
   }
+
+  Future<String?> forgotPassword({required String email}) async {
+    state = const AsyncLoading();
+    try {
+      final authService = ref.read(authServiceProvider);
+      final msg = await authService.forgotPassword(email: email);
+      state = const AsyncData(null);
+      return msg;
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return null;
+    }
+  }
 }
