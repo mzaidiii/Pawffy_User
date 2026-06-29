@@ -142,6 +142,18 @@ class AuthService {
     }
   }
 
+  Future<String> forgotPassword({required String email}) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.forgotPassword,
+        data: {'email': email},
+      );
+      return response.data['message'] as String? ?? 'Password reset link sent to your email';
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Forgot password failed');
+    }
+  }
+
   Future<void> logout(String token) async {
     try {
       await _dio.post(
