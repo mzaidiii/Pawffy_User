@@ -207,6 +207,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: const BorderSide(
@@ -271,7 +275,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
             const SizedBox(height: 16),
 
-            // Results count & Dynamic Body
             Expanded(
               child: searchState.when(
                 loading: () => const Center(
