@@ -48,6 +48,13 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: CircularProgressIndicator(
+          color: Color(0xFFE85D04),
+        ),
+      ),
+    );
   }
 }
