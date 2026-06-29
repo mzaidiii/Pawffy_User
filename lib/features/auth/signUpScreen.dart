@@ -97,7 +97,30 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   Future<void> _handleSignUp() async {
-    if (!_validateAll()) return;
+    if (!_validateAll()) {
+      final errors = <String>[];
+      final nameErr = _validateName(_nameController.text.trim());
+      final emailErr = _validateEmail(_emailController.text.trim());
+      final passErr = _validatePassword(_passwordController.text);
+      final confirmErr = _validateConfirmPassword(
+        _confirmPasswordController.text,
+      );
+
+      if (nameErr != null) errors.add(nameErr);
+      if (emailErr != null) errors.add(emailErr);
+      if (passErr != null) errors.add(passErr);
+      if (confirmErr != null) errors.add(confirmErr);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            errors.isNotEmpty ? errors.join('\n') : 'Validation failed',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
 
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -141,12 +164,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDark = brightness == Brightness.dark;
-    final scaffoldBg = isDark ? Colors.black : Colors.white;
+    final isDark = true;
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
+      backgroundColor: Colors.black,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -159,11 +180,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: Icon(
-                  Icons.arrow_back,
-                  color: isDark ? Colors.white : Colors.black,
-                  size: 24,
-                ),
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 24),
               ),
 
               SizedBox(height: size.height * 0.04),
@@ -174,7 +191,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   fontSize: 58,
                   fontWeight: FontWeight.w400,
                   height: 0.95,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: Colors.white,
                 ),
               ),
               Text(
@@ -193,9 +210,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? const Color(0xFFE0E0E0)
-                      : const Color(0xFF666666),
+                  color: const Color(0xFFE0E0E0),
                 ),
               ),
 
@@ -322,7 +337,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     text: TextSpan(
                       text: 'I agree to the ',
                       style: GoogleFonts.barlow(
-                        color: isDark ? Colors.white : Colors.black87,
+                        color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                       ),
@@ -376,45 +391,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ],
                       ),
               ),
-              const SizedBox(height: 20),
-
-              Center(
-                child: Text(
-                  'Or Sign Up With',
-                  style: GoogleFonts.barlow(
-                    color: Colors.grey,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
               const SizedBox(height: 16),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildSocialButton(
-                    'G',
-                    const Color(0xFF4285F4),
-                    isDark: isDark,
-                  ),
-                  const SizedBox(width: 16),
-                  _buildSocialButton(
-                    '',
-                    const Color(0xFF000000),
-                    icon: Icons.apple,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(width: 16),
-                  _buildSocialButton(
-                    'f',
-                    const Color(0xFF1877F2),
-                    isDark: isDark,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-
               Center(
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -424,7 +401,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       text: TextSpan(
                         text: 'Already have an account? ',
                         style: GoogleFonts.barlow(
-                          color: isDark ? Colors.white : Colors.black87,
+                          color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                         ),
@@ -540,39 +517,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           ),
         ],
       ],
-    );
-  }
-
-  Widget _buildSocialButton(
-    String label,
-    Color color, {
-    IconData? icon,
-    required bool isDark,
-  }) {
-    final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFF2F2F2);
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Center(
-        child: icon != null
-            ? Icon(
-                icon,
-                color: isDark ? Colors.white : Colors.black87,
-                size: 26,
-              )
-            : Text(
-                label,
-                style: GoogleFonts.barlow(
-                  color: color,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-      ),
     );
   }
 }

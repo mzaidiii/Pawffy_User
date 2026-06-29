@@ -56,6 +56,68 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return emailErr == null && passErr == null;
   }
 
+  Future<void> _handleForgotPassword() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email address first'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final emailErr = _validateEmail(email);
+    if (emailErr != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(emailErr), backgroundColor: Colors.redAccent),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: 16),
+            Text('Sending password reset link...'),
+          ],
+        ),
+        duration: Duration(days: 1),
+      ),
+    );
+
+    final message = await ref
+        .read(authControllerProvider.notifier)
+        .forgotPassword(email: email);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    if (message != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.green),
+      );
+    } else {
+      final error = ref.read(authControllerProvider);
+      final errorMsg = error.hasError
+          ? error.error.toString().replaceFirst('Exception: ', '')
+          : 'Forgot password failed';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg), backgroundColor: Colors.redAccent),
+      );
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (!_validateAll()) return;
 
@@ -90,13 +152,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDark = brightness == Brightness.dark;
-    final scaffoldBg = isDark ? Colors.black : Colors.white;
+    final isDark =
+        true; // Always style as dark mode since the screen background is black
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
+      backgroundColor: Colors.black,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
@@ -112,46 +173,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'HELLO,',
-                            style: GoogleFonts.archivoBlack(
-                              fontSize: 52,
-                              fontWeight: FontWeight.w400,
-                              height: 1.0,
-                              color: isDark ? Colors.white : Colors.black,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'HELLO,',
+                              style: GoogleFonts.archivoBlack(
+                                fontSize: 52,
+                                fontWeight: FontWeight.w400,
+                                height: 1.0,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.asset(
-                              'android/assets/LoginDog.png',
-                              width: 102,
-                              height: 60,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                width: 105,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE85D04),
-                                  borderRadius: BorderRadius.circular(20),
+                            const SizedBox(width: 10),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset(
+                                'android/assets/LoginDog.png',
+                                width: 102,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  width: 105,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE85D04),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       SizedBox(height: 18),
-                      Text(
-                        'WELCOME BACK!',
-                        style: GoogleFonts.archivoBlack(
-                          fontSize: 35,
-                          fontWeight: FontWeight.w400,
-                          height: 1.0,
-                          color: isDark ? Colors.white : Colors.black,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'WELCOME BACK!',
+                          style: GoogleFonts.archivoBlack(
+                            fontSize: 35,
+                            fontWeight: FontWeight.w400,
+                            height: 1.0,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
@@ -224,14 +293,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Text(
                       'Remember me',
                       style: GoogleFonts.barlow(
-                        color: isDark ? Colors.white : Colors.black,
+                        color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: _handleForgotPassword,
                       child: Text(
                         'Forgot Password?',
                         style: GoogleFonts.barlow(
@@ -285,41 +354,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 22),
 
-                Text(
-                  'Or Log In With',
-                  style: GoogleFonts.barlow(
-                    color: Colors.grey,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildSocialButton(
-                      'G',
-                      const Color(0xFF4285F4),
-                      isDark: isDark,
-                    ),
-                    const SizedBox(width: 16),
-                    _buildSocialButton(
-                      '',
-                      const Color(0xFF000000),
-                      icon: Icons.apple,
-                      isDark: isDark,
-                    ),
-                    const SizedBox(width: 16),
-                    _buildSocialButton(
-                      'f',
-                      const Color(0xFF1877F2),
-                      isDark: isDark,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -333,7 +367,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       text: TextSpan(
                         text: "Don't have an account? ",
                         style: GoogleFonts.barlow(
-                          color: isDark ? Colors.white : Colors.black87,
+                          color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                         ),
@@ -446,39 +480,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ],
       ],
-    );
-  }
-
-  Widget _buildSocialButton(
-    String label,
-    Color color, {
-    IconData? icon,
-    required bool isDark,
-  }) {
-    final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFF2F2F2);
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Center(
-        child: icon != null
-            ? Icon(
-                icon,
-                color: isDark ? Colors.white : Colors.black87,
-                size: 26,
-              )
-            : Text(
-                label,
-                style: GoogleFonts.barlow(
-                  color: color,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-      ),
     );
   }
 }

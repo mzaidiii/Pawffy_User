@@ -10,6 +10,7 @@ class OnboardingScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           // ── Background Image (full screen) ──────────────────
@@ -24,7 +25,9 @@ class OnboardingScreen extends StatelessWidget {
 
           // ── GET STARTED Button (pinned to bottom) ───────────
           Positioned(
-            bottom: 40,
+            bottom: MediaQuery.of(context).padding.bottom > 0
+                ? MediaQuery.of(context).padding.bottom + 16
+                : 40,
             left: 24,
             right: 24,
             child: ElevatedButton(

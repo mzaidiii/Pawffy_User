@@ -175,9 +175,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDark = brightness == Brightness.dark;
-    final scaffoldBg = isDark ? Colors.black : Colors.white;
+    final isDark =
+        true; // Always style as dark mode since the screen background is black
+    final scaffoldBg = Colors.black;
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
@@ -194,11 +194,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: Icon(
-                  Icons.arrow_back,
-                  color: isDark ? Colors.white : Colors.black,
-                  size: 24,
-                ),
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 24),
               ),
 
               SizedBox(height: size.height * 0.04),
@@ -209,7 +205,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   fontSize: 52,
                   fontWeight: FontWeight.w400,
                   height: 0.95,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: Colors.white,
                 ),
               ),
               Text(
@@ -229,9 +225,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? const Color(0xFFE0E0E0)
-                      : const Color(0xFF666666),
+                  color: const Color(0xFFE0E0E0),
                 ),
               ),
 
@@ -244,13 +238,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isDark
-                            ? const Color(0xFF2A2A2A)
-                            : const Color(0xFFE8E8E8),
+                        color: const Color(0xFF2A2A2A),
                         border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF333333)
-                              : const Color(0xFFCCCCCC),
+                          color: const Color(0xFF333333),
                           width: 2,
                         ),
                         image: _selectedImagePath != null
