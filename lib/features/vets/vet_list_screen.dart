@@ -195,6 +195,7 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
+                          filled: false,
                         ),
                       ),
                     ),

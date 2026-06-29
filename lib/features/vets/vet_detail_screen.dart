@@ -38,16 +38,19 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
         error: (e, _) => _buildError(),
         data: (vet) {
           if (vet == null) return _buildLoading();
-          return Stack(
-            children: [
-              _buildContent(vet, isDark),
-              Positioned(
-                bottom: 20,
-                left: 20,
-                right: 20,
-                child: _buildBottomActions(vet, isDark),
-              ),
-            ],
+          return _buildContent(vet, isDark);
+        },
+      ),
+      bottomNavigationBar: vetAsync.when(
+        loading: () => null,
+        error: (e, _) => null,
+        data: (vet) {
+          if (vet == null) return null;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: _buildBottomActions(vet, isDark),
+            ),
           );
         },
       ),
@@ -331,7 +334,7 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
 
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
