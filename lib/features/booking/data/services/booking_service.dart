@@ -14,63 +14,40 @@ class BookingService {
     return Options(headers: {'Authorization': 'Bearer $token'});
   }
 
-  // STEP 2 — Get Available Time Slots dynamically from availability schedule
+  // STEP 2 — Get Available Time Slots dynamically from production slots endpoint
   Future<List<String>> getAvailableSlots(String vetId, String date) async {
     try {
       final response = await _dio.get(
-        ApiConstants.vetAvailability(vetId),
+        ApiConstants.vetSlots(vetId),
+        queryParameters: {'date': date},
         options: (await _authHeader).copyWith(
-          receiveTimeout: const Duration(seconds: 5),
-          sendTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 10),
+          sendTimeout: const Duration(seconds: 10),
         ),
       );
       debugPrint('SLOTS API RESPONSE: ${response.data}');
 
-      final List<dynamic> availabilities = response.data['data'] ?? [];
-      
-      // Find the weekday of the selected date (e.g., "Monday", "Friday")
-      final selectedDateTime = DateTime.parse(date);
-      final weekdayName = DateFormat('EEEE').format(selectedDateTime); // e.g. "Friday"
-
-      // Find availability for this weekday
-      final availability = availabilities.firstWhere(
-        (a) => a is Map &&
-               a['dayOfWeek']?.toString().toLowerCase() == weekdayName.toLowerCase() &&
-               a['isAvailable'] == true,
-        orElse: () => null,
-      );
-
-      if (availability == null) {
-        debugPrint('No availability found for $weekdayName');
-        return [];
-      }
-
-      final String startTime = availability['startTime'] ?? '09:00';
-      final String endTime = availability['endTime'] ?? '17:00';
-      final int duration = availability['slotDuration'] ?? 30;
-
-      // Generate slots list dynamically from start to end time
-      final startParts = startTime.split(':');
-      final startHour = int.parse(startParts[0]);
-      final startMinute = int.parse(startParts[1]);
-
-      final endParts = endTime.split(':');
-      final endHour = int.parse(endParts[0]);
-      final endMinute = int.parse(endParts[1]);
-
+      final List<dynamic> slotsData = response.data['data'] ?? [];
       final List<String> slots = [];
-      var current = DateTime(2000, 1, 1, startHour, startMinute);
-      final end = DateTime(2000, 1, 1, endHour, endMinute);
 
-      while (current.isBefore(end)) {
-        final formattedTime = DateFormat('hh:mm a').format(current); // e.g., "09:00 AM"
-        slots.add(formattedTime);
-        current = current.add(Duration(minutes: duration));
+      for (final item in slotsData) {
+        if (item is Map && item['available'] == true) {
+          final String rawTime = item['time'] ?? '';
+          if (rawTime.isNotEmpty) {
+            try {
+              final parsedTime = DateFormat('HH:mm').parse(rawTime);
+              final formattedTime = DateFormat('hh:mm a').format(parsedTime);
+              slots.add(formattedTime);
+            } catch (e) {
+              debugPrint('Error parsing slot time: $rawTime -> $e');
+            }
+          }
+        }
       }
 
       return slots;
     } catch (e) {
-      debugPrint('GET SLOTS ERROR (Gracefully catching and returning empty): $e');
+      debugPrint('GET SLOTS ERROR: $e');
       return []; // Return empty list to show "No slots available" gracefully
     }
   }
