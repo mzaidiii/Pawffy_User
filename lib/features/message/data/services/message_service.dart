@@ -42,12 +42,29 @@ class MessageService {
       );
       final dynamic body = response.data;
       if (body is Map<String, dynamic>) {
-        if (body.containsKey('conversationId')) {
-          return body['conversationId'] as String;
+        // Direct checks
+        if (body['conversationId'] != null) {
+          return body['conversationId'].toString();
         }
-        if (body['data'] is Map<String, dynamic> &&
-            body['data'].containsKey('conversationId')) {
-          return body['data']['conversationId'] as String;
+        if (body['id'] != null) {
+          return body['id'].toString();
+        }
+        if (body['_id'] != null) {
+          return body['_id'].toString();
+        }
+
+        // Nested 'data' checks
+        final data = body['data'];
+        if (data is Map<String, dynamic>) {
+          if (data['conversationId'] != null) {
+            return data['conversationId'].toString();
+          }
+          if (data['id'] != null) {
+            return data['id'].toString();
+          }
+          if (data['_id'] != null) {
+            return data['_id'].toString();
+          }
         }
       }
       throw Exception('Conversation ID not found in response');
@@ -95,7 +112,7 @@ class MessageService {
   Future<void> markAsRead(String conversationId) async {
     try {
       final options = await _getOptions();
-      await _dio.post(
+      await _dio.patch(
         ApiConstants.markConversationRead(conversationId),
         options: options,
       );

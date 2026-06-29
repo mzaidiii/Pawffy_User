@@ -40,7 +40,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               .read(chatControllerProvider.notifier)
               .startChatWithUser(widget.receiverId);
           setState(() {
-            _currentConversationId = newId;
+            _currentConversationId = newId.isNotEmpty ? newId : null;
           });
           _scrollToBottom();
         } catch (_) {
@@ -84,8 +84,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
     _messageController.clear();
-    await ref.read(chatControllerProvider.notifier).sendMessage(text);
-    _scrollToBottom();
+    try {
+      final controller = ref.read(chatControllerProvider.notifier);
+      await controller.sendMessage(text);
+      if (_currentConversationId == null && controller.conversationId != null) {
+        setState(() {
+          _currentConversationId = controller.conversationId;
+        });
+      }
+      _scrollToBottom();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception:', '').trim()),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -176,13 +193,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         minimumSize: Size.zero,
                       ),
                       onPressed: () {
-                        if (_currentConversationId != null) {
-                          ref
-                              .read(chatControllerProvider.notifier)
-                              .loadMessages(
-                                _currentConversationId!,
-                                widget.receiverId,
-                              );
+                        final controller = ref.read(chatControllerProvider.notifier);
+                        final convId = _currentConversationId ?? controller.conversationId;
+                        if (convId != null) {
+                          controller.loadMessages(
+                            convId,
+                            widget.receiverId,
+                          );
                         }
                       },
                       child: const Text('Retry'),

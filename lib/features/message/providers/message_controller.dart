@@ -38,6 +38,8 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
   String? _conversationId;
   String? _receiverId;
 
+  String? get conversationId => _conversationId;
+
   @override
   Future<List<dynamic>> build() async {
     return [];
@@ -69,19 +71,22 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
 
   Future<String> startChatWithUser(String receiverId) async {
     state = const AsyncLoading();
+    _receiverId = receiverId;
     try {
       final conversationId = await ref
           .read(messageServiceProvider)
           .startOrGetConversation(receiverId);
       _conversationId = conversationId;
-      _receiverId = receiverId;
       await loadMessages(conversationId, receiverId);
       // Refresh conversations list in background
       ref.read(conversationsControllerProvider.notifier).refresh();
       return conversationId;
     } catch (e) {
-      state = AsyncError(e, StackTrace.current);
-      rethrow;
+      // If startOrGetConversation fails (e.g. 404 conversation doesn't exist yet),
+      // we initialize state as empty list and set conversationId to null.
+      _conversationId = null;
+      state = const AsyncData([]);
+      return '';
     }
   }
 
@@ -103,7 +108,9 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
 
       ref.read(conversationsControllerProvider.notifier).refresh();
     } catch (e) {
-      state = AsyncError(e, StackTrace.current);
+      // Keep existing state so that the messages list does not disappear from the UI.
+      // Simply rethrow the exception so the UI's send action can handle it and show a SnackBar.
+      rethrow;
     }
   }
 
