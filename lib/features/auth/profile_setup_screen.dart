@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:pawffy/features/auth/providers/auth_controller.dart';
 import 'package:pawffy/features/home/home_screen.dart';
-import 'package:pawffy/core/utils/image_picker_helper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,8 +24,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _stateFocus = FocusNode();
   final _addressFocus = FocusNode();
 
-  String? _selectedImagePath;
-  bool _isUploadingImage = false;
+
 
   String? _phoneError;
   String? _cityError;
@@ -98,23 +95,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         addressErr == null;
   }
 
-  Future<void> _pickAvatar() async {
-    final source = await ImagePickerHelper.showSourceBottomSheet(context);
-    if (source == null) return;
-    if (!mounted) return;
-
-    final pickedFile = await ImagePickerHelper.pickImageWithPermission(
-      context: context,
-      source: source,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImagePath = pickedFile.path;
-      });
-    }
-  }
-
   Future<void> _handleSubmit() async {
     if (!_validateAll()) return;
 
@@ -140,23 +120,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           const SnackBar(content: Text('Failed to update profile')),
         );
         return;
-      }
-      if (_selectedImagePath != null) {
-        setState(() => _isUploadingImage = true);
-
-        final uploadSuccess = await ref
-            .read(authControllerProvider.notifier)
-            .uploadAvatar(_selectedImagePath!);
-
-        if (!mounted) return;
-        setState(() => _isUploadingImage = false);
-        if (!uploadSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to upload profile image')),
-          );
-        }
-      } else {
-        debugPrint('[ProfileSetup] No avatar selected, skipping upload.');
       }
       Navigator.pushAndRemoveUntil(
         context,
@@ -229,58 +192,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 ),
               ),
 
-              SizedBox(height: size.height * 0.04),
-              Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF2A2A2A),
-                        border: Border.all(
-                          color: const Color(0xFF333333),
-                          width: 2,
-                        ),
-                        image: _selectedImagePath != null
-                            ? DecorationImage(
-                                image: FileImage(File(_selectedImagePath!)),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                      child: _selectedImagePath == null
-                          ? const Icon(
-                              Icons.person_outline,
-                              color: Colors.grey,
-                              size: 44,
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _pickAvatar,
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFE85D04),
-                          ),
-                          child: const Icon(
-                            Icons.camera_alt_outlined,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              SizedBox(height: size.height * 0.02),
 
               const SizedBox(height: 28),
 
@@ -376,7 +288,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
               const SizedBox(height: 28),
               ElevatedButton(
-                onPressed: (authState.isLoading || _isUploadingImage)
+                onPressed: authState.isLoading
                     ? null
                     : _handleSubmit,
                 style: ElevatedButton.styleFrom(
@@ -390,7 +302,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: authState.isLoading || _isUploadingImage
+                child: authState.isLoading
                     ? const SizedBox(
                         height: 22,
                         width: 22,
