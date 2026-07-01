@@ -1,218 +1,170 @@
 <div align="center">
 
-<!-- Animated Header Banner -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=220&section=header&text=🐾%20Pawffy&fontSize=90&fontColor=ffffff&animation=twinkling&fontAlignY=38&desc=Premium%20Pet%20Services%20at%20Your%20Paw%20Tips&descAlignY=62&descSize=20" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:02569B,100:6DB33F&height=180&section=header&text=Pawffy&fontSize=60&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Pet%20care,%20on%20demand.&descAlignY=58&descSize=20" width="100%"/>
 
-<!-- Typing SVG -->
 <a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1000&color=F7A23B&center=true&vCenter=true&multiline=true&repeat=true&width=650&height=80&lines=🐶+Flutter+Pet+Services+Platform;Vet+Bookings+•+Dog+Walking+•+Grooming+•+Stripe;Designed+%26+Built+Solo+from+Scratch+🚀" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=20&pause=1000&color=02569B&center=true&vCenter=true&width=650&lines=Connecting+pet+owners+with+trusted+vets+%F0%9F%90%BE;Real-time+booking+for+dog+walkers+%26+groomers;Built+solo%2C+end+to+end%2C+in+Flutter+%2B+Riverpod;Pixel-perfect+fidelity+to+the+original+Figma+design" alt="Typing SVG" />
 </a>
 
-<br/><br/>
+A production-ready Flutter application connecting pet owners with trusted vets, dog walkers, and groomers — built solo, end to end, with pixel-perfect fidelity to the original design.
 
-<!-- Tech Badges -->
-![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-![Riverpod](https://img.shields.io/badge/Riverpod-00BCD4?style=for-the-badge&logo=dart&logoColor=white)
-![Stripe](https://img.shields.io/badge/Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![REST API](https://img.shields.io/badge/REST_API-FF6F00?style=for-the-badge&logo=fastapi&logoColor=white)
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Riverpod](https://img.shields.io/badge/Riverpod-00BCD4?style=for-the-badge&logo=dart&logoColor=white)](https://riverpod.dev)
+[![Stripe](https://img.shields.io/badge/Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com)
+[![Spring Boot](https://img.shields.io/badge/Backend-Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 
-<br/>
-
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-brightgreen?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-✅%20Completed-success?style=for-the-badge)
-![Solo Built](https://img.shields.io/badge/Built%20By-Mohammad%20Zaidi-blueviolet?style=for-the-badge)
-![Client](https://img.shields.io/badge/Client-US%20Based-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-production--ready-brightgreen?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square)
+![Built by](https://img.shields.io/badge/built%20by-Mohammad%20Zaidi-blueviolet?style=flat-square)
 
 </div>
 
 ---
 
-## 🐾 What is Pawffy?
+## Overview
 
-**Pawffy** is a full-featured, pixel-perfect **pet services mobile application** — a US-based freelance project connecting pet owners with trusted vets, dog walkers, and groomers. Every screen, every state, every pixel was **designed, architected, and implemented solo from scratch** with zero compromise on design fidelity.
+**Pawffy** is a full-featured pet services mobile app built for a US-based freelance client. It connects pet owners with vets, dog walkers, and groomers — handling everything from discovery and booking to in-app messaging and payments.
 
-> 🎨 **Design Philosophy:** Figma exports are used as full-screen background layers inside Flutter `Stack` widgets, with UI components precisely overlaid — achieving 1:1 pixel-perfect fidelity to the original designs.
+The entire app — architecture, state management, UI, and API integration — was designed and built solo, from Figma handoff to a shipped, production-ready product.
 
----
-
-## ✨ Feature Highlights
-
-<div align="center">
-
-| 🏠 Discovery | 🔐 Auth | 📅 Bookings | 💳 Payments |
-|:---:|:---:|:---:|:---:|
-| Home Feed | Email Sign Up/In | Vet Appointments | Stripe Integration |
-| Search & Filters | Onboarding Flow | Dog Walking Sessions | Secure Checkout |
-| GPS-based Listings | JWT Auth | Service Scheduling | Payment History |
-| Service Detail Pages | Profile Setup | Booking History | Refund Flow |
-
-</div>
+> **Design approach:** Figma exports are used as precisely-overlaid background layers inside Flutter `Stack` widgets, giving the app 1:1 pixel fidelity to the original design files.
 
 ---
 
-## 📱 Screen Sections
+## Features
+
+| Discovery | Booking | Payments | Communication |
+|---|---|---|---|
+| Home feed with categories | Vet appointments | Stripe checkout | Real-time chat |
+| Search & filters | Dog walking sessions | Payment history | Conversation threads |
+| GPS-based nearby listings | `bookingType`-driven flows | Refund handling | Provider messaging |
+| Service detail pages | Booking history | Secure card storage | — |
+
+**Also included:** onboarding & OTP-verified auth, pet profile management, multi-address support, and a full settings/notifications section.
 
 <details>
-<summary><b>🚀 Onboarding & Authentication</b></summary>
-<br>
+<summary><strong>Full feature breakdown</strong></summary>
 
-- Splash & welcome screens
-- Multi-step onboarding flow
-- Sign Up / Sign In with full validation
-- Forgot password & OTP verification
+**Onboarding & Authentication**
+- Splash and multi-step onboarding flow
+- Email sign up / sign in with validation
+- Forgot password and OTP verification
+- JWT-based session handling
 
-</details>
-
-<details>
-<summary><b>🏠 Home & Discovery</b></summary>
-<br>
-
+**Home & Discovery**
 - Dynamic home feed with service categories
-- Search with filters (location, rating, service type)
-- Nearby vets and walkers via real-time GPS
-- Service & provider detail pages
+- Search with location, rating, and service-type filters
+- Real-time GPS for nearby vets and walkers
+- Service and provider detail pages
 
-</details>
-
-<details>
-<summary><b>📅 Booking Flow</b></summary>
-<br>
-
-- `bookingType`-driven logic — different flows for Vet vs. Dog Walking bookings
+**Booking**
+- Single booking screen with `bookingType`-driven logic for vet vs. dog-walking flows
 - Pet selection per booking
-- Date & time scheduling UI
-- Stripe-powered checkout integration
-- Booking confirmation & history
+- Date and time scheduling
+- Stripe-powered checkout and booking confirmation
 
-</details>
+**Messaging**
+- Conversation list and real-time chat with providers
 
-<details>
-<summary><b>💬 Messaging</b></summary>
-<br>
+**Profile & Pet Management**
+- Editable user profile
+- Add/edit/delete pet profiles
+- Multiple saved addresses
 
-- Conversation list view
-- Real-time chat interface with service providers
-- Message threading
-
-</details>
-
-<details>
-<summary><b>👤 Profile & Pet Management</b></summary>
-<br>
-
-- User profile view & edit
-- Pet profiles — add, edit, delete
-- Address management (multiple addresses supported)
-
-</details>
-
-<details>
-<summary><b>⚙️ Settings</b></summary>
-<br>
-
-- Notification preferences
-- Account settings
-- Privacy & security options
-- App configuration
+**Settings**
+- Notification preferences, account, and privacy controls
 
 </details>
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-```
-📦 Pawffy_User
-├── 🎯  Framework       →  Flutter (Dart)
-├── 🔄  State Mgmt      →  Riverpod (NotifierProvider pattern)
-├── 🔤  Typography      →  Google Fonts — Barlow
-├── 📍  Location        →  geolocator + geocoding (shared GPS provider)
-├── 💳  Payments        →  Stripe SDK
-├── 🌐  Backend         →  REST APIs (Spring Boot)
-├── ⚡  Performance     →  RepaintBoundary on high-res PNG assets
-└── 🎨  UI Strategy     →  Figma PNG exports as bg + Flutter widget overlay via Stack
-```
+| Layer | Choice |
+|---|---|
+| Framework | Flutter (Dart) |
+| State Management | Riverpod (`NotifierProvider` pattern) |
+| Typography | Google Fonts — Barlow |
+| Location | `geolocator` + `geocoding`, shared GPS provider |
+| Payments | Stripe SDK |
+| Backend | REST API (Spring Boot) |
+| Performance | `RepaintBoundary` on high-resolution assets |
 
 ---
 
-## 🏗️ Project Architecture
+## Architecture
 
 ```
 lib/
 ├── main.dart
 ├── core/
-│   ├── providers/          # Shared Riverpod providers (GPS, auth state, etc.)
-│   ├── models/             # Data models & DTOs
-│   └── services/           # API service layer & Stripe integration
-├── features/
-│   ├── auth/               # Onboarding, login, register, OTP
-│   ├── home/               # Home feed, search & filters
-│   ├── booking/            # Full booking flow (vet & walking)
-│   ├── messaging/          # Chat screens
-│   ├── profile/            # User profile, pets, addresses
-│   └── settings/           # Settings section
-└── shared/
-    ├── widgets/            # Reusable UI components
-    └── assets/             # Figma-exported design assets
+│   ├── config/         # App-wide configuration & environment values
+│   ├── networks/       # API service layer & network clients
+│   ├── storage/        # Local storage (secure storage, caching)
+│   └── utils/          # Shared helpers & extensions
+└── features/
+    ├── auth/           # Onboarding, login, register, OTP
+    ├── booking/        # Vet & dog-walking booking flow
+    ├── home/           # Home feed
+    ├── message/        # Chat
+    ├── notification/   # Notification handling & preferences
+    ├── pets/           # Pet profile management
+    ├── profile/        # User profile & addresses
+    ├── search/         # Search & filters
+    └── vets/           # Vet discovery & detail pages
 ```
 
----
+The project also ships with platform folders for **iOS**, **macOS**, and **Linux**, alongside a dedicated `test/` directory.
 
-## ⚡ Engineering Highlights
-
-- **`RepaintBoundary`** wrapping all high-res Figma PNG assets — eliminates rendering jank
-- **Shared GPS architecture** — single location stream provider consumed across all features, avoiding redundant permission calls
-- **`NotifierProvider` pattern** — predictable, reactive state management across complex booking flows
-- **Keyboard-aware layouts** — prevents content jump on text field focus across all form screens
-- **Dark theme isolation** — custom dropdown theming to prevent system dark mode bleeding into UI
-- **`bookingType`-driven logic** — single booking screen handles divergent vet vs. walker flows cleanly
+**Notable engineering decisions:**
+- A single shared GPS stream provider is consumed across every feature that needs location, avoiding redundant permission prompts and duplicate location listeners.
+- `RepaintBoundary` wraps high-res Figma-exported PNGs to keep scroll and animation performance smooth.
+- Booking logic branches on a single `bookingType` field rather than duplicating screens, keeping the vet and dog-walking flows in one maintainable path.
+- Keyboard-aware layouts prevent content jumping when form fields gain focus.
+- Dark-theme styling is explicitly isolated on dropdowns so system dark mode can't bleed into the UI unexpectedly.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-
 - Flutter SDK `>=3.x`
 - Dart `>=3.x`
-- Android Studio / VS Code with Flutter extension
-- Pawffy backend (Spring Boot) running locally or deployed
+- Android Studio or VS Code with the Flutter extension
+- The Pawffy backend (Spring Boot) running locally or deployed
 
 ### Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/mzaidiii/Pawffy_User.git
-
-# Navigate into the project
 cd Pawffy_User
 
-# Install all dependencies
+# Install dependencies
 flutter pub get
 
-# Run on connected device or emulator
+# Run on a connected device or emulator
 flutter run
 ```
 
 ### Configuration
 
-Update `lib/core/config.dart` with your environment values:
+Set your environment values in `lib/core/config.dart`:
 
 ```dart
-const String baseUrl        = 'YOUR_BACKEND_BASE_URL';
-const String stripeKey      = 'YOUR_STRIPE_PUBLISHABLE_KEY';
+const String baseUrl   = 'YOUR_BACKEND_BASE_URL';
+const String stripeKey = 'YOUR_STRIPE_PUBLISHABLE_KEY';
 ```
 
 ---
 
-## ✅ Development Status
+## Project Status
 
-> All core modules are fully implemented and delivered.
+All core modules are implemented, tested, and ready for production deployment.
 
 | Module | Status |
-|--------|:------:|
+|---|---|
 | Onboarding & Splash | ✅ Complete |
 | Authentication (Sign Up / Sign In / OTP) | ✅ Complete |
 | Home Feed & Service Discovery | ✅ Complete |
@@ -222,50 +174,30 @@ const String stripeKey      = 'YOUR_STRIPE_PUBLISHABLE_KEY';
 | Messaging / Chat | ✅ Complete |
 | User Profile & Pet Management | ✅ Complete |
 | Address Management | ✅ Complete |
-| Settings Section | ✅ Complete |
+| Settings | ✅ Complete |
 
 ---
 
-## 👨‍💻 About the Developer
+## About the Developer
 
-<div align="center">
+**Mohammad Zaidi**
+Flutter & Spring Boot Developer
 
-<img src="https://github-readme-stats.vercel.app/api?username=mzaidiii&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" height="160"/>
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=mzaidiii&layout=compact&theme=tokyonight&hide_border=true" height="160"/>
+- 🏆 SIH 2025 National Finalist — *SymbioMed*, validated by the Ministry of AYUSH
+- 🐾 Solo-built Pawffy end to end for a US-based freelance client
+- 📱 Delivers production Flutter apps and has run Flutter workshops
+- 💡 Stack: Flutter · Dart · Spring Boot · Java · Firebase · MySQL · Docker · JWT
 
-</div>
-
-<br/>
-
-<div align="center">
-
-### Mohammad Zaidi
-**Flutter & Spring Boot Developer**  
-**B.Tech Computer Science Engineering @ ABES Institute of Technology (AKTU), Ghaziabad — Class of 2027**
-
-🏆 **SIH 2025 National Finalist** — *SymbioMed*, validated by the Ministry of AYUSH  
-🐾 **Pawffy** — Solo-built, pixel-perfect Flutter app for a US-based freelance client  
-📱 **Freelance Flutter Developer** — Delivered production apps & conducted Flutter workshops  
-💡 **Tech Stack:** Flutter · Dart · Spring Boot · Java · Firebase · MySQL · Docker · JWT
-
-<br/>
-
-[![GitHub](https://img.shields.io/badge/GitHub-mzaidiii-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/mzaidiii)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Mohammad%20Zaidi-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/mzaidiii)
-[![LeetCode](https://img.shields.io/badge/LeetCode-mzaidiii-FFA116?style=for-the-badge&logo=leetcode&logoColor=black)](https://leetcode.com/mzaidiii)
-
-</div>
+[GitHub](https://github.com/mzaidiii) · [LinkedIn](https://linkedin.com/in/mzaidiii) · [LeetCode](https://leetcode.com/mzaidiii)
 
 ---
 
 <div align="center">
 
-> *Pawffy was designed, architected, and built entirely solo — every screen, every provider, every pixel.*
+**Designed, architected, and built solo — every screen, every provider, every pixel.**
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=120&section=footer&animation=twinkling" width="100%"/>
+⭐ If this project is useful to you, consider starring the repo.
 
-**Made with ❤️ and Flutter magic by [Mohammad Zaidi](https://github.com/mzaidiii)**
-
-⭐ *If this project impressed you, drop a star — it means the world!* ⭐
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6DB33F,100:02569B&height=100&section=footer" width="100%"/>
 
 </div>
