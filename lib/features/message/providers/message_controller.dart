@@ -8,7 +8,7 @@ final messageServiceProvider = Provider<MessageService>(
 
 final conversationsControllerProvider =
     AsyncNotifierProvider<ConversationsController, List<ConversationModel>>(
-      () => ConversationsController(),
+      ConversationsController.new,
     );
 
 class ConversationsController extends AsyncNotifier<List<ConversationModel>> {
@@ -30,8 +30,8 @@ class ConversationsController extends AsyncNotifier<List<ConversationModel>> {
 }
 
 final chatControllerProvider =
-    AsyncNotifierProvider<ChatController, List<dynamic>>(
-      () => ChatController(),
+    AsyncNotifierProvider.autoDispose<ChatController, List<dynamic>>(
+      ChatController.new,
     );
 
 class ChatController extends AsyncNotifier<List<dynamic>> {
@@ -62,9 +62,9 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
           .read(messageServiceProvider)
           .getMessages(conversationId);
       state = AsyncData(messages);
-    } catch (e) {
-      if (!silent) {
-        state = AsyncError(e, StackTrace.current);
+    } catch (e, st) {
+      if (!silent || state.hasError || !state.hasValue) {
+        state = AsyncError(e, st);
       }
     }
   }
@@ -78,20 +78,18 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
           .startOrGetConversation(receiverId);
       _conversationId = conversationId;
       await loadMessages(conversationId, receiverId);
-      // Refresh conversations list in background
       ref.read(conversationsControllerProvider.notifier).refresh();
       return conversationId;
-    } catch (e) {
-      // If startOrGetConversation fails (e.g. 404 conversation doesn't exist yet),
-      // we initialize state as empty list and set conversationId to null.
+    } catch (e, st) {
       _conversationId = null;
-      state = const AsyncData([]);
+      state = AsyncError(e, st);
       return '';
     }
   }
 
   Future<void> sendMessage(String content) async {
     if (_receiverId == null) return;
+
     try {
       await ref
           .read(messageServiceProvider)
@@ -102,14 +100,11 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
           .startOrGetConversation(_receiverId!);
 
       if (_conversationId != null) {
-        // Pass silent: true here to prevent the screen from flashing a loading spinner
         await loadMessages(_conversationId!, _receiverId!, silent: true);
       }
 
       ref.read(conversationsControllerProvider.notifier).refresh();
     } catch (e) {
-      // Keep existing state so that the messages list does not disappear from the UI.
-      // Simply rethrow the exception so the UI's send action can handle it and show a SnackBar.
       rethrow;
     }
   }
@@ -118,7 +113,6 @@ class ChatController extends AsyncNotifier<List<dynamic>> {
     if (_conversationId != null) {
       try {
         await ref.read(messageServiceProvider).markAsRead(_conversationId!);
-        // Refresh the inbox list in the background
         ref.read(conversationsControllerProvider.notifier).refresh();
       } catch (_) {}
     }
