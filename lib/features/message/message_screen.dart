@@ -22,11 +22,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
-
-    // Refresh conversations when entering screen
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(conversationsControllerProvider.notifier).refresh();
-    });
   }
 
   @override
@@ -71,7 +66,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
           children: [
             const SizedBox(height: 16),
 
-            // ── Top Bar ────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -87,7 +81,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
             const SizedBox(height: 16),
 
-            // ── Search Bar ─────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -140,7 +133,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
             const SizedBox(height: 12),
 
-            // ── Divider ────────────────────────────────
             Divider(
               color: isDark
                   ? Colors.white.withOpacity(0.08)
@@ -149,7 +141,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               height: 1,
             ),
 
-            // ── Conversations List ────────────────────────────
             Expanded(
               child: conversationsAsync.when(
                 loading: () => const Center(
