@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'providers/pet_controller.dart';
 import 'data/models/pet_model.dart';

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pawffy/core/utils/image_picker_helper.dart';
 import '../providers/pet_controller.dart';
 import '../data/models/pet_model.dart';
@@ -27,7 +26,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
   late final TextEditingController _colorController;
   late final TextEditingController _medicalNotesController;
 
-  // Dropdowns
   String _species = 'Dog';
   String _gender = 'Male';
   String _vaccinationStatus = 'Up to date';
@@ -125,7 +123,7 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
       final updated = await ref
           .read(petControllerProvider.notifier)
           .updatePet(widget.pet!.id, body);
-      
+
       if (updated != null) {
         if (_localImagePath != null) {
           final updatedWithImage = await ref
@@ -140,7 +138,7 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
       final created = await ref
           .read(petControllerProvider.notifier)
           .createPet(body);
-      
+
       if (created != null) {
         if (_localImagePath != null) {
           final updatedWithImage = await ref
@@ -205,7 +203,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -217,8 +214,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Title
               Text(
                 _isEditMode ? 'EDIT PET' : 'ADD NEW PET',
                 style: GoogleFonts.barlow(
@@ -230,7 +225,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Image Picker Area
               Center(
                 child: Stack(
                   children: [
@@ -246,16 +240,17 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
                                 fit: BoxFit.cover,
                               )
                             : (widget.pet?.imageUrl != null &&
-                                    widget.pet!.imageUrl!.isNotEmpty
+                                      widget.pet!.imageUrl!.isNotEmpty
                                   ? DecorationImage(
                                       image: ImagePickerHelper.getImageProvider(
                                         widget.pet!.imageUrl!,
                                       ),
                                       fit: BoxFit.cover,
                                     )
-                                : null),
+                                  : null),
                       ),
-                      child: _localImagePath == null &&
+                      child:
+                          _localImagePath == null &&
                               (widget.pet?.imageUrl == null ||
                                   widget.pet!.imageUrl!.isEmpty)
                           ? const Icon(
@@ -290,7 +285,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Name
               _buildTextField(
                 controller: _nameController,
                 label: 'Pet Name',
@@ -300,7 +294,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Species dropdown
               _buildDropdown(
                 label: 'Species',
                 value: _species,
@@ -309,7 +302,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Breed
               _buildTextField(
                 controller: _breedController,
                 label: 'Breed',
@@ -319,7 +311,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Gender dropdown
               _buildDropdown(
                 label: 'Gender',
                 value: _gender,
@@ -328,7 +319,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Age + Weight row
               Row(
                 children: [
                   Expanded(
@@ -358,7 +348,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Color
               _buildTextField(
                 controller: _colorController,
                 label: 'Color',
@@ -368,7 +357,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Vaccination status
               _buildDropdown(
                 label: 'Vaccination Status',
                 value: _vaccinationStatus,
@@ -377,7 +365,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 14),
 
-              // Medical notes
               _buildTextField(
                 controller: _medicalNotesController,
                 label: 'Medical Notes (optional)',
@@ -386,7 +373,6 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
               ),
               const SizedBox(height: 24),
 
-              // Submit button
               SizedBox(
                 width: double.infinity,
                 height: 52,
