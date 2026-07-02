@@ -61,10 +61,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String? _validatePassword(String value) {
     if (value.isEmpty) return 'Password is required';
     if (value.length < 8) return 'Password must be at least 8 characters';
-    if (!RegExp(r'[A-Za-z]').hasMatch(value))
+    if (!RegExp(r'[A-Za-z]').hasMatch(value)) {
       return 'Must contain at least one letter';
-    if (!RegExp(r'\d').hasMatch(value))
+    }
+    if (!RegExp(r'\d').hasMatch(value)) {
       return 'Must contain at least one number';
+    }
     if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(value)) {
       return 'Must contain at least one special character';
     }
