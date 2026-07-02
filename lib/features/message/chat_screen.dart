@@ -24,6 +24,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late String? _currentConversationId;
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +55,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         }
       }
 
-      // Mark as read
       if (_currentConversationId != null) {
         ref.read(chatControllerProvider.notifier).markAsRead();
       }
@@ -109,6 +109,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -193,13 +194,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         minimumSize: Size.zero,
                       ),
                       onPressed: () {
-                        final controller = ref.read(chatControllerProvider.notifier);
-                        final convId = _currentConversationId ?? controller.conversationId;
+                        final controller = ref.read(
+                          chatControllerProvider.notifier,
+                        );
+                        final convId =
+                            _currentConversationId ?? controller.conversationId;
                         if (convId != null) {
-                          controller.loadMessages(
-                            convId,
-                            widget.receiverId,
-                          );
+                          controller.loadMessages(convId, widget.receiverId);
                         }
                       },
                       child: const Text('Retry'),
@@ -219,7 +220,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   );
                 }
-                // Scroll to bottom after rebuild
                 WidgetsBinding.instance.addPostFrameCallback(
                   (_) => _scrollToBottom(),
                 );
@@ -255,7 +255,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ),
                       );
                     }
-                    // Render Message Bubble
                     final isMine = item['isMine'] ?? false;
                     final content = item['content'] ?? '';
                     return Align(
@@ -306,7 +305,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               },
             ),
           ),
-          // Message Composer Input Bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
