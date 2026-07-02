@@ -85,7 +85,6 @@ class AuthController extends AsyncNotifier<void> {
         final authService = ref.read(authServiceProvider);
         await authService.logout(token);
       }
-    } catch (e) {
     } finally {
       await StorageService.clearAll();
       ref.read(currentUserProvider.notifier).clear();
