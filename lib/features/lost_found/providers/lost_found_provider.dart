@@ -48,6 +48,20 @@ class LostFoundNotifier extends AsyncNotifier<List<LostFoundReportModel>> {
     }
     await refreshFeed();
   }
+
+  Future<LostFoundReportModel> updateLostPet(String id, Map<String, dynamic> data) async {
+    final report = await ref.read(lostFoundServiceProvider).updateLostReport(id, data);
+    ref.invalidate(lostReportDetailsProvider(id));
+    await refreshFeed();
+    return report;
+  }
+
+  Future<LostFoundReportModel> updateFoundPet(String id, Map<String, dynamic> data) async {
+    final report = await ref.read(lostFoundServiceProvider).updateFoundReport(id, data);
+    ref.invalidate(foundReportDetailsProvider(id));
+    await refreshFeed();
+    return report;
+  }
 }
 
 // Detail fetchers
