@@ -13,13 +13,42 @@ class ApiConstants {
   // ── Users ─────────────────────────────────────────
   static const String updateMe = '/api/users/me';
   static const String uploadAvatar = '/api/users/me/avatar';
+  static const String users = '/api/users';
+  static String userById(String id) => '/api/users/$id';
+  static String changeUserRole(String id) => '/api/users/$id/role';
+
+  // ── Dashboard ─────────────────────────────────────
+  static const String dashboard = '/api/dashboard/dashboard';
+  static String dashboardUser(String id) => '/api/dashboard/users/$id';
+  static const String dashboardPartners = '/api/dashboard/partners';
+  static String dashboardNotifications(String id) =>
+      '/api/dashboard/notifications/$id';
+  static const String dashboardCategories = '/api/dashboard/categories';
+  static const String dashboardBanner = '/api/dashboard/banner';
+
+  // ── Lost & Found Pets ─────────────────────────────
+  static const String lostPets = '/api/lost-pets';
+  static const String lostPetReports = '/api/lost-pets/reports';
+  static String lostPetReportById(String id) => '/api/lost-pets/report/$id';
+  static const String foundPets = '/api/found-pets';
+  static String foundPetById(String id) => '/api/found-pets/$id';
+  static const String allPetReports = '/api/reports';
 
   // ── Pets ──────────────────────────────────────────
   static const String pets = '/api/pets';
   static String petById(String id) => '/api/pets/$id';
   static String uploadPetImage(String id) => '/api/pets/$id/image';
 
-  // ── Vets ──────────────────────────────────────────
+  // ── Vendors (Public Discovery) ────────────────────
+  static const String vendors = '/api/vendors';
+  static String vendorById(String id) => '/api/vendors/$id';
+  static String vendorReviews(String id) => '/api/vendors/$id/reviews';
+  static String vendorSlots(String id) => '/api/vendors/$id/slots';
+  static String vendorRequests(String id) => '/api/vendors/$id/requests';
+  static const String vendorRequestsAsVendor = '/api/vendor/requests';
+
+  // ── Vets (Booking flow — slots/services) ─────────
+  // These stay on old /api/vets until vendor equivalents exist
   static const String vets = '/api/vets';
   static String vetById(String id) => '/api/vets/$id';
   static String vetAvailability(String id) => '/api/vets/$id/availability';
@@ -31,6 +60,10 @@ class ApiConstants {
   static const String bookings = '/api/bookings';
   static String bookingById(String id) => '/api/bookings/$id';
   static String updateBookingStatus(String id) => '/api/bookings/$id/status';
+
+  // ── Walking Bookings ──────────────────────────────
+  static const String walkingBookings = '/api/bookings/walking';
+  static String walkingBookingById(String id) => '/api/bookings/walking/$id';
 
   // ── Messages ──────────────────────────────────────
   static const String conversations = '/api/messages/conversations';
@@ -66,3 +99,4 @@ class ApiConstants {
       '/api/notifications/$id/read';
   static String deleteNotification(String id) => '/api/notifications/$id';
 }
+
