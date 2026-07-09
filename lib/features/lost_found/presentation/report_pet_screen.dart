@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pawffy/core/utils/location_provider.dart';
 import '../providers/lost_found_provider.dart';
+import '../data/models/lost_found_model.dart';
 
 class ReportPetScreen extends ConsumerStatefulWidget {
-  const ReportPetScreen({super.key});
+  final LostFoundReportModel? existingReport;
+  const ReportPetScreen({super.key, this.existingReport});
 
   @override
   ConsumerState<ReportPetScreen> createState() => _ReportPetScreenState();
@@ -33,7 +35,22 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
   @override
   void initState() {
     super.initState();
-    _prefillLocation();
+    if (widget.existingReport != null) {
+      final rep = widget.existingReport!;
+      _isLost = rep.reportType == 'lost';
+      _nameController.text = rep.name ?? '';
+      _breedController.text = rep.breed;
+      _ageController.text = rep.age?.toString() ?? '';
+      _colorController.text = rep.color;
+      _heightController.text = rep.height ?? '';
+      _weightController.text = rep.weight ?? '';
+      _descriptionController.text = rep.description;
+      _addressController.text = rep.location.address;
+      _imageController.text = rep.images.isNotEmpty ? rep.images.first : '';
+      _gender = rep.gender;
+    } else {
+      _prefillLocation();
+    }
   }
 
   Future<void> _prefillLocation() async {
@@ -99,19 +116,31 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
 
     try {
       final notifier = ref.read(lostFoundFeedProvider.notifier);
-      if (_isLost) {
-        await notifier.reportLostPet(payload);
+      if (widget.existingReport != null) {
+        if (_isLost) {
+          await notifier.updateLostPet(widget.existingReport!.id, payload);
+        } else {
+          await notifier.updateFoundPet(widget.existingReport!.id, payload);
+        }
       } else {
-        await notifier.reportFoundPet(payload);
+        if (_isLost) {
+          await notifier.reportLostPet(payload);
+        } else {
+          await notifier.reportFoundPet(payload);
+        }
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _isLost
-                  ? 'Lost pet reported successfully!'
-                  : 'Found pet reported successfully!',
+              widget.existingReport != null
+                  ? (_isLost
+                      ? 'Lost pet report updated successfully!'
+                      : 'Found pet report updated successfully!')
+                  : (_isLost
+                      ? 'Lost pet reported successfully!'
+                      : 'Found pet reported successfully!'),
             ),
           ),
         );
@@ -139,7 +168,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'REPORT A PET',
+          widget.existingReport != null ? 'EDIT REPORT' : 'REPORT A PET',
           style: GoogleFonts.barlow(
             fontWeight: FontWeight.w800,
             letterSpacing: 1.2,
@@ -166,7 +195,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => _isLost = true),
+                            onTap: widget.existingReport != null
+                                ? null
+                                : () => setState(() => _isLost = true),
                             child: Container(
                               height: 48,
                               decoration: BoxDecoration(
@@ -191,7 +222,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => _isLost = false),
+                            onTap: widget.existingReport != null
+                                ? null
+                                : () => setState(() => _isLost = false),
                             child: Container(
                               height: 48,
                               decoration: BoxDecoration(
@@ -427,7 +460,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                               )
                             : Text(
-                                'SUBMIT REPORT',
+                                widget.existingReport != null ? 'SAVE CHANGES' : 'SUBMIT REPORT',
                                 style: GoogleFonts.barlow(
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.1,
