@@ -11,7 +11,8 @@ import 'widgets/ad_banner.dart';
 import '../search/search_screen.dart';
 import '../message/message_screen.dart';
 import '../profile/profile_screen.dart';
-import 'package:pawffy/features/vets/providers/vet_controller.dart';
+import 'package:pawffy/features/home/providers/dashboard_provider.dart';
+import 'package:pawffy/features/lost_found/presentation/lost_found_feed_screen.dart';
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 import 'package:pawffy/features/notification/notification_screen.dart';
 import 'package:pawffy/features/notification/provider/notification_controller.dart';
@@ -265,15 +266,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ServiceGrid(
                         onSeeAll: () {},
                         onServiceTap: (service) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => VetListScreen(
-                                serviceType: service.serviceType,
-                                serviceLabel: service.label,
+                          if (service.serviceType == 'lost_found') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const LostFoundFeedScreen(),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => VetListScreen(
+                                  serviceType: service.serviceType,
+                                  serviceLabel: service.label,
+                                ),
+                              ),
+                            );
+                          }
                         },
                       ),
 
@@ -377,7 +387,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 10),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LostFoundFeedScreen(),
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -418,7 +435,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildNearbyProviders() {
-    final vetsAsync = ref.watch(vetControllerProvider);
+    final vetsAsync = ref.watch(dashboardPartnersProvider);
 
     return Column(
       children: [
@@ -488,6 +505,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     location: '${vet.city}, ${vet.state}',
                     price: '\$${vet.consultationFee}',
                     rating: vet.rating,
+                    isOnline: vet.availableStatus,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
