@@ -52,6 +52,12 @@ final List<ServiceItem> popularServices = [
     serviceType: 'adoption',
     comingSoon: true,
   ),
+  ServiceItem(
+    label: 'Lost & Found',
+    icon: Icons.search_rounded,
+    serviceType: 'lost_found',
+    comingSoon: false,
+  ),
 ];
 
 class ServiceGrid extends StatelessWidget {
