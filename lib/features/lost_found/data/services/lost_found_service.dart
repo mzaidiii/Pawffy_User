@@ -164,4 +164,41 @@ class LostFoundService {
       );
     }
   }
+
+  /// Update Lost Pet Report
+  Future<LostFoundReportModel> updateLostReport(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put(
+        ApiConstants.lostPetReportById(id),
+        data: data,
+        options: await _authHeader,
+      );
+      final reportData = response.data['data'] ?? response.data;
+      return LostFoundReportModel.fromJson(reportData);
+    } on DioException catch (e) {
+      debugPrint('UPDATE LOST REPORT ERROR: ${e.response?.data}');
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to update lost pet report',
+      );
+    }
+  }
+
+  /// Update Found Pet Report
+  Future<LostFoundReportModel> updateFoundReport(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put(
+        ApiConstants.foundPetById(id),
+        data: data,
+        options: await _authHeader,
+      );
+      final reportData = response.data['data'] ?? response.data;
+      return LostFoundReportModel.fromJson(reportData);
+    } on DioException catch (e) {
+      debugPrint('UPDATE FOUND REPORT ERROR: ${e.response?.data}');
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to update found pet report',
+      );
+    }
+  }
 }
+
