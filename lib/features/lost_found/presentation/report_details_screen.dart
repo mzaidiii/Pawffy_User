@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:pawffy/features/message/chat_screen.dart';
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
+import 'package:pawffy/features/lost_found/presentation/report_pet_screen.dart';
 import '../providers/lost_found_provider.dart';
 import '../data/models/lost_found_model.dart';
 
@@ -60,6 +62,8 @@ class ReportDetailsScreen extends ConsumerWidget {
         ),
         data: (report) {
           final isLost = report.reportType == 'lost';
+          final currentUser = ref.watch(currentUserProvider).asData?.value;
+          final isOwner = currentUser != null && report.reporterId == currentUser.id;
 
           return SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -186,7 +190,7 @@ class ReportDetailsScreen extends ConsumerWidget {
                       const SizedBox(height: 30),
 
                       // Contact Reporter Action Card
-                      _buildReporterCard(context, report, isDark, primaryColor),
+                      _buildReporterCard(context, ref, report, isDark, primaryColor, isOwner: isOwner),
                     ],
                   ),
                 ),
@@ -269,8 +273,58 @@ class ReportDetailsScreen extends ConsumerWidget {
     );
   }
 
+  void _confirmDelete(BuildContext context, WidgetRef ref, LostFoundReportModel report) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Delete Report?',
+          style: GoogleFonts.barlow(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete this report? This action cannot be undone.',
+          style: GoogleFonts.barlow(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'CANCEL',
+              style: GoogleFonts.barlow(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(lostFoundFeedProvider.notifier).deleteReport(report.id, report.reportType);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Report deleted successfully.')),
+                  );
+                  Navigator.pop(context);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to delete report: $e')),
+                  );
+                }
+              }
+            },
+            child: Text(
+              'DELETE',
+              style: GoogleFonts.barlow(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildReporterCard(
-      BuildContext context, LostFoundReportModel report, bool isDark, Color primaryColor) {
+      BuildContext context, WidgetRef ref, LostFoundReportModel report, bool isDark, Color primaryColor, {required bool isOwner}) {
     final String repName = report.reporterName ?? 'Helpful User';
     final String repEmail = report.reporterEmail ?? 'reporter@pawffy.com';
 
@@ -284,7 +338,7 @@ class ReportDetailsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'REPORTER CONTACT',
+            isOwner ? 'REPORT MANAGEMENT' : 'REPORTER CONTACT',
             style: GoogleFonts.barlow(
               fontSize: 11,
               fontWeight: FontWeight.w800,
@@ -332,41 +386,89 @@ class ReportDetailsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           // Actions Row
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Start in-app chat with reporter
-                    // We generate receiverId: standard reporterEmail or ID
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatScreen(
-                          receiverId: report.reporterId ?? report.id,
-                          receiverName: repName,
+          if (isOwner)
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ReportPetScreen(existingReport: report),
                         ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit_rounded, size: 18),
+                    label: const Text('EDIT'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: BorderSide(color: primaryColor),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      textStyle: GoogleFonts.barlow(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
-                  label: const Text('MESSAGE'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    textStyle: GoogleFonts.barlow(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _confirmDelete(context, ref, report),
+                    icon: const Icon(Icons.delete_rounded, size: 18),
+                    label: const Text('DELETE'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      textStyle: GoogleFonts.barlow(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      // Start in-app chat with reporter
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChatScreen(
+                            receiverId: report.reporterId ?? report.id,
+                            receiverName: repName,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+                    label: const Text('MESSAGE'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      textStyle: GoogleFonts.barlow(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
 }
+
