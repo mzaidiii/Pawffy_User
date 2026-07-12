@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/settings_appbar.dart';
+import 'support_service.dart';
 
-class TermsScreen extends StatelessWidget {
+class TermsScreen extends ConsumerWidget {
   const TermsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const SettingsAppBar(title: 'TERMS & CONDITIONS'),
@@ -61,46 +63,67 @@ class TermsScreen extends StatelessWidget {
 
             const SizedBox(height: 28),
 
-            _buildSection(
-              context,
-              'Welcome to PawCare!',
-              'At PawCare, we value your privacy and are committed to protecting your personal information. This policy explains how we collect, use, and share your data when you use the PawCare application and our services provided by us.',
-            ),
-
-            _buildSection(
-              context,
-              '1. Acceptance of Terms',
-              'By using PawCare, you agree to these Terms & Conditions. If you do not agree, please do not use the app.',
-            ),
-
-            _buildSection(
-              context,
-              '2. Use of Services',
-              'PawCare provides a platform to connect pet parents with trusted service providers. You are responsible for the accuracy of the information you provide when making bookings.',
-            ),
-
-            _buildSection(
-              context,
-              '3. User Responsibilities',
-              'You are responsible for maintaining the confidentiality of your account. You must not use the app for any unlawful purpose. Treat all service providers and partners required to fulfill your order with respect.',
-            ),
-
-            _buildSection(
-              context,
-              '4. Payments',
-              'All payments are processed securely. Prices are subject to change without notice.',
-            ),
-
-            _buildSection(
-              context,
-              '5. Cancellations & Refunds',
-              'Cancellations and refund eligibility are subject to our policy.',
-            ),
-
-            _buildSection(
-              context,
-              '6. Your Choices',
-              'You can access, update, or delete your account information at any time through the app settings. You may also request deletion of your account.',
+            FutureBuilder<String>(
+              future: ref.read(supportServiceProvider).getTerms(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final content = snapshot.data;
+                if (content == null || content.trim().isEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSection(
+                        context,
+                        'Welcome to PawCare!',
+                        'At PawCare, we value your privacy and are committed to protecting your personal information. This policy explains how we collect, use, and share your data when you use the PawCare application and our services provided by us.',
+                      ),
+                      _buildSection(
+                        context,
+                        '1. Acceptance of Terms',
+                        'By using PawCare, you agree to these Terms & Conditions. If you do not agree, please do not use the app.',
+                      ),
+                      _buildSection(
+                        context,
+                        '2. Use of Services',
+                        'PawCare provides a platform to connect pet parents with trusted service providers. You are responsible for the accuracy of the information you provide when making bookings.',
+                      ),
+                      _buildSection(
+                        context,
+                        '3. User Responsibilities',
+                        'You are responsible for maintaining the confidentiality of your account. You must not use the app for any unlawful purpose. Treat all service providers and partners required to fulfill your order with respect.',
+                      ),
+                      _buildSection(
+                        context,
+                        '4. Payments',
+                        'All payments are processed securely. Prices are subject to change without notice.',
+                      ),
+                      _buildSection(
+                        context,
+                        '5. Cancellations & Refunds',
+                        'Cancellations and refund eligibility are subject to our policy.',
+                      ),
+                      _buildSection(
+                        context,
+                        '6. Your Choices',
+                        'You can access, update, or delete your account information at any time through the app settings. You may also request deletion of your account.',
+                      ),
+                    ],
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Text(
+                    content,
+                    style: GoogleFonts.barlow(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      height: 1.6,
+                    ),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 20),
