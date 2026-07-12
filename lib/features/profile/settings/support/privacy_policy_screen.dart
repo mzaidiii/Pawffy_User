@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/settings_appbar.dart';
+import 'support_service.dart';
 
-class PrivacyPolicyScreen extends StatelessWidget {
+class PrivacyPolicyScreen extends ConsumerWidget {
   const PrivacyPolicyScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const SettingsAppBar(title: 'PRIVACY POLICY'),
@@ -61,52 +63,72 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
             const SizedBox(height: 28),
 
-            _buildSection(
-              context,
-              '1. Information We Collect',
-              'We collect information you provide directly such as name, email, phone number, and address. We also collect usage data, device identifiers, and location information when you use our services.',
-            ),
-
-            _buildSection(
-              context,
-              '2. How We Use Information',
-              'We use your information to provide and improve our services, personalize your experience, process bookings and payments, and send service notifications.',
-            ),
-
-            _buildSection(
-              context,
-              '3. Information Sharing',
-              'We do not sell your personal information. We may share it with trusted service providers and partners required to fulfill your orders.',
-            ),
-
-            _buildSection(
-              context,
-              '4. Data Security',
-              'We implement industry-standard security measures to protect your information from unauthorized access.',
-            ),
-
-            _buildSection(
-              context,
-              '5. Your Choices',
-              'You can access, update, or delete your account information at any time through the app settings. You may also request deletion of your account.',
-            ),
-
-            _buildSection(
-              context,
-              '6. Cookies & Tracking',
-              'We use cookies and similar technologies to enhance your experience and collect usage analytics. You can manage cookie preferences through your device settings.',
-            ),
-
-            _buildSection(
-              context,
-              '7. Children\'s Privacy',
-              'Our services are not directed to children under 13. We do not knowingly collect personal information from children.',
-            ),
-
-            _buildSection(
-              context,
-              '8. Changes to Policy',
-              'We may update this Privacy Policy periodically. We will notify you of significant changes via the app or email.',
+            FutureBuilder<String>(
+              future: ref.read(supportServiceProvider).getPrivacy(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final content = snapshot.data;
+                if (content == null || content.trim().isEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSection(
+                        context,
+                        '1. Information We Collect',
+                        'We collect information you provide directly such as name, email, phone number, and address. We also collect usage data, device identifiers, and location information when you use our services.',
+                      ),
+                      _buildSection(
+                        context,
+                        '2. How We Use Information',
+                        'We use your information to provide and improve our services, personalize your experience, process bookings and payments, and send service notifications.',
+                      ),
+                      _buildSection(
+                        context,
+                        '3. Information Sharing',
+                        'We do not sell your personal information. We may share it with trusted service providers and partners required to fulfill your orders.',
+                      ),
+                      _buildSection(
+                        context,
+                        '4. Data Security',
+                        'We implement industry-standard security measures to protect your information from unauthorized access.',
+                      ),
+                      _buildSection(
+                        context,
+                        '5. Your Choices',
+                        'You can access, update, or delete your account information at any time through the app settings. You may also request deletion of your account.',
+                      ),
+                      _buildSection(
+                        context,
+                        '6. Cookies & Tracking',
+                        'We use cookies and similar technologies to enhance your experience and collect usage analytics. You can manage cookie preferences through your device settings.',
+                      ),
+                      _buildSection(
+                        context,
+                        '7. Children\'s Privacy',
+                        'Our services are not directed to children under 13. We do not knowingly collect personal information from children.',
+                      ),
+                      _buildSection(
+                        context,
+                        '8. Changes to Policy',
+                        'We may update this Privacy Policy periodically. We will notify you of significant changes via the app or email.',
+                      ),
+                    ],
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Text(
+                    content,
+                    style: GoogleFonts.barlow(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      height: 1.6,
+                    ),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 20),
