@@ -1,9 +1,14 @@
 class ApiConstants {
-  static const String baseUrl = 'https://pawffy-backend.onrender.com';
+  static const String baseUrl = 'https://pawffy-backend-yyed.onrender.com';
+
+  // Supabase Configuration
+  static const String supabaseUrl = 'https://hnwslusckrzbnulxwgwp.supabase.co';
+  static const String supabaseAnonKey = ''; // Enter your Supabase Anon Key here
 
   // ── Auth ──────────────────────────────────────────
   static const String login = '/api/auth/login';
   static const String register = '/api/auth/register';
+  static const String session = '/api/auth/session';
   static const String me = '/api/auth/me';
   static const String logout = '/api/auth/logout';
   static const String forgotPassword = '/api/auth/forgot-password';
@@ -16,6 +21,9 @@ class ApiConstants {
   static const String users = '/api/users';
   static String userById(String id) => '/api/users/$id';
   static String changeUserRole(String id) => '/api/users/$id/role';
+  static const String addresses = '/api/users/me/addresses';
+  static String addressById(String id) => '/api/users/me/addresses/$id';
+  static String setDefaultAddress(String id) => '/api/users/me/addresses/$id/default';
 
   // ── Dashboard ─────────────────────────────────────
   static const String dashboard = '/api/dashboard/dashboard';
@@ -98,5 +106,17 @@ class ApiConstants {
   static String markNotificationRead(String id) =>
       '/api/notifications/$id/read';
   static String deleteNotification(String id) => '/api/notifications/$id';
+
+  // ── Wallet ─────────────────────────────────────────
+  static const String wallet = '/api/wallet';
+  static const String walletTopUp = '/api/wallet/top-up';
+  static const String walletTopUpIntent = '/api/wallet/top-up/intent';
+  static const String walletTopUpVerify = '/api/wallet/top-up/verify';
+  static const String walletWithdraw = '/api/wallet/withdraw';
+
+  // ── Support & Static ──────────────────────────────
+  static const String supportTickets = '/api/support/tickets';
+  static const String staticTerms = '/api/static/terms';
+  static const String staticPrivacy = '/api/static/privacy';
 }
 
