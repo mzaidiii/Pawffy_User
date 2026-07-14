@@ -164,4 +164,85 @@ class AuthService {
       throw Exception(e.response?.data['message'] ?? 'Logout failed');
     }
   }
+
+  Future<void> sendOtp({required String phone}) async {
+    try {
+      await _dio.post(
+        '${ApiConstants.supabaseUrl}/auth/v1/otp',
+        data: {'phone': phone},
+        options: Options(headers: {
+          'apikey': ApiConstants.supabaseAnonKey,
+          'Authorization': 'Bearer ${ApiConstants.supabaseAnonKey}',
+          'Content-Type': 'application/json',
+        }),
+      );
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['msg'] ??
+            e.response?.data['error_description'] ??
+            'Failed to send OTP. Please check phone number.',
+      );
+    }
+  }
+
+  Future<String> verifyOtp({
+    required String phone,
+    required String token,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '${ApiConstants.supabaseUrl}/auth/v1/verify',
+        data: {
+          'type': 'sms',
+          'phone': phone,
+          'token': token,
+        },
+        options: Options(headers: {
+          'apikey': ApiConstants.supabaseAnonKey,
+          'Authorization': 'Bearer ${ApiConstants.supabaseAnonKey}',
+          'Content-Type': 'application/json',
+        }),
+      );
+
+      final accessToken = response.data['access_token'] as String?;
+      if (accessToken == null) {
+        throw Exception('OTP Verification failed: Access Token not returned');
+      }
+      return accessToken;
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['msg'] ??
+            e.response?.data['error_description'] ??
+            'OTP Verification failed. Please check the code.',
+      );
+    }
+  }
+
+  Future<AuthResponseModel> loginWithOtpSession({
+    required String accessToken,
+    String? name,
+    String? email,
+  }) async {
+    try {
+      final data = <String, dynamic>{'accessToken': accessToken};
+      if (name != null && name.isNotEmpty) {
+        data['name'] = name;
+      }
+      if (email != null && email.isNotEmpty) {
+        data['email'] = email;
+      }
+
+      final response = await _dio.post(
+        ApiConstants.session,
+        data: data,
+      );
+
+      return AuthResponseModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ??
+            'Failed to complete session authentication',
+      );
+    }
+  }
 }
