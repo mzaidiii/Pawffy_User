@@ -3,8 +3,8 @@ class ApiConstants {
 
   // Supabase Configuration
   static const String supabaseUrl = 'https://hnwslusckrzbnulxwgwp.supabase.co';
-  static const String supabaseAnonKey = ''; // Enter your Supabase Anon Key here
-
+  static const String supabaseAnonKey =
+      'sb_publishable_nuKdWOHmpNp87YsximpVVw_1Huju3QL';
   // ── Auth ──────────────────────────────────────────
   static const String login = '/api/auth/login';
   static const String register = '/api/auth/register';
@@ -23,7 +23,8 @@ class ApiConstants {
   static String changeUserRole(String id) => '/api/users/$id/role';
   static const String addresses = '/api/users/me/addresses';
   static String addressById(String id) => '/api/users/me/addresses/$id';
-  static String setDefaultAddress(String id) => '/api/users/me/addresses/$id/default';
+  static String setDefaultAddress(String id) =>
+      '/api/users/me/addresses/$id/default';
 
   // ── Dashboard ─────────────────────────────────────
   static const String dashboard = '/api/dashboard/dashboard';
@@ -119,4 +120,3 @@ class ApiConstants {
   static const String staticTerms = '/api/static/terms';
   static const String staticPrivacy = '/api/static/privacy';
 }
-
