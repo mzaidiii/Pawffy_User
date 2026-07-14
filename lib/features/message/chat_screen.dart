@@ -177,12 +177,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Failed to load messages',
+                      e.toString().replaceAll('Exception:', '').trim(),
                       style: GoogleFonts.barlow(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColors.grey,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
                     ElevatedButton(
