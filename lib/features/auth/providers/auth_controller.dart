@@ -183,4 +183,60 @@ class AuthController extends AsyncNotifier<void> {
       return null;
     }
   }
+
+  Future<bool> sendOtp({required String phone}) async {
+    state = const AsyncLoading();
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.sendOtp(phone: phone);
+      state = const AsyncData(null);
+      return true;
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return false;
+    }
+  }
+
+  Future<String?> verifyOtp({
+    required String phone,
+    required String token,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      final authService = ref.read(authServiceProvider);
+      final accessToken = await authService.verifyOtp(phone: phone, token: token);
+      state = const AsyncData(null);
+      return accessToken;
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return null;
+    }
+  }
+
+  Future<bool> loginWithOtpSession({
+    required String accessToken,
+    String? name,
+    String? email,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      final authService = ref.read(authServiceProvider);
+      final response = await authService.loginWithOtpSession(
+        accessToken: accessToken,
+        name: name,
+        email: email,
+      );
+
+      await StorageService.saveToken(response.token);
+      await StorageService.saveUserId(response.user.id);
+
+      await ref.read(currentUserProvider.notifier).refresh();
+
+      state = const AsyncData(null);
+      return true;
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return false;
+    }
+  }
 }
