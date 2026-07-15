@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
-import 'package:pawffy/features/vets/providers/vet_provider.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
+import 'package:pawffy/features/vendors/providers/vendor_provider.dart';
 
 final searchControllerProvider =
-    AsyncNotifierProvider<SearchController, List<VetModel>>(
+    AsyncNotifierProvider<SearchController, List<VendorModel>>(
       () => SearchController(),
     );
 
-class SearchController extends AsyncNotifier<List<VetModel>> {
+class SearchController extends AsyncNotifier<List<VendorModel>> {
   Timer? _debounceTimer;
   String _currentQuery = '';
   String _currentFilter = 'All';
   @override
-  Future<List<VetModel>> build() async {
+  Future<List<VendorModel>> build() async {
     // Start with all providers pre-loaded on search screen opening
     return _fetchList();
   }
@@ -39,11 +39,11 @@ class SearchController extends AsyncNotifier<List<VetModel>> {
     }
   }
 
-  Future<List<VetModel>> _fetchList() async {
+  Future<List<VendorModel>> _fetchList() async {
     final serviceType = _mapFilterToServiceType(_currentFilter);
     return await ref
-        .read(vetServiceProvider)
-        .getVetsByServiceType(serviceType: serviceType, search: _currentQuery);
+        .read(vendorServiceProvider)
+        .getVendorsByServiceType(serviceType: serviceType, search: _currentQuery);
   }
 
   Future<void> retry() async {

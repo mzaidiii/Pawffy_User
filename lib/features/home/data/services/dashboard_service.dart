@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pawffy/core/networks/dio_client.dart';
 import 'package:pawffy/core/networks/api_constants.dart';
 import 'package:pawffy/core/storage/storage_service.dart';
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
 
 class DashboardService {
   final Dio _dio = DioClient.dio;
@@ -40,7 +40,7 @@ class DashboardService {
   }
 
   /// Get Nearby Partners using POST /api/dashboard/partners
-  Future<List<VetModel>> getNearbyPartners({
+  Future<List<VendorModel>> getNearbyPartners({
     required double latitude,
     required double longitude,
   }) async {
@@ -58,7 +58,7 @@ class DashboardService {
           ? response.data['data']
           : [];
       return data
-          .map((json) => VetModel.fromJson(json))
+          .map((json) => VendorModel.fromJson(json))
           .where((vet) => vet.isVerified)
           .toList();
     } catch (e) {

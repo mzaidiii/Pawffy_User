@@ -58,12 +58,6 @@ class ApiConstants {
 
   // ── Vets (Booking flow — slots/services) ─────────
   // These stay on old /api/vets until vendor equivalents exist
-  static const String vets = '/api/vets';
-  static String vetById(String id) => '/api/vets/$id';
-  static String vetAvailability(String id) => '/api/vets/$id/availability';
-  static String vetSlots(String id) => '/api/vets/$id/slots';
-  static String vetServices(String id) => '/api/vets/$id/services';
-  static String vetReviews(String id) => '/api/vets/$id/reviews';
 
   // ── Bookings ──────────────────────────────────────
   static const String bookings = '/api/bookings';

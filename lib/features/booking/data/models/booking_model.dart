@@ -1,11 +1,11 @@
-class VetServiceModel {
+class VendorServiceModel {
   final String id;
   final String name;
   final double price;
   final int duration;
   final String description;
 
-  VetServiceModel({
+  VendorServiceModel({
     required this.id,
     required this.name,
     required this.price,
@@ -13,13 +13,16 @@ class VetServiceModel {
     required this.description,
   });
 
-  factory VetServiceModel.fromJson(Map<String, dynamic> json) {
-    return VetServiceModel(
+  factory VendorServiceModel.fromJson(Map<String, dynamic> json) {
+    return VendorServiceModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
-      duration: json['duration'] ?? 0,
-      description: json['description'] ?? '',
+      price: double.tryParse((json['price'] ?? json['minPrice'])?.toString() ?? '0') ?? 0.0,
+      duration: () {
+        final d = int.tryParse((json['duration'] ?? json['durationMinutes'])?.toString() ?? '');
+        return (d == null || d <= 0) ? 30 : d;
+      }(),
+      description: json['description'] ?? json['serviceType'] ?? '',
     );
   }
 }
@@ -50,14 +53,14 @@ class BookingPetModel {
   }
 }
 
-class BookingVetModel {
+class BookingVendorModel {
   final String id;
   final String name;
   final String clinicName;
   final String? clinicAddress;
   final String? phone;
 
-  BookingVetModel({
+  BookingVendorModel({
     required this.id,
     required this.name,
     required this.clinicName,
@@ -65,8 +68,8 @@ class BookingVetModel {
     this.phone,
   });
 
-  factory BookingVetModel.fromJson(Map<String, dynamic> json) {
-    return BookingVetModel(
+  factory BookingVendorModel.fromJson(Map<String, dynamic> json) {
+    return BookingVendorModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       clinicName: json['clinicName'] ?? '',
@@ -94,7 +97,10 @@ class BookingServiceModel {
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
-      duration: json['duration'],
+      duration: () {
+        final d = int.tryParse(json['duration']?.toString() ?? '');
+        return (d == null || d <= 0) ? 30 : d;
+      }(),
     );
   }
 }
@@ -131,7 +137,7 @@ class BookingModel {
   final String bookingTime;
   final String? dateTimeFormatted;
   final BookingPetModel pet;
-  final BookingVetModel vet;
+  final BookingVendorModel vendor;
   final BookingServiceModel service;
   final BookingPaymentModel? payment;
 
@@ -144,12 +150,27 @@ class BookingModel {
     required this.bookingTime,
     this.dateTimeFormatted,
     required this.pet,
-    required this.vet,
+    required this.vendor,
     required this.service,
     this.payment,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
+    // Robust fallbacks for walking bookings
+    final petJson = json['pet'] ??
+        ((json['pets'] is List && (json['pets'] as List).isNotEmpty)
+            ? json['pets'][0]
+            : (json['selectedPetList'] is List &&
+                    (json['selectedPetList'] as List).isNotEmpty)
+                ? (json['selectedPetList'][0] is Map
+                    ? json['selectedPetList'][0]
+                    : {'id': json['selectedPetList'][0]})
+                : {});
+
+    final vendorJson = json['vendor'] ?? json['partner'] ?? json['vet'] ?? {};
+
+    final serviceJson = json['service'] ?? json['selectedService'] ?? {};
+
     return BookingModel(
       id: json['id'] ?? '',
       appointmentId: json['appointmentId'],
@@ -158,11 +179,11 @@ class BookingModel {
       bookingDate: json['bookingDate'] != null
           ? DateTime.parse(json['bookingDate'])
           : DateTime.now(),
-      bookingTime: json['bookingTime'] ?? '',
+      bookingTime: json['bookingTime'] ?? json['slotTime']?.toString() ?? '',
       dateTimeFormatted: json['dateTimeFormatted'],
-      pet: BookingPetModel.fromJson(json['pet'] ?? {}),
-      vet: BookingVetModel.fromJson(json['vet'] ?? {}),
-      service: BookingServiceModel.fromJson(json['service'] ?? {}),
+      pet: BookingPetModel.fromJson(petJson),
+      vendor: BookingVendorModel.fromJson(vendorJson),
+      service: BookingServiceModel.fromJson(serviceJson),
       payment: json['payment'] != null
           ? BookingPaymentModel.fromJson(json['payment'])
           : null,

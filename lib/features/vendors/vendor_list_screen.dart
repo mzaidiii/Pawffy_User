@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:pawffy/features/vets/providers/vet_controller.dart';
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
-import 'package:pawffy/features/vets/vet_detail_screen.dart';
+import 'package:pawffy/features/vendors/providers/vendor_controller.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
+import 'package:pawffy/features/vendors/vendor_detail_screen.dart';
+import 'package:pawffy/core/utils/location_provider.dart';
 
 IconData _iconForService(String serviceType) {
   switch (serviceType) {
@@ -23,31 +24,38 @@ IconData _iconForService(String serviceType) {
   }
 }
 
-class VetListScreen extends ConsumerStatefulWidget {
+class VendorListScreen extends ConsumerStatefulWidget {
   final String serviceType;
   final String serviceLabel;
 
-  const VetListScreen({
+  const VendorListScreen({
     super.key,
     required this.serviceType,
     required this.serviceLabel,
   });
 
   @override
-  ConsumerState<VetListScreen> createState() => _VetListScreenState();
+  ConsumerState<VendorListScreen> createState() => _VendorListScreenState();
 }
 
-class _VetListScreenState extends ConsumerState<VetListScreen> {
+class _VendorListScreenState extends ConsumerState<VendorListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  bool _showOnlineOnly = false;
+  bool _filterByCity = false;
 
   @override
   void initState() {
     super.initState();
     // Load providers for this serviceType as soon as screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final placemark = ref.read(placemarkProvider).value;
+      final city = placemark?.locality;
       ref
-          .read(vetListControllerProvider.notifier)
-          .setParams(serviceType: widget.serviceType);
+          .read(vendorListControllerProvider.notifier)
+          .setParams(
+            serviceType: widget.serviceType,
+            city: _filterByCity ? city : null,
+          );
     });
   }
 
@@ -58,18 +66,22 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
   }
 
   void _onSearch(String query) {
+    final placemark = ref.read(placemarkProvider).value;
+    final city = placemark?.locality;
     ref
-        .read(vetListControllerProvider.notifier)
+        .read(vendorListControllerProvider.notifier)
         .setParams(
           serviceType: widget.serviceType,
           search: query.isEmpty ? null : query,
+          city: _filterByCity ? city : null,
+          isOnline: _showOnlineOnly ? true : null,
         );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final vetsAsync = ref.watch(vetListControllerProvider);
+    final vendorsAsync = ref.watch(vendorListControllerProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -118,9 +130,9 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
                             letterSpacing: 0.5,
                           ),
                         ),
-                        vetsAsync.when(
-                          data: (vets) => Text(
-                            '${vets.length} provider${vets.length != 1 ? 's' : ''} found',
+                        vendorsAsync.when(
+                          data: (vendors) => Text(
+                            '${vendors.length} provider${vendors.length != 1 ? 's' : ''} found',
                             style: GoogleFonts.barlow(
                               fontSize: 12,
                               color: Colors.grey,
@@ -218,28 +230,169 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
 
-            const SizedBox(height: 20),
+            // ── Filter Chips ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  // Online Only Chip
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showOnlineOnly = !_showOnlineOnly;
+                      });
+                      final placemark = ref.read(placemarkProvider).value;
+                      final city = placemark?.locality;
+                      ref.read(vendorListControllerProvider.notifier).setParams(
+                            serviceType: widget.serviceType,
+                            search: _searchController.text.isNotEmpty
+                                ? _searchController.text
+                                : null,
+                            city: _filterByCity ? city : null,
+                            isOnline: _showOnlineOnly ? true : null,
+                          );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _showOnlineOnly
+                            ? const Color(0xFFE85D04)
+                            : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: _showOnlineOnly
+                              ? Colors.transparent
+                              : (isDark ? Colors.white24 : Colors.grey.shade300),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            color: _showOnlineOnly ? Colors.white : Colors.green,
+                            size: 8,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Online Only',
+                            style: GoogleFonts.barlow(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _showOnlineOnly
+                                  ? Colors.white
+                                  : (isDark ? Colors.white70 : Colors.grey.shade700),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Builder(builder: (context) {
+                    final placemark = ref.watch(placemarkProvider).value;
+                    final city = placemark?.locality;
+                    if (city != null && city.isNotEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _filterByCity = !_filterByCity;
+                            });
+                            ref.read(vendorListControllerProvider.notifier).setParams(
+                                  serviceType: widget.serviceType,
+                                  search: _searchController.text.isNotEmpty
+                                      ? _searchController.text
+                                      : null,
+                                  city: _filterByCity ? city : null,
+                                  isOnline: _showOnlineOnly ? true : null,
+                                );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _filterByCity
+                                  ? const Color(0xFFE85D04)
+                                  : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: _filterByCity
+                                    ? Colors.transparent
+                                    : (isDark ? Colors.white24 : Colors.grey.shade300),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.04),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.location_on_rounded,
+                                  color: _filterByCity ? Colors.white : const Color(0xFFE85D04),
+                                  size: 12,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'In $city',
+                                  style: GoogleFonts.barlow(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: _filterByCity
+                                        ? Colors.white
+                                        : (isDark ? Colors.white70 : Colors.grey.shade700),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
 
             // ── List ─────────────────────────────────────────────────────
             Expanded(
-              child: vetsAsync.when(
+              child: vendorsAsync.when(
                 loading: () => const Center(
                   child: CircularProgressIndicator(color: Color(0xFFE85D04)),
                 ),
                 error: (e, _) => _buildError(),
-                data: (vets) {
-                  if (vets.isEmpty) return _buildEmpty();
+                data: (vendors) {
+                  if (vendors.isEmpty) return _buildEmpty();
                   return RefreshIndicator(
                     color: const Color(0xFFE85D04),
                     onRefresh: () async =>
-                        ref.read(vetListControllerProvider.notifier).refresh(),
+                        ref.read(vendorListControllerProvider.notifier).refresh(),
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                      itemCount: vets.length,
+                      itemCount: vendors.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 14),
                       itemBuilder: (context, index) =>
-                          _ProviderListCard(vet: vets[index]),
+                          _ProviderListCard(vendor: vendors[index]),
                     ),
                   );
                 },
@@ -303,7 +456,7 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
           ),
           const SizedBox(height: 16),
           GestureDetector(
-            onTap: () => ref.read(vetListControllerProvider.notifier).refresh(),
+            onTap: () => ref.read(vendorListControllerProvider.notifier).refresh(),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               decoration: BoxDecoration(
@@ -328,8 +481,8 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
 // ── _ProviderListCard ─────────────────────────────────────────────────────
 
 class _ProviderListCard extends StatefulWidget {
-  final VetModel vet;
-  const _ProviderListCard({required this.vet});
+  final VendorModel vendor;
+  const _ProviderListCard({required this.vendor});
 
   @override
   State<_ProviderListCard> createState() => _ProviderListCardState();
@@ -341,7 +494,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final vet = widget.vet;
+    final vet = widget.vendor;
 
     return GestureDetector(
       onTap: () {
@@ -349,7 +502,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
           context,
           MaterialPageRoute(
             builder: (_) =>
-                VetDetailScreen(vetId: vet.id, heroClinicName: vet.clinicName),
+                VendorDetailScreen(vendorId: vet.id, heroClinicName: vet.clinicName),
           ),
         );
       },
@@ -450,7 +603,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
                     Row(
                       children: [
                         Text(
-                          '₹${vet.consultationFee}',
+                          '\$${vet.consultationFee}',
                           style: GoogleFonts.barlow(
                             fontSize: 15,
                             fontWeight: FontWeight.w900,
@@ -514,7 +667,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
   Widget _placeholder() {
     return Center(
       child: Icon(
-        _iconForService(widget.vet.serviceType),
+        _iconForService(widget.vendor.serviceType),
         color: const Color(0xFFE85D04).withOpacity(0.4),
         size: 36,
       ),

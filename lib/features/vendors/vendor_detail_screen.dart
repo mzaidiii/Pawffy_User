@@ -2,46 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
-import 'package:pawffy/features/vets/providers/vet_controller.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
+import 'package:pawffy/features/vendors/providers/vendor_controller.dart';
 import 'package:pawffy/features/message/chat_screen.dart';
 import 'package:pawffy/features/booking/presentation/booking_slots_screen.dart';
 
-class VetDetailScreen extends ConsumerStatefulWidget {
-  final String vetId;
+class VendorDetailScreen extends ConsumerStatefulWidget {
+  final String vendorId;
   final String? heroClinicName;
 
-  const VetDetailScreen({super.key, required this.vetId, this.heroClinicName});
+  const VendorDetailScreen({super.key, required this.vendorId, this.heroClinicName});
 
   @override
-  ConsumerState<VetDetailScreen> createState() => _VetDetailScreenState();
+  ConsumerState<VendorDetailScreen> createState() => _VendorDetailScreenState();
 }
 
-class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
+class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(vetDetailControllerProvider.notifier).loadVet(widget.vetId);
+      ref.read(vendorDetailControllerProvider.notifier).loadVendor(widget.vendorId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final vetAsync = ref.watch(vetDetailControllerProvider);
+    final vendorAsync = ref.watch(vendorDetailControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: vetAsync.when(
+      body: vendorAsync.when(
         loading: () => _buildLoading(),
         error: (e, _) => _buildError(),
         data: (vet) {
-          if (vet == null) return _buildLoading();
+          if (vet == null) return _buildEndpointMissing();
           return _buildContent(vet, isDark);
         },
       ),
-      bottomNavigationBar: vetAsync.when(
+      bottomNavigationBar: vendorAsync.when(
         loading: () => null,
         error: (e, _) => null,
         data: (vet) {
@@ -57,7 +57,7 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
     );
   }
 
-  Widget _buildBottomActions(VetModel vet, bool isDark) {
+  Widget _buildBottomActions(VendorModel vet, bool isDark) {
     return Row(
       children: [
         Expanded(
@@ -117,7 +117,7 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => BookingSlotsScreen(vet: vet),
+                  builder: (_) => BookingSlotsScreen(vendor: vet),
                 ),
               );
             },
@@ -183,7 +183,7 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
                   const SizedBox(height: 16),
                   GestureDetector(
                     onTap: () => ref
-                        .read(vetDetailControllerProvider.notifier)
+                        .read(vendorDetailControllerProvider.notifier)
                         .refresh(),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -212,7 +212,94 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
     );
   }
 
-  Widget _buildContent(VetModel vet, bool isDark) {
+  /// Placeholder shown when vendor detail endpoint doesn't exist yet.
+  Widget _buildEndpointMissing() {
+    return SafeArea(
+      child: Column(
+        children: [
+          _backButton(),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE85D04).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.construction_rounded,
+                        size: 40,
+                        color: Color(0xFFE85D04),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Vendor Detail Coming Soon',
+                      style: GoogleFonts.barlow(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'The vendor detail endpoint is not available yet.\n'
+                      'This screen will be fully functional once the\n'
+                      'backend API is ready.',
+                      style: GoogleFonts.barlow(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 28),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE85D04),
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFE85D04).withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Go Back',
+                          style: GoogleFonts.barlow(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(VendorModel vet, bool isDark) {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -411,6 +498,44 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
                   ),
                 ),
 
+                if (vet.timings != null && vet.timings!['label'] != null) ...[
+                  const SizedBox(height: 24),
+                  _sectionTitle('Clinic Hours'),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        _infoRow(
+                          Icons.access_time_rounded,
+                          'Working Hours',
+                          vet.timings!['label']?.toString() ?? '',
+                        ),
+                        if (vet.timings!['sameDayRequests'] != null) ...[
+                          const SizedBox(height: 10),
+                          _infoRow(
+                            Icons.bolt_rounded,
+                            'Same Day Booking',
+                            vet.timings!['sameDayRequests'] == true ? 'Supported' : 'Not supported',
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+
                 const SizedBox(height: 24),
 
                 _sectionTitle('Location'),
@@ -543,7 +668,7 @@ class _VetDetailScreenState extends ConsumerState<VetDetailScreen> {
     );
   }
 
-  Widget _imageFallback(VetModel vet) {
+  Widget _imageFallback(VendorModel vet) {
     return Container(
       color: const Color(0xFFE85D04).withOpacity(0.1),
       child: Center(

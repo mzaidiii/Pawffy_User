@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
 import 'package:pawffy/features/pets/data/models/pet_model.dart';
 import 'package:pawffy/features/pets/data/services/pet_service.dart';
 import '../data/models/booking_model.dart';
 import '../providers/booking_controller.dart';
+import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 import 'payment_summary_screen.dart';
 
 class BookingDetailsScreen extends ConsumerStatefulWidget {
-  final VetModel vet;
+  final VendorModel vendor;
+  VendorModel get vet => vendor;
   final DateTime selectedDate;
   final String selectedSlot;
-  final VetServiceModel selectedService;
+  final VendorServiceModel selectedService;
 
   const BookingDetailsScreen({
     super.key,
-    required this.vet,
+    required this.vendor,
     required this.selectedDate,
     required this.selectedSlot,
     required this.selectedService,
@@ -43,6 +45,19 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   void initState() {
     super.initState();
     _loadPets();
+    _prefillAddress();
+  }
+
+  void _prefillAddress() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = ref.read(currentUserProvider).value;
+      final address = user?.address;
+      final serviceType = widget.vet.serviceType.toLowerCase().trim();
+      final isWalking = serviceType == 'walker' || serviceType == 'dog walking';
+      if (isWalking && address != null && address.isNotEmpty) {
+        _reasonController.text = address;
+      }
+    });
   }
 
   Future<void> _loadPets() async {
@@ -83,10 +98,21 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
     final dateStr = DateFormat('yyyy-MM-dd').format(widget.selectedDate);
 
+    final serviceType = widget.vet.serviceType.toLowerCase().trim();
+    final isVet = serviceType == 'vet' || serviceType == 'veterinarian';
+
     // Map booking type (e.g., "vet" -> "veterinarian")
-    String bookingType = widget.vet.serviceType.toLowerCase().trim();
+    String bookingType = serviceType;
     if (bookingType == 'vet') {
       bookingType = 'veterinarian';
+    } else if (bookingType == 'groomer') {
+      bookingType = 'grooming';
+    } else if (bookingType == 'sitter') {
+      bookingType = 'sitting';
+    } else if (bookingType == 'walker') {
+      bookingType = 'walking';
+    } else if (bookingType == 'trainer') {
+      bookingType = 'training';
     }
 
     // Convert booking time format from "10:00 AM" to 24-hour "10:00" format
@@ -98,23 +124,61 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       debugPrint('Error formatting booking time: $e');
     }
 
-    final bookingData = {
-      'vetId': widget.vet.id,
-      'serviceId': widget.selectedService.id,
-      'petId': _selectedPet!.id,
-      'bookingType': bookingType,
-      'bookingDate': dateStr,
-      'bookingTime': formattedTime,
-      'reasonForVisit': _reasonController.text.trim(),
-      'symptoms': _symptomsController.text.trim().isNotEmpty ? _symptomsController.text.trim() : null,
-      'symptomsDuration': _selectedDuration,
-      'notes': _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
-    };
+    final isWalking = bookingType == 'walker' || bookingType == 'dog walking';
+
+    final Map<String, dynamic> bookingData;
+    if (isWalking) {
+      bookingData = {
+        'partnerId': widget.vet.id,
+        'walkingType': 'Once a day',
+        'selectedDays': DateFormat('E').format(widget.selectedDate), // e.g. "Mon"
+        'walkingDuration': widget.selectedService.duration > 0
+            ? '${widget.selectedService.duration} mins'
+            : '30 mins',
+        'isPackage': false,
+        'selectedPackage': null,
+        'selectedPetList': [_selectedPet!.id],
+        'selectedService': {
+          'title': widget.selectedService.name,
+          'description': widget.selectedService.description,
+          'price': widget.selectedService.price,
+        },
+        'selectedAddress': {
+          'fullAddress': _reasonController.text.trim(),
+        },
+        'slotTime': {
+          'morningSlot': widget.selectedSlot,
+        },
+        'bookingType': bookingType,
+        'bookingDate': dateStr,
+        'bookingTime': formattedTime,
+        'notes': _notesController.text.trim().isNotEmpty
+            ? _notesController.text.trim()
+            : null,
+      };
+    } else {
+      bookingData = {
+        'vetId': widget.vet.id,
+        'serviceId': widget.selectedService.id,
+        'petId': _selectedPet!.id,
+        'bookingType': bookingType,
+        'bookingDate': dateStr,
+        'bookingTime': formattedTime,
+        'reasonForVisit': _reasonController.text.trim(),
+        'symptoms': isVet && _symptomsController.text.trim().isNotEmpty
+            ? _symptomsController.text.trim()
+            : null,
+        'symptomsDuration': isVet ? _selectedDuration : null,
+        'notes': _notesController.text.trim().isNotEmpty
+            ? _notesController.text.trim()
+            : null,
+      };
+    }
 
     try {
       final notifier = ref.read(bookingControllerProvider.notifier);
       final booking = await notifier.createBooking(bookingData);
-      
+
       if (booking != null && mounted) {
         Navigator.push(
           context,
@@ -137,6 +201,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = const Color(0xFFE85D04);
     final bookingState = ref.watch(bookingControllerProvider);
+    final serviceType = widget.vet.serviceType.toLowerCase().trim();
+    final isWalking = serviceType == 'walker' || serviceType == 'dog walking';
+    final isVet = serviceType == 'vet' || serviceType == 'veterinarian';
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -184,7 +251,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
                           // Form Title
                           Text(
-                            'VISIT DETAILS',
+                            isWalking ? 'WALKING DETAILS' : 'VISIT DETAILS',
                             style: GoogleFonts.barlow(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
@@ -194,9 +261,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           ),
                           const SizedBox(height: 12),
 
-                          // Reason Field
+                          // Reason/Address Field
                           Text(
-                            'Reason for Visit *',
+                            isWalking ? 'Walking Address *' : 'Reason for Visit *',
                             style: GoogleFonts.barlow(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -205,62 +272,67 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           const SizedBox(height: 6),
                           TextFormField(
                             controller: _reasonController,
-                            decoration: const InputDecoration(
-                              hintText: 'e.g., Annual vaccination, checkup...',
+                            decoration: InputDecoration(
+                              hintText: isWalking
+                                  ? 'e.g., 123 Pet Street, Mumbai...'
+                                  : 'e.g., Annual vaccination, checkup...',
                             ),
                             validator: (val) {
                               if (val == null || val.trim().isEmpty) {
-                                return 'Reason is required';
+                                return isWalking
+                                    ? 'Walking address is required'
+                                    : 'Reason is required';
                               }
                               return null;
                             },
                           ),
                           const SizedBox(height: 16),
 
-                          // Symptoms Field
-                          Text(
-                            'Symptoms *',
-                            style: GoogleFonts.barlow(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _symptomsController,
-                            decoration: const InputDecoration(
-                              hintText: 'e.g., Lethargy, scratching, coughing...',
-                            ),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                  return 'Symptoms list is required';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Symptoms Duration Field
-                          Text(
-                            'Symptoms Duration *',
-                            style: GoogleFonts.barlow(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          DropdownButtonFormField<String>(
-                            value: _selectedDuration,
-                            hint: Text(
-                              'Select symptoms duration',
+                          if (isVet) ...[
+                            // Symptoms Field
+                            Text(
+                              'Symptoms *',
                               style: GoogleFonts.barlow(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: _symptomsController,
+                              decoration: const InputDecoration(
+                                hintText: 'e.g., Lethargy, scratching, coughing...',
+                              ),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return 'Symptoms list is required';
+                                }
+                                return null;
+                              },
                             ),
+                            const SizedBox(height: 16),
+
+                            // Symptoms Duration Field
+                            Text(
+                              'Symptoms Duration *',
+                              style: GoogleFonts.barlow(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            DropdownButtonFormField<String>(
+                              value: _selectedDuration,
+                              hint: Text(
+                                'Select symptoms duration',
+                                style: GoogleFonts.barlow(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              ),
                             items: const [
                               DropdownMenuItem(value: 'Today', child: Text('Today')),
                               DropdownMenuItem(value: '2 Days ago', child: Text('2 Days ago')),
@@ -279,7 +351,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                        ],
+                        const SizedBox(height: 16),
 
                           // Additional Notes
                           Text(

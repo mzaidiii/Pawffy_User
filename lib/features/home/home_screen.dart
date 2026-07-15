@@ -16,8 +16,8 @@ import 'package:pawffy/features/lost_found/presentation/lost_found_feed_screen.d
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 import 'package:pawffy/features/notification/notification_screen.dart';
 import 'package:pawffy/features/notification/provider/notification_controller.dart';
-import 'package:pawffy/features/vets/vet_list_screen.dart';
-import 'package:pawffy/features/vets/vet_detail_screen.dart';
+import 'package:pawffy/features/vendors/vendor_list_screen.dart';
+import 'package:pawffy/features/vendors/vendor_detail_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -273,11 +273,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 builder: (_) => const LostFoundFeedScreen(),
                               ),
                             );
+
                           } else {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => VetListScreen(
+                                builder: (_) => VendorListScreen(
                                   serviceType: service.serviceType,
                                   serviceLabel: service.label,
                                 ),
@@ -291,8 +292,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                       // ── Ad Banner ──────────────────────
                       const AdBanner(),
-
-                      const SizedBox(height: 24),
 
                       // ── Adoption Banner ────────────────
                       _buildAdoptionBanner(),
@@ -509,8 +508,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => VetDetailScreen(
-                          vetId: vet.id,
+                        builder: (_) => VendorDetailScreen(
+                          vendorId: vet.id,
                           heroClinicName: vet.clinicName,
                         ),
                       ),

@@ -11,12 +11,19 @@ final bookingSlotsProvider = FutureProvider.family<List<String>, String>((ref, p
   final parts = paramString.split('|');
   final vetId = parts[0];
   final date = parts[1];
-  return ref.watch(bookingServiceProvider).getAvailableSlots(vetId, date);
+  final serviceId = parts.length > 2 && parts[2].isNotEmpty ? parts[2] : null;
+  final serviceType = parts.length > 3 && parts[3].isNotEmpty ? parts[3] : null;
+  return ref.watch(bookingServiceProvider).getAvailableSlots(
+        vetId,
+        date,
+        serviceId: serviceId,
+        serviceType: serviceType,
+      );
 });
 
-// Fetch services offered by a vet
-final vetServicesProvider = FutureProvider.family<List<VetServiceModel>, String>((ref, vetId) {
-  return ref.watch(bookingServiceProvider).getVetServices(vetId);
+// Fetch services offered by a vendor
+final vendorServicesProvider = FutureProvider.family<List<VendorServiceModel>, String>((ref, vendorId) {
+  return ref.watch(bookingServiceProvider).getVendorServices(vendorId);
 });
 
 // Fetch booking by ID
@@ -46,7 +53,13 @@ class BookingController extends Notifier<AsyncValue<BookingModel?>> {
   Future<BookingModel?> createBooking(Map<String, dynamic> bookingData) async {
     state = const AsyncLoading();
     try {
-      final booking = await ref.read(bookingServiceProvider).createBooking(bookingData);
+      final type = bookingData['bookingType']?.toString().toLowerCase().trim();
+      final isWalking = type == 'walker' || type == 'dog walking';
+      
+      final booking = isWalking
+          ? await ref.read(bookingServiceProvider).createWalkingBooking(bookingData)
+          : await ref.read(bookingServiceProvider).createBooking(bookingData);
+          
       state = AsyncData(booking);
       return booking;
     } catch (e, st) {

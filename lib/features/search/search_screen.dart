@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pawffy/main.dart';
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
-import 'package:pawffy/features/vets/vet_detail_screen.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
+import 'package:pawffy/features/vendors/vendor_detail_screen.dart';
 import 'providers/search_controller.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -320,14 +320,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     ),
                   ),
                 ),
-                data: (vets) {
+                data: (vendors) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
-                          '${vets.length} provider${vets.length != 1 ? 's' : ''} found',
+                          '${vendors.length} provider${vendors.length != 1 ? 's' : ''} found',
                           style: GoogleFonts.barlow(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -339,17 +339,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                       const SizedBox(height: 10),
                       Expanded(
-                        child: vets.isEmpty
+                        child: vendors.isEmpty
                             ? _buildEmptyState()
                             : ListView.separated(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
-                                itemCount: vets.length,
+                                itemCount: vendors.length,
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(height: 12),
                                 itemBuilder: (context, index) {
-                                  return _buildProviderCard(vets[index]);
+                                  return _buildProviderCard(vendors[index]);
                                 },
                               ),
                       ),
@@ -364,7 +364,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildProviderCard(VetModel provider) {
+  Widget _buildProviderCard(VendorModel provider) {
     final bool isAvailable = provider.availableStatus;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -373,7 +373,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => VetDetailScreen(vetId: provider.id),
+            builder: (_) => VendorDetailScreen(vendorId: provider.id),
           ),
         );
       },

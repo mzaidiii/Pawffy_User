@@ -15,17 +15,26 @@ class BookingService {
   }
 
   // STEP 2 — Get Available Time Slots dynamically from production slots endpoint
-  Future<List<String>> getAvailableSlots(String vetId, String date) async {
+  Future<List<String>> getAvailableSlots(
+    String vendorId,
+    String date, {
+    String? serviceId,
+    String? serviceType,
+  }) async {
     try {
+      final Map<String, dynamic> queryParams = {'date': date};
+      if (serviceId != null && serviceId.isNotEmpty) {
+        queryParams['serviceId'] = serviceId;
+      }
+
       final response = await _dio.get(
-        ApiConstants.vetSlots(vetId),
-        queryParameters: {'date': date},
+        ApiConstants.vendorSlots(vendorId),
+        queryParameters: queryParams,
         options: (await _authHeader).copyWith(
           receiveTimeout: const Duration(seconds: 10),
           sendTimeout: const Duration(seconds: 10),
         ),
       );
-      debugPrint('SLOTS API RESPONSE: ${response.data}');
 
       final List<dynamic> slotsData = response.data['data'] ?? [];
       final List<String> slots = [];
@@ -44,27 +53,25 @@ class BookingService {
           }
         }
       }
-
       return slots;
     } catch (e) {
-      debugPrint('GET SLOTS ERROR: $e');
-      return []; // Return empty list to show "No slots available" gracefully
+      debugPrint('GET VENDOR SLOTS FAILED: $e');
+      return [];
     }
   }
 
-  Future<List<VetServiceModel>> getVetServices(String vetId) async {
+  Future<List<VendorServiceModel>> getVendorServices(String vendorId) async {
     try {
       final response = await _dio.get(
-        ApiConstants.vetServices(vetId),
+        ApiConstants.vendorById(vendorId),
         options: await _authHeader,
       );
-      final List<dynamic> data = response.data['data'] ?? [];
-      return data.map((json) => VetServiceModel.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint('GET SERVICES ERROR: ${e.response?.data}');
-      throw Exception(
-        e.response?.data['message'] ?? 'Failed to fetch services',
-      );
+      final vendorData = response.data['data'] ?? {};
+      final List<dynamic> servicesData = vendorData['services'] ?? [];
+      return servicesData.map((json) => VendorServiceModel.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('FETCH VENDOR SERVICES FAILED: $e');
+      throw Exception('Failed to fetch services');
     }
   }
 
@@ -208,6 +215,40 @@ class BookingService {
       debugPrint('GET MY BOOKINGS ERROR: ${e.response?.data}');
       throw Exception(
         e.response?.data['message'] ?? 'Failed to fetch bookings',
+      );
+    }
+  }
+
+  // POST /api/bookings/walking
+  Future<BookingModel> createWalkingBooking(Map<String, dynamic> walkingData) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.walkingBookings,
+        data: walkingData,
+        options: await _authHeader,
+      );
+      return BookingModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      debugPrint('CREATE WALKING BOOKING ERROR: ${e.response?.data}');
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to create walking booking',
+      );
+    }
+  }
+
+  // GET /api/bookings/walking
+  Future<List<BookingModel>> getMyWalkingBookings() async {
+    try {
+      final response = await _dio.get(
+        ApiConstants.walkingBookings,
+        options: await _authHeader,
+      );
+      final List<dynamic> data = response.data['data'] ?? [];
+      return data.map((json) => BookingModel.fromJson(json)).toList();
+    } on DioException catch (e) {
+      debugPrint('GET WALKING BOOKINGS ERROR: ${e.response?.data}');
+      throw Exception(
+        e.response?.data['message'] ?? 'Failed to fetch walking bookings',
       );
     }
   }

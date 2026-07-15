@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:pawffy/features/vets/data/models/vet_model.dart';
+import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
 import '../providers/booking_controller.dart';
 import '../data/models/booking_model.dart';
 import 'booking_details_screen.dart';
 
 class BookingSlotsScreen extends ConsumerStatefulWidget {
-  final VetModel vet;
+  final VendorModel vendor;
 
-  const BookingSlotsScreen({super.key, required this.vet});
+  const BookingSlotsScreen({super.key, required this.vendor});
 
   @override
   ConsumerState<BookingSlotsScreen> createState() => _BookingSlotsScreenState();
@@ -19,7 +19,7 @@ class BookingSlotsScreen extends ConsumerStatefulWidget {
 class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
   late DateTime _selectedDate;
   String? _selectedSlot;
-  VetServiceModel? _selectedService;
+  VendorServiceModel? _selectedService;
   final List<DateTime> _dates = [];
 
   @override
@@ -29,6 +29,9 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
     // Generate next 14 days
     for (int i = 0; i < 14; i++) {
       _dates.add(DateTime.now().add(Duration(days: i)));
+    }
+    if (widget.vendor.services.isNotEmpty) {
+      _selectedService = widget.vendor.services.first;
     }
   }
 
@@ -41,9 +44,20 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = const Color(0xFFE85D04);
 
+    final servicesAsync = ref.watch(vendorServicesProvider(widget.vendor.id));
+
+    // Pre-select first service if loaded/available to prevent empty serviceId slot API calls
+    final List<VendorServiceModel> servicesList = widget.vendor.services.isNotEmpty
+        ? widget.vendor.services
+        : (servicesAsync.asData?.value ?? const []);
+
+    if (_selectedService == null && servicesList.isNotEmpty) {
+      _selectedService = servicesList.first;
+    }
+
     final dateStr = _formatDateForApi(_selectedDate);
-    final slotsAsync = ref.watch(bookingSlotsProvider('${widget.vet.id}|$dateStr'));
-    final servicesAsync = ref.watch(vetServicesProvider(widget.vet.id));
+    final slotsAsync = ref.watch(bookingSlotsProvider(
+        '${widget.vendor.id}|$dateStr|${_selectedService?.id ?? ''}|${widget.vendor.serviceType}'));
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -76,33 +90,35 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                     // Section 1: Choose Service
                     _buildSectionHeader('1. SELECT SERVICE'),
                     const SizedBox(height: 12),
-                    servicesAsync.when(
-                      loading: () => _buildServicesLoadingShimmer(isDark),
-                      error: (err, _) => Center(
-                        child: Text(
-                          'Failed to load services: $err',
-                          style: GoogleFonts.barlow(color: Colors.red),
-                        ),
-                      ),
-                      data: (services) {
-                        if (services.isEmpty) {
-                          return Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
+                    widget.vendor.services.isNotEmpty
+                        ? _buildServicesList(widget.vendor.services, isDark, primaryColor)
+                        : servicesAsync.when(
+                            loading: () => _buildServicesLoadingShimmer(isDark),
+                            error: (err, _) => Center(
                               child: Text(
-                                'No specific services available. Using general checkup.',
-                                style: GoogleFonts.barlow(color: Colors.grey),
+                                'Failed to load services: $err',
+                                style: GoogleFonts.barlow(color: Colors.red),
                               ),
                             ),
-                          );
-                        }
-                        return _buildServicesList(services, isDark, primaryColor);
-                      },
-                    ),
+                            data: (services) {
+                              if (services.isEmpty) {
+                                return Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'No specific services available. Using general checkup.',
+                                      style: GoogleFonts.barlow(color: Colors.grey),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return _buildServicesList(services, isDark, primaryColor);
+                            },
+                          ),
                     const SizedBox(height: 24),
 
                     // Section 2: Date Selector
@@ -144,7 +160,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => BookingDetailsScreen(
-                              vet: widget.vet,
+                              vendor: widget.vendor,
                               selectedDate: _selectedDate,
                               selectedSlot: _selectedSlot!,
                               selectedService: _selectedService!,
@@ -209,10 +225,10 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
           CircleAvatar(
             radius: 32,
             backgroundColor: const Color(0xFFE85D04).withOpacity(0.1),
-            backgroundImage: widget.vet.profileImage != null
-                ? NetworkImage(widget.vet.profileImage!)
+            backgroundImage: widget.vendor.profileImage != null
+                ? NetworkImage(widget.vendor.profileImage!)
                 : null,
-            child: widget.vet.profileImage == null
+            child: widget.vendor.profileImage == null
                 ? const Icon(Icons.medical_services_outlined, color: Color(0xFFE85D04), size: 28)
                 : null,
           ),
@@ -222,14 +238,14 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.vet.name,
+                  widget.vendor.name,
                   style: GoogleFonts.barlow(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  widget.vet.specialization,
+                  widget.vendor.specialization,
                   style: GoogleFonts.barlow(
                     fontSize: 14,
                     color: Colors.grey,
@@ -241,7 +257,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                     const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
                     const SizedBox(width: 4),
                     Text(
-                      widget.vet.rating?.toStringAsFixed(1) ?? 'New',
+                      widget.vendor.rating?.toStringAsFixed(1) ?? 'New',
                       style: GoogleFonts.barlow(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -252,7 +268,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                     const SizedBox(width: 2),
                     Expanded(
                       child: Text(
-                        widget.vet.clinicName,
+                        widget.vendor.clinicName,
                         style: GoogleFonts.barlow(
                           fontSize: 13,
                           color: Colors.grey,
@@ -271,7 +287,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
     );
   }
 
-  Widget _buildServicesList(List<VetServiceModel> services, bool isDark, Color primaryColor) {
+  Widget _buildServicesList(List<VendorServiceModel> services, bool isDark, Color primaryColor) {
     // Select first service by default if none selected
     if (_selectedService == null && services.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
