@@ -137,7 +137,7 @@ class BookingModel {
   final String bookingTime;
   final String? dateTimeFormatted;
   final BookingPetModel pet;
-  final BookingVendorModel vendor;
+  final BookingVendorModel vet;
   final BookingServiceModel service;
   final BookingPaymentModel? payment;
 
@@ -150,7 +150,7 @@ class BookingModel {
     required this.bookingTime,
     this.dateTimeFormatted,
     required this.pet,
-    required this.vendor,
+    required this.vet,
     required this.service,
     this.payment,
   });
@@ -182,7 +182,7 @@ class BookingModel {
       bookingTime: json['bookingTime'] ?? json['slotTime']?.toString() ?? '',
       dateTimeFormatted: json['dateTimeFormatted'],
       pet: BookingPetModel.fromJson(petJson),
-      vendor: BookingVendorModel.fromJson(vendorJson),
+      vet: BookingVendorModel.fromJson(vendorJson),
       service: BookingServiceModel.fromJson(serviceJson),
       payment: json['payment'] != null
           ? BookingPaymentModel.fromJson(json['payment'])

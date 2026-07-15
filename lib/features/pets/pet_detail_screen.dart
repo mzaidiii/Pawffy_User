@@ -11,7 +11,7 @@ import 'providers/vaccination_controller.dart';
 import 'widgets/add_edit_pet_sheet.dart';
 import 'widgets/add_edit_medical_record_sheet.dart';
 import 'widgets/add_edit_vaccination_sheet.dart';
-import '../vets/providers/vet_controller.dart';
+import '../vendors/providers/vendor_controller.dart';
 
 
 class PetDetailScreen extends ConsumerStatefulWidget {
@@ -619,7 +619,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
 
   Widget _buildVaccinationsSection(BuildContext context, WidgetRef ref, PetModel pet) {
     final vaccinationsAsync = ref.watch(vaccinationControllerProvider(pet.id));
-    final vetsAsync = ref.watch(vetControllerProvider);
+    final vetsAsync = ref.watch(vendorControllerProvider);
 
     return vaccinationsAsync.when(
       loading: () => const Center(

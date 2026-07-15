@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../data/models/vaccination_model.dart';
 import '../providers/vaccination_controller.dart';
-import '../../vets/providers/vet_controller.dart';
+import '../../vendors/providers/vendor_controller.dart';
 
 class AddEditVaccinationSheet extends ConsumerStatefulWidget {
   final String petId;
@@ -184,7 +184,7 @@ class _AddEditVaccinationSheetState
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final vetsAsync = ref.watch(vetControllerProvider);
+    final vetsAsync = ref.watch(vendorControllerProvider);
 
     return Container(
       decoration: BoxDecoration(
