@@ -158,7 +158,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       };
     } else {
       bookingData = {
-        'vetId': widget.vet.id,
+        if (isVet) 'vetId': widget.vet.id else 'partnerId': widget.vet.id,
         'serviceId': widget.selectedService.id,
         'petId': _selectedPet!.id,
         'bookingType': bookingType,
