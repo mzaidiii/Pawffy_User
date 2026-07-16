@@ -53,13 +53,7 @@ class BookingController extends Notifier<AsyncValue<BookingModel?>> {
   Future<BookingModel?> createBooking(Map<String, dynamic> bookingData) async {
     state = const AsyncLoading();
     try {
-      final type = bookingData['bookingType']?.toString().toLowerCase().trim();
-      final isWalking = type == 'walker' || type == 'dog walking';
-      
-      final booking = isWalking
-          ? await ref.read(bookingServiceProvider).createWalkingBooking(bookingData)
-          : await ref.read(bookingServiceProvider).createBooking(bookingData);
-          
+      final booking = await ref.read(bookingServiceProvider).createBooking(bookingData);
       state = AsyncData(booking);
       return booking;
     } catch (e, st) {
