@@ -26,11 +26,13 @@ class BookingDetailsScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<BookingDetailsScreen> createState() => _BookingDetailsScreenState();
+  ConsumerState<BookingDetailsScreen> createState() =>
+      _BookingDetailsScreenState();
 }
 
 class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _locationController = TextEditingController();
   final _reasonController = TextEditingController();
   final _symptomsController = TextEditingController();
   final _notesController = TextEditingController();
@@ -52,10 +54,26 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = ref.read(currentUserProvider).value;
       final address = user?.address;
-      final serviceType = widget.vet.serviceType.toLowerCase().trim();
-      final isWalking = serviceType == 'walker' || serviceType == 'dog walking';
-      if (isWalking && address != null && address.isNotEmpty) {
-        _reasonController.text = address;
+      final serviceType = widget.vendor.serviceType.toLowerCase().trim();
+      final isHomeService = [
+        'walker',
+        'walking',
+        'sitter',
+        'sitting',
+        'poop_scooper',
+        'transport',
+        'boarding',
+      ].contains(serviceType);
+      if (isHomeService) {
+        if (address != null && address.isNotEmpty) {
+          _locationController.text = address;
+        }
+      } else {
+        final clinicAddr = widget.vendor.clinicAddress ?? '';
+        final clinicName = widget.vendor.clinicName;
+        _locationController.text = clinicAddr.isNotEmpty
+            ? clinicAddr
+            : clinicName;
       }
     });
   }
@@ -80,6 +98,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
   @override
   void dispose() {
+    _locationController.dispose();
     _reasonController.dispose();
     _symptomsController.dispose();
     _notesController.dispose();
@@ -97,25 +116,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final dateStr = DateFormat('yyyy-MM-dd').format(widget.selectedDate);
-
-    final serviceType = widget.vet.serviceType.toLowerCase().trim();
+    final serviceType = widget.vendor.serviceType.toLowerCase().trim();
     final isVet = serviceType == 'vet' || serviceType == 'veterinarian';
 
-    // Map booking type (e.g., "vet" -> "veterinarian")
-    String bookingType = serviceType;
-    if (bookingType == 'vet') {
-      bookingType = 'veterinarian';
-    } else if (bookingType == 'groomer') {
-      bookingType = 'grooming';
-    } else if (bookingType == 'sitter') {
-      bookingType = 'sitting';
-    } else if (bookingType == 'walker') {
-      bookingType = 'walking';
-    } else if (bookingType == 'trainer') {
-      bookingType = 'training';
-    }
-
-    // Convert booking time format from "10:00 AM" to 24-hour "10:00" format
     String formattedTime = widget.selectedSlot;
     try {
       final parsedTime = DateFormat('hh:mm a').parse(widget.selectedSlot);
@@ -124,56 +127,32 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       debugPrint('Error formatting booking time: $e');
     }
 
-    final isWalking = bookingType == 'walker' || bookingType == 'dog walking';
-
-    final Map<String, dynamic> bookingData;
-    if (isWalking) {
-      bookingData = {
-        'partnerId': widget.vet.id,
-        'walkingType': 'Once a day',
-        'selectedDays': DateFormat('E').format(widget.selectedDate), // e.g. "Mon"
-        'walkingDuration': widget.selectedService.duration > 0
-            ? '${widget.selectedService.duration} mins'
-            : '30 mins',
-        'isPackage': false,
-        'selectedPackage': null,
-        'selectedPetList': [_selectedPet!.id],
-        'selectedService': {
-          'title': widget.selectedService.name,
-          'description': widget.selectedService.description,
-          'price': widget.selectedService.price,
-        },
-        'selectedAddress': {
-          'fullAddress': _reasonController.text.trim(),
-        },
-        'slotTime': {
-          'morningSlot': widget.selectedSlot,
-        },
-        'bookingType': bookingType,
-        'bookingDate': dateStr,
-        'bookingTime': formattedTime,
-        'notes': _notesController.text.trim().isNotEmpty
-            ? _notesController.text.trim()
-            : null,
-      };
+    String? finalNotes;
+    if (isVet) {
+      final List<String> notesParts = [];
+      notesParts.add('Reason: ${_reasonController.text.trim()}');
+      if (_symptomsController.text.trim().isNotEmpty) {
+        notesParts.add('Symptoms: ${_symptomsController.text.trim()}');
+      }
+      if (_selectedDuration != null && _selectedDuration!.isNotEmpty) {
+        notesParts.add('Duration: $_selectedDuration');
+      }
+      finalNotes = notesParts.join('. ') + '.';
     } else {
-      bookingData = {
-        if (isVet) 'vetId': widget.vet.id else 'partnerId': widget.vet.id,
-        'serviceId': widget.selectedService.id,
-        'petId': _selectedPet!.id,
-        'bookingType': bookingType,
-        'bookingDate': dateStr,
-        'bookingTime': formattedTime,
-        'reasonForVisit': _reasonController.text.trim(),
-        'symptoms': isVet && _symptomsController.text.trim().isNotEmpty
-            ? _symptomsController.text.trim()
-            : null,
-        'symptomsDuration': isVet ? _selectedDuration : null,
-        'notes': _notesController.text.trim().isNotEmpty
-            ? _notesController.text.trim()
-            : null,
-      };
+      finalNotes = _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null;
     }
+
+    final Map<String, dynamic> bookingData = {
+      'vendorId': widget.vendor.id,
+      'serviceId': widget.selectedService.id,
+      'petId': _selectedPet!.id,
+      'bookingDate': dateStr,
+      'bookingTime': formattedTime,
+      'location': _locationController.text.trim(),
+      'notes': finalNotes,
+    };
 
     try {
       final notifier = ref.read(bookingControllerProvider.notifier);
@@ -189,9 +168,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error creating booking: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error creating booking: $e')));
       }
     }
   }
@@ -201,8 +180,16 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = const Color(0xFFE85D04);
     final bookingState = ref.watch(bookingControllerProvider);
-    final serviceType = widget.vet.serviceType.toLowerCase().trim();
-    final isWalking = serviceType == 'walker' || serviceType == 'dog walking';
+    final serviceType = widget.vendor.serviceType.toLowerCase().trim();
+    final isHomeService = [
+      'walker',
+      'walking',
+      'sitter',
+      'sitting',
+      'poop_scooper',
+      'transport',
+      'boarding',
+    ].contains(serviceType);
     final isVet = serviceType == 'vet' || serviceType == 'veterinarian';
 
     return Scaffold(
@@ -233,7 +220,6 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Pet Selection Title
                           Text(
                             'SELECT PET',
                             style: GoogleFonts.barlow(
@@ -245,13 +231,11 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           ),
                           const SizedBox(height: 12),
 
-                          // Pet Selector Widget
                           _buildPetSelector(isDark, primaryColor),
                           const SizedBox(height: 24),
 
-                          // Form Title
                           Text(
-                            isWalking ? 'WALKING DETAILS' : 'VISIT DETAILS',
+                            isHomeService ? 'SERVICE DETAILS' : 'VISIT DETAILS',
                             style: GoogleFonts.barlow(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
@@ -261,9 +245,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           ),
                           const SizedBox(height: 12),
 
-                          // Reason/Address Field
                           Text(
-                            isWalking ? 'Walking Address *' : 'Reason for Visit *',
+                            isHomeService
+                                ? 'Service Address *'
+                                : 'Location / Address *',
                             style: GoogleFonts.barlow(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -271,17 +256,15 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           ),
                           const SizedBox(height: 6),
                           TextFormField(
-                            controller: _reasonController,
+                            controller: _locationController,
                             decoration: InputDecoration(
-                              hintText: isWalking
+                              hintText: isHomeService
                                   ? 'e.g., 123 Pet Street, Mumbai...'
-                                  : 'e.g., Annual vaccination, checkup...',
+                                  : 'e.g., Clinic, Home, or custom address...',
                             ),
                             validator: (val) {
                               if (val == null || val.trim().isEmpty) {
-                                return isWalking
-                                    ? 'Walking address is required'
-                                    : 'Reason is required';
+                                return 'Location/Address is required';
                               }
                               return null;
                             },
@@ -289,9 +272,31 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           const SizedBox(height: 16),
 
                           if (isVet) ...[
-                            // Symptoms Field
                             Text(
-                              'Symptoms *',
+                              'Reason for Visit *',
+                              style: GoogleFonts.barlow(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: _reasonController,
+                              decoration: const InputDecoration(
+                                hintText:
+                                    'e.g., Annual vaccination, checkup...',
+                              ),
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return 'Reason is required';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            Text(
+                              'Symptoms (Optional)',
                               style: GoogleFonts.barlow(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -301,20 +306,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                             TextFormField(
                               controller: _symptomsController,
                               decoration: const InputDecoration(
-                                hintText: 'e.g., Lethargy, scratching, coughing...',
+                                hintText:
+                                    'e.g., Lethargy, scratching, coughing...',
                               ),
-                              validator: (val) {
-                                if (val == null || val.trim().isEmpty) {
-                                  return 'Symptoms list is required';
-                                }
-                                return null;
-                              },
                             ),
                             const SizedBox(height: 16),
 
-                            // Symptoms Duration Field
                             Text(
-                              'Symptoms Duration *',
+                              'Symptoms Duration (Optional)',
                               style: GoogleFonts.barlow(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -331,61 +330,66 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                 ),
                               ),
                               decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
                               ),
-                            items: const [
-                              DropdownMenuItem(value: 'Today', child: Text('Today')),
-                              DropdownMenuItem(value: '2 Days ago', child: Text('2 Days ago')),
-                              DropdownMenuItem(value: 'A week ago', child: Text('A week ago')),
-                              DropdownMenuItem(value: 'More than a week', child: Text('More than a week')),
-                            ],
-                            onChanged: (val) {
-                              setState(() {
-                                _selectedDuration = val;
-                              });
-                            },
-                            validator: (val) {
-                              if (val == null || val.isEmpty) {
-                                return 'Symptoms duration is required';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                        const SizedBox(height: 16),
-
-                          // Additional Notes
-                          Text(
-                            'Additional Notes *',
-                            style: GoogleFonts.barlow(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Today',
+                                  child: Text('Today'),
+                                ),
+                                DropdownMenuItem(
+                                  value: '2 Days ago',
+                                  child: Text('2 Days ago'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'A week ago',
+                                  child: Text('A week ago'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'More than a week',
+                                  child: Text('More than a week'),
+                                ),
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedDuration = val;
+                                });
+                              },
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _notesController,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              hintText: 'e.g., Pet is a bit anxious around new people...',
+                            const SizedBox(height: 16),
+                          ] else ...[
+                            Text(
+                              'Notes / Instructions (Optional)',
+                              style: GoogleFonts.barlow(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return 'Additional notes are required';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: _notesController,
+                              maxLines: 3,
+                              decoration: const InputDecoration(
+                                hintText:
+                                    'e.g., Pet needs a bath and nail trim...',
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
                         ],
                       ),
                     ),
                   ),
                 ),
 
-                // Booking Submit CTA
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   child: ElevatedButton(
                     onPressed: bookingState.isLoading ? null : _submitBooking,
                     style: ElevatedButton.styleFrom(
@@ -409,8 +413,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
               ],
             ),
           ),
-          
-          // Loading spinner overlay
+
           if (bookingState.isLoading)
             Container(
               color: Colors.black.withOpacity(0.3),
@@ -427,9 +430,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     if (_isLoadingPets) {
       return SizedBox(
         height: 80,
-        child: Center(
-          child: CircularProgressIndicator(color: primaryColor),
-        ),
+        child: Center(child: CircularProgressIndicator(color: primaryColor)),
       );
     }
 
@@ -440,10 +441,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
           color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(
-          _petError!,
-          style: GoogleFonts.barlow(color: Colors.red),
-        ),
+        child: Text(_petError!, style: GoogleFonts.barlow(color: Colors.red)),
       );
     }
 
@@ -461,7 +459,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             const SizedBox(height: 8),
             Text(
               'No pets found',
-              style: GoogleFonts.barlow(fontWeight: FontWeight.w700, color: Colors.grey),
+              style: GoogleFonts.barlow(
+                fontWeight: FontWeight.w700,
+                color: Colors.grey,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -515,11 +516,22 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: isSelected ? Colors.white24 : primaryColor.withOpacity(0.1),
-                    backgroundImage: pet.imageUrl != null ? NetworkImage(pet.imageUrl!) : null,
-                    child: pet.imageUrl == null
-                        ? Icon(Icons.pets_rounded, color: isSelected ? Colors.white : primaryColor, size: 18)
+                    backgroundColor: isSelected
+                        ? Colors.white24
+                        : primaryColor.withOpacity(0.1),
+                    foregroundImage: (pet.imageUrl != null && pet.imageUrl!.trim().isNotEmpty)
+                        ? NetworkImage(pet.imageUrl!)
                         : null,
+                    onForegroundImageError: (pet.imageUrl != null && pet.imageUrl!.trim().isNotEmpty)
+                        ? (exception, stackTrace) {
+                            debugPrint('Error loading pet image: $exception');
+                          }
+                        : null,
+                    child: Icon(
+                      Icons.pets_rounded,
+                      color: isSelected ? Colors.white : primaryColor,
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
