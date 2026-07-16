@@ -5,7 +5,8 @@
     <application
         android:label="pawffy"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+        android:theme="@style/NormalTheme">
         <activity
             android:name=".MainActivity"
             android:exported="true"
