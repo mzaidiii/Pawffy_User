@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 import 'package:pawffy/features/auth/providers/auth_controller.dart';
+import 'address_service.dart';
 
 class AddressModel {
   final String id;
@@ -58,71 +59,97 @@ class AddressModel {
   }
 }
 
-class AddressNotifier extends Notifier<List<AddressModel>> {
+final addressServiceProvider = Provider<AddressService>((ref) => AddressService());
+
+class AddressNotifier extends AsyncNotifier<List<AddressModel>> {
   @override
-  List<AddressModel> build() {
-    final userAsync = ref.watch(currentUserProvider);
-    final user = userAsync.asData?.value;
-    final List<AddressModel> list = [];
+  Future<List<AddressModel>> build() async {
+    final service = ref.watch(addressServiceProvider);
+    return await service.getAddresses();
+  }
 
-    if (user != null && user.address != null && user.address!.isNotEmpty) {
-      list.add(
-        AddressModel(
-          id: 'primary',
-          label: 'Primary / Home',
-          fullName: user.name,
-          mobile: user.phone ?? '',
-          addressLine1: user.address!,
-          city: user.city ?? '',
-          state: user.state ?? '',
-          pinCode: '110001',
-          isDefault: true,
-        ),
+  Future<void> addAddress(AddressModel address) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final service = ref.read(addressServiceProvider);
+      final newAddress = await service.createAddress(
+        label: address.label,
+        address: address.addressLine1,
+        city: address.city,
+        state: address.state,
+        pincode: address.pinCode,
+        isDefault: address.isDefault,
       );
-    }
-    return list;
+
+      final currentList = state.value ?? [];
+      if (newAddress.isDefault) {
+        final updatedList = currentList.map((a) => a.copyWith(isDefault: false)).toList();
+        _syncToProfile(newAddress);
+        return [...updatedList, newAddress];
+      }
+      return [...currentList, newAddress];
+    });
   }
 
-  void addAddress(AddressModel address) {
-    if (address.isDefault) {
-      state = state.map((a) => a.copyWith(isDefault: false)).toList();
-      _syncToProfile(address);
-    }
-    state = [...state, address];
-  }
-
-  void updateAddress(AddressModel updated) {
-    if (updated.isDefault) {
-      state = state.map((a) => a.copyWith(isDefault: false)).toList();
-    }
-    state = state.map((a) => a.id == updated.id ? updated : a).toList();
-
-    if (updated.id == 'primary' || updated.isDefault) {
-      _syncToProfile(updated);
-    }
-  }
-
-  void deleteAddress(String id) {
-    final toDelete = state.firstWhere((a) => a.id == id, orElse: () => AddressModel(id: '', label: '', fullName: '', mobile: '', addressLine1: '', city: '', state: '', pinCode: ''));
-    state = state.where((a) => a.id != id).toList();
-    
-    if (id == 'primary' || toDelete.isDefault) {
-      ref.read(authControllerProvider.notifier).updateProfile(
-        name: '',
-        phone: '',
-        city: '',
-        userState: '',
-        address: '',
+  Future<void> updateAddress(AddressModel updated) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final service = ref.read(addressServiceProvider);
+      final newAddress = await service.updateAddress(
+        id: updated.id,
+        label: updated.label,
+        address: updated.addressLine1,
+        city: updated.city,
+        state: updated.state,
       );
-    }
+
+      final currentList = state.value ?? [];
+      final wasDefault = currentList.firstWhere((a) => a.id == updated.id, orElse: () => updated).isDefault;
+      
+      final updatedList = currentList.map((a) => a.id == updated.id ? newAddress.copyWith(isDefault: wasDefault) : a).toList();
+      
+      if (wasDefault) {
+        _syncToProfile(newAddress);
+      }
+      return updatedList;
+    });
   }
 
-  void setDefault(String id) {
-    state = state.map((a) => a.copyWith(isDefault: a.id == id)).toList();
-    final defaultAddress = state.firstWhere((a) => a.isDefault, orElse: () => AddressModel(id: '', label: '', fullName: '', mobile: '', addressLine1: '', city: '', state: '', pinCode: ''));
-    if (defaultAddress.id.isNotEmpty) {
-      _syncToProfile(defaultAddress);
-    }
+  Future<void> deleteAddress(String id) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final service = ref.read(addressServiceProvider);
+      await service.deleteAddress(id);
+      final currentList = state.value ?? [];
+      final toDelete = currentList.firstWhere((a) => a.id == id, orElse: () => AddressModel(id: '', label: '', fullName: '', mobile: '', addressLine1: '', city: '', state: '', pinCode: ''));
+      
+      if (toDelete.isDefault) {
+        ref.read(authControllerProvider.notifier).updateProfile(
+          name: '',
+          phone: '',
+          city: '',
+          userState: '',
+          address: '',
+        );
+      }
+      return currentList.where((a) => a.id != id).toList();
+    });
+  }
+
+  Future<void> setDefault(String id) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final service = ref.read(addressServiceProvider);
+      await service.setDefaultAddress(id);
+      
+      final currentList = state.value ?? [];
+      final updatedList = currentList.map((a) => a.copyWith(isDefault: a.id == id)).toList();
+      final defaultAddress = updatedList.firstWhere((a) => a.isDefault, orElse: () => AddressModel(id: '', label: '', fullName: '', mobile: '', addressLine1: '', city: '', state: '', pinCode: ''));
+      if (defaultAddress.id.isNotEmpty) {
+        _syncToProfile(defaultAddress);
+      }
+      return updatedList;
+    });
   }
 
   void _syncToProfile(AddressModel address) {
@@ -139,6 +166,6 @@ class AddressNotifier extends Notifier<List<AddressModel>> {
   }
 }
 
-final addressProvider = NotifierProvider<AddressNotifier, List<AddressModel>>(
+final addressProvider = AsyncNotifierProvider<AddressNotifier, List<AddressModel>>(
   AddressNotifier.new,
 );
