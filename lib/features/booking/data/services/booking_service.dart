@@ -22,86 +22,31 @@ class BookingService {
     String? serviceType,
   }) async {
     try {
-      // 1. Fetch vendor details
       final response = await _dio.get(
-        ApiConstants.vendorById(vendorId),
+        ApiConstants.vendorSlots(vendorId),
+        queryParameters: {
+          'date': date,
+          if (serviceId != null && serviceId.isNotEmpty) 'serviceId': serviceId,
+        },
         options: await _authHeader,
       );
-      final vendorData = response.data['data'] ?? {};
-      
-      // 2. Determine target day of week from date (date is formatted as "yyyy-MM-dd")
-      final parsedDate = DateFormat('yyyy-MM-dd').parse(date);
-      final String dayOfWeek = DateFormat('E').format(parsedDate); // e.g. "Wed", "Thu", "Mon"
-      
-      // 3. Find availability for this day of week
-      final List<dynamic> availabilityList = vendorData['availability'] is List
-          ? vendorData['availability']
-          : [];
-          
-      Map<String, dynamic>? todayAvailability;
-      for (final item in availabilityList) {
-        if (item is Map && item['dayOfWeek']?.toString().toLowerCase().trim() == dayOfWeek.toLowerCase().trim()) {
-          todayAvailability = Map<String, dynamic>.from(item);
-          break;
-        }
-      }
-      
-      // Also check timings workingDays
-      final timings = vendorData['timings'] is Map ? vendorData['timings'] : null;
-      final List<dynamic> workingDays = timings != null && timings['workingDays'] is List
-          ? timings['workingDays']
-          : [];
-          
-      final bool isWorkingDay = todayAvailability != null 
-          ? (todayAvailability['isAvailable'] == true)
-          : workingDays.any((d) => d.toString().toLowerCase().trim() == dayOfWeek.toLowerCase().trim());
-          
-      if (!isWorkingDay) {
-        debugPrint('Vendor is not available on $dayOfWeek ($date)');
-        return []; // Not available on this day
-      }
-      
-      // Get start/end time
-      String startTimeStr = todayAvailability?['startTime'] ?? timings?['startTime'] ?? '09:00 AM';
-      String endTimeStr = todayAvailability?['endTime'] ?? timings?['endTime'] ?? '06:00 PM';
-      
-      // Generate slots dynamically between startTime and endTime
-      return _generateSlots(startTimeStr, endTimeStr);
+      final Map<String, dynamic> responseData = response.data['data'] is Map ? response.data['data'] : {};
+      final List<dynamic> slotsList = responseData['slots'] is List ? responseData['slots'] : [];
+      return slotsList
+          .where((item) => item is Map && item['available'] == true && item['time'] != null)
+          .map((item) {
+            final timeStr = item['time'].toString();
+            try {
+              final parsedTime = DateFormat('HH:mm').parse(timeStr);
+              return DateFormat('hh:mm a').format(parsedTime);
+            } catch (_) {
+              return timeStr;
+            }
+          })
+          .toList();
     } catch (e) {
-      debugPrint('DYNAMIC SLOTS GENERATION FAILED: $e');
+      debugPrint('FETCH VENDOR SLOTS FAILED: $e');
       return [];
-    }
-  }
-
-  List<String> _generateSlots(String startTimeStr, String endTimeStr) {
-    final List<String> slots = [];
-    try {
-      final DateFormat parser = DateFormat('hh:mm a');
-      final DateTime start = _parseTime(startTimeStr);
-      final DateTime end = _parseTime(endTimeStr);
-      
-      DateTime current = start;
-      while (current.isBefore(end)) {
-        slots.add(parser.format(current));
-        current = current.add(const Duration(minutes: 60)); // Hourly slots
-      }
-    } catch (e) {
-      debugPrint('Error parsing/generating slots from timings: $e');
-      // Fallback: standard business hours
-      return ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
-    }
-    return slots;
-  }
-
-  DateTime _parseTime(String timeStr) {
-    try {
-      return DateFormat('hh:mm a').parse(timeStr.trim());
-    } catch (_) {
-      try {
-        return DateFormat('HH:mm').parse(timeStr.trim());
-      } catch (_) {
-        return DateFormat('yyyy-MM-dd HH:mm').parse('2000-01-01 ${timeStr.trim()}');
-      }
     }
   }
 
@@ -264,37 +209,5 @@ class BookingService {
     }
   }
 
-  // POST /api/bookings/walking
-  Future<BookingModel> createWalkingBooking(Map<String, dynamic> walkingData) async {
-    try {
-      final response = await _dio.post(
-        ApiConstants.walkingBookings,
-        data: walkingData,
-        options: await _authHeader,
-      );
-      return BookingModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      debugPrint('CREATE WALKING BOOKING ERROR: ${e.response?.data}');
-      throw Exception(
-        e.response?.data['message'] ?? 'Failed to create walking booking',
-      );
-    }
-  }
 
-  // GET /api/bookings/walking
-  Future<List<BookingModel>> getMyWalkingBookings() async {
-    try {
-      final response = await _dio.get(
-        ApiConstants.walkingBookings,
-        options: await _authHeader,
-      );
-      final List<dynamic> data = response.data['data'] ?? [];
-      return data.map((json) => BookingModel.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint('GET WALKING BOOKINGS ERROR: ${e.response?.data}');
-      throw Exception(
-        e.response?.data['message'] ?? 'Failed to fetch walking bookings',
-      );
-    }
-  }
 }
