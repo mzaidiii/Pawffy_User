@@ -93,17 +93,35 @@ class LoggingInterceptor extends Interceptor {
     super.onError(err, handler);
   }
 
+  dynamic _sanitizeData(dynamic data) {
+    if (data is Map) {
+      return data.map((key, value) => MapEntry(key, _sanitizeData(value)));
+    } else if (data is List) {
+      return data.map((item) => _sanitizeData(item)).toList();
+    } else if (data is String) {
+      if (data.length > 200) {
+        return '${data.substring(0, 200)}...[TRUNCATED ${data.length} CHARS]';
+      }
+      return data;
+    }
+    return data;
+  }
+
   String _prettyJson(dynamic data) {
     try {
       if (data == null) return 'null';
       const encoder = JsonEncoder.withIndent('  ');
       if (data is String) {
         final decoded = json.decode(data);
-        return encoder.convert(decoded);
+        return encoder.convert(_sanitizeData(decoded));
       }
-      return encoder.convert(data);
+      return encoder.convert(_sanitizeData(data));
     } catch (_) {
-      return data.toString();
+      final str = data.toString();
+      if (str.length > 500) {
+        return '${str.substring(0, 500)}...[TRUNCATED]';
+      }
+      return str;
     }
   }
 }
