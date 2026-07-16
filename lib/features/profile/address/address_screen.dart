@@ -43,19 +43,31 @@ class AddressScreen extends ConsumerWidget {
 
             // ── Address List ───────────────────────────
             Expanded(
-              child: addresses.isEmpty
-                  ? _buildEmptyState(context)
-                  : ListView.separated(
-                      itemCount: addresses.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return _buildAddressCard(
-                          context,
-                          ref,
-                          addresses[index],
-                        );
-                      },
-                    ),
+              child: addresses.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, _) => Center(
+                  child: Text(
+                    'Error loading addresses: $err',
+                    style: GoogleFonts.barlow(color: Colors.red),
+                  ),
+                ),
+                data: (list) {
+                  if (list.isEmpty) {
+                    return _buildEmptyState(context);
+                  }
+                  return ListView.separated(
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      return _buildAddressCard(
+                        context,
+                        ref,
+                        list[index],
+                      );
+                    },
+                  );
+                },
+              ),
             ),
 
             const SizedBox(height: 12),
