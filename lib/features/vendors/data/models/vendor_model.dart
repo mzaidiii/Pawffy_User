@@ -74,7 +74,19 @@ class VendorModel {
           json['userId'] ?? (json['user'] is Map ? json['user']['id'] : null),
       name: json['name'] ?? json['contactName'] ?? '',
       email: json['email'] ?? '',
-      serviceType: json['serviceType'] ?? 'vet',
+      serviceType: () {
+        final String type = json['serviceType']?.toString() ?? '';
+        if (type.isNotEmpty) return type;
+        final servicesList = json['services'];
+        if (servicesList is List && servicesList.isNotEmpty) {
+          final first = servicesList.first;
+          if (first is Map) {
+            final st = first['serviceType']?.toString() ?? '';
+            if (st.isNotEmpty) return st;
+          }
+        }
+        return 'vet';
+      }(),
       specialization: json['specialization'] ?? json['description'] ?? '',
       experienceYears: json['experienceYears'] ?? 0,
       clinicName: json['clinicName'] ?? json['businessName'] ?? '',
