@@ -71,9 +71,9 @@ class BookingVendorModel {
   factory BookingVendorModel.fromJson(Map<String, dynamic> json) {
     return BookingVendorModel(
       id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      clinicName: json['clinicName'] ?? '',
-      clinicAddress: json['clinicAddress'] ?? json['clinicAddressFormatted'],
+      name: json['name'] ?? json['contactName'] ?? json['businessName'] ?? '',
+      clinicName: json['clinicName'] ?? json['businessName'] ?? '',
+      clinicAddress: json['clinicAddress'] ?? json['clinicAddressFormatted'] ?? json['location'],
       phone: json['phone'],
     );
   }
@@ -136,6 +136,7 @@ class BookingModel {
   final DateTime bookingDate;
   final String bookingTime;
   final String? dateTimeFormatted;
+  final String? notes;
   final BookingPetModel pet;
   final BookingVendorModel vet;
   final BookingServiceModel service;
@@ -149,6 +150,7 @@ class BookingModel {
     required this.bookingDate,
     required this.bookingTime,
     this.dateTimeFormatted,
+    this.notes,
     required this.pet,
     required this.vet,
     required this.service,
@@ -157,7 +159,7 @@ class BookingModel {
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     // Robust fallbacks for walking bookings
-    final petJson = json['pet'] ??
+    final rawPet = json['pet'] ?? json['selectedPet'] ??
         ((json['pets'] is List && (json['pets'] as List).isNotEmpty)
             ? json['pets'][0]
             : (json['selectedPetList'] is List &&
@@ -165,11 +167,20 @@ class BookingModel {
                 ? (json['selectedPetList'][0] is Map
                     ? json['selectedPetList'][0]
                     : {'id': json['selectedPetList'][0]})
-                : {});
+                : (json['petName'] != null && json['petName'].toString().isNotEmpty)
+                    ? {
+                        'id': json['petId'] ?? '',
+                        'name': json['petName'] ?? '',
+                        'species': json['petSpecies'] ?? '',
+                        'breed': json['petBreed'] ?? '',
+                        'age': int.tryParse(json['petAge']?.toString() ?? '') ?? 0,
+                        'imageUrl': json['petImageUrl'] ?? '',
+                      }
+                    : <String, dynamic>{});
 
-    final vendorJson = json['vendor'] ?? json['partner'] ?? json['vet'] ?? {};
+    final rawVendor = json['vendor'] ?? json['partner'] ?? json['vet'] ?? json['business'] ?? <String, dynamic>{};
 
-    final serviceJson = json['service'] ?? json['selectedService'] ?? {};
+    final rawService = json['service'] ?? json['selectedService'] ?? json['partnerService'] ?? json['businessService'] ?? <String, dynamic>{};
 
     return BookingModel(
       id: json['id'] ?? '',
@@ -181,11 +192,12 @@ class BookingModel {
           : DateTime.now(),
       bookingTime: json['bookingTime'] ?? json['slotTime']?.toString() ?? '',
       dateTimeFormatted: json['dateTimeFormatted'],
-      pet: BookingPetModel.fromJson(petJson),
-      vet: BookingVendorModel.fromJson(vendorJson),
-      service: BookingServiceModel.fromJson(serviceJson),
+      notes: json['notes'] ?? json['reasonForVisit'],
+      pet: BookingPetModel.fromJson(_castMap(rawPet)),
+      vet: BookingVendorModel.fromJson(_castMap(rawVendor)),
+      service: BookingServiceModel.fromJson(_castMap(rawService)),
       payment: json['payment'] != null
-          ? BookingPaymentModel.fromJson(json['payment'])
+          ? BookingPaymentModel.fromJson(_castMap(json['payment']))
           : null,
     );
   }
@@ -273,4 +285,11 @@ class PaymentIntentModel {
           : null,
     );
   }
+}
+
+Map<String, dynamic> _castMap(dynamic map) {
+  if (map is Map) {
+    return Map<String, dynamic>.from(map);
+  }
+  return <String, dynamic>{};
 }
