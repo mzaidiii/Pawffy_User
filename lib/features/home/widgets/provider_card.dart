@@ -7,6 +7,7 @@ class ProviderCard extends StatefulWidget {
   final String location;
   final String price;
   final double? rating;
+  final bool? isOnline;
   final VoidCallback? onTap; // ← added
 
   const ProviderCard({
@@ -16,6 +17,7 @@ class ProviderCard extends StatefulWidget {
     required this.location,
     required this.price,
     this.rating,
+    this.isOnline,
     this.onTap, // ← added
   });
 
@@ -34,7 +36,7 @@ class _ProviderCardState extends State<ProviderCard> {
       child: Container(
         width: 160,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -103,6 +105,41 @@ class _ProviderCardState extends State<ProviderCard> {
                   ),
                 ),
 
+                // Online/Offline status badge
+                if (widget.isOnline != null)
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: widget.isOnline!
+                            ? Colors.green
+                            : Colors.grey.shade600,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        widget.isOnline! ? 'Active' : 'Offline',
+                        style: GoogleFonts.barlow(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+
                 // Heart icon
                 Positioned(
                   top: 6,
@@ -142,7 +179,7 @@ class _ProviderCardState extends State<ProviderCard> {
                     style: GoogleFonts.barlow(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
