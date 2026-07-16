@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../providers/booking_controller.dart';
 import '../data/models/booking_model.dart';
 import '../../search/search_screen.dart';
+import 'payment_summary_screen.dart';
+import 'booking_confirmation_screen.dart';
 
 class MyBookingsScreen extends ConsumerWidget {
   const MyBookingsScreen({super.key});
@@ -169,89 +171,147 @@ class MyBookingsScreen extends ConsumerWidget {
       statusTextColor = Colors.orange;
     }
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top Row: Service name + Status Badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  booking.service.name.toUpperCase(),
-                  style: GoogleFonts.barlow(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: primaryColor,
-                    letterSpacing: 0.5,
+    return InkWell(
+      onTap: () {
+        if (booking.status.toLowerCase() == 'pending') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PaymentSummaryScreen(booking: booking),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BookingConfirmationScreen(bookingId: booking.id),
+            ),
+          );
+        }
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Row: Service name + Status Badge + Chevron Icon
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    booking.service.name.toUpperCase(),
+                    style: GoogleFonts.barlow(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: primaryColor,
+                      letterSpacing: 0.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusBgColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        booking.status.toUpperCase(),
+                        style: GoogleFonts.barlow(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: statusTextColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.grey,
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Provider info (Vendor Name)
+            Text(
+              booking.vet.name.isNotEmpty ? booking.vet.name : 'Unknown Provider',
+              style: GoogleFonts.barlow(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusBgColor,
-                  borderRadius: BorderRadius.circular(10),
+            ),
+            
+            // Clinic name and phone (Contact Details)
+            Text(
+              [
+                if (booking.vet.clinicName.isNotEmpty) booking.vet.clinicName,
+                if (booking.vet.phone != null && booking.vet.phone!.isNotEmpty) booking.vet.phone!,
+              ].join(' • '),
+              style: GoogleFonts.barlow(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+
+            // Notes info (conditionally shown if present)
+            if (booking.notes != null && booking.notes!.trim().isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Notes: ${booking.notes}',
+                style: GoogleFonts.barlow(
+                  fontSize: 13,
+                  color: Colors.grey.shade400,
+                  fontStyle: FontStyle.italic,
                 ),
-                child: Text(
-                  booking.status.toUpperCase(),
-                  style: GoogleFonts.barlow(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: statusTextColor,
-                    letterSpacing: 0.5,
-                  ),
-                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
-          ),
-          const SizedBox(height: 12),
 
-          // Provider info
-          Text(
-            booking.vet.name,
-            style: GoogleFonts.barlow(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          Text(
-            booking.vet.clinicName,
-            style: GoogleFonts.barlow(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-          ),
-          const Divider(height: 24, thickness: 0.8),
+            const Divider(height: 24, thickness: 0.8),
 
-          // Details grid
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSmallCardDetail('PET', booking.pet.name),
-              _buildSmallCardDetail(
-                'DATE',
-                booking.dateTimeFormatted ?? DateFormat('dd MMM yyyy').format(booking.bookingDate),
-              ),
-              _buildSmallCardDetail('TIME', booking.bookingTime),
-            ],
-          ),
-        ],
+            // Details grid (Pet, Date, Time)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildSmallCardDetail(
+                  'PET',
+                  booking.pet.name.isNotEmpty ? booking.pet.name : 'N/A',
+                ),
+                _buildSmallCardDetail(
+                  'DATE',
+                  booking.dateTimeFormatted ?? DateFormat('dd MMM yyyy').format(booking.bookingDate),
+                ),
+                _buildSmallCardDetail(
+                  'TIME',
+                  booking.bookingTime.isNotEmpty ? booking.bookingTime : 'N/A',
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
