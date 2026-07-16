@@ -46,12 +46,7 @@ final List<ServiceItem> popularServices = [
     icon: Icons.cleaning_services_outlined,
     serviceType: 'poop_scooper',
   ),
-  ServiceItem(
-    label: 'Adoption',
-    icon: Icons.favorite_outline_rounded,
-    serviceType: 'adoption',
-    comingSoon: true,
-  ),
+
   ServiceItem(
     label: 'Lost & Found',
     icon: Icons.search_rounded,
