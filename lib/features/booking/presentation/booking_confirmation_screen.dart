@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../providers/booking_controller.dart';
 import '../data/models/booking_model.dart';
+import '../../home/home_screen.dart';
 
 class BookingConfirmationScreen extends ConsumerWidget {
   final String bookingId;
@@ -45,7 +46,13 @@ class BookingConfirmationScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
                   child: const Text('GO HOME'),
                 ),
               ],
@@ -111,7 +118,11 @@ class BookingConfirmationScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
