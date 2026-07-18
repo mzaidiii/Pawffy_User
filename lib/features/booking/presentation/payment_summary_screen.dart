@@ -54,7 +54,9 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
         });
         // Refetch summary
         ref.invalidate(
-          paymentSummaryProvider('${widget.booking.id}|${_appliedCoupon ?? ""}'),
+          paymentSummaryProvider(
+            '${widget.booking.id}|${_appliedCoupon ?? ""}',
+          ),
         );
       } else {
         setState(() {
@@ -136,7 +138,7 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
               builder: (_) =>
                   BookingConfirmationScreen(bookingId: widget.booking.id),
             ),
-            (route) => route.isFirst,
+            (route) => false,
           );
         } else {
           if (mounted) {
@@ -153,6 +155,7 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
           if (e.error.code == FailureCode.Canceled) {
             debugPrint('Payment Sheet cancelled by user');
           } else {
+            debugPrint(e.error.localizedMessage);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
@@ -418,15 +421,22 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: isDark ? BorderSide.none : BorderSide(color: Colors.grey.shade300),
+                    borderSide: isDark
+                        ? BorderSide.none
+                        : BorderSide(color: Colors.grey.shade300),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: isDark ? BorderSide.none : BorderSide(color: Colors.grey.shade300),
+                    borderSide: isDark
+                        ? BorderSide.none
+                        : BorderSide(color: Colors.grey.shade300),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFFE85D04), width: 1.5),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFE85D04),
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
@@ -452,7 +462,10 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
                   backgroundColor: _appliedCoupon != null
                       ? Colors.red
                       : primaryColor,
-                  minimumSize: const Size(80, 48), // Override global infinite width theme
+                  minimumSize: const Size(
+                    80,
+                    48,
+                  ), // Override global infinite width theme
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
