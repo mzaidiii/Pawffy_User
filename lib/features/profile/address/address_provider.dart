@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawffy/features/auth/providers/current_user_provider.dart';
 import 'package:pawffy/features/auth/providers/auth_controller.dart';
@@ -65,7 +66,27 @@ class AddressNotifier extends AsyncNotifier<List<AddressModel>> {
   @override
   Future<List<AddressModel>> build() async {
     final service = ref.watch(addressServiceProvider);
-    return await service.getAddresses();
+    final apiList = await service.getAddresses();
+
+    if (apiList.isEmpty) {
+      final user = ref.read(currentUserProvider).asData?.value;
+      if (user != null && user.address != null && user.address!.trim().isNotEmpty) {
+        try {
+          final newAddress = await service.createAddress(
+            label: 'Default',
+            address: user.address!,
+            city: user.city ?? '',
+            state: user.state ?? '',
+            pincode: '',
+            isDefault: true,
+          );
+          return [newAddress];
+        } catch (e) {
+          debugPrint('Failed to auto-create profile address on backend: $e');
+        }
+      }
+    }
+    return apiList;
   }
 
   Future<void> addAddress(AddressModel address) async {
