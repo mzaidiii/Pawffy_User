@@ -55,6 +55,22 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
     }
   }
 
+  String _mapSubjectToCategory(String subject) {
+    switch (subject) {
+      case 'Booking Issue':
+        return 'booking_issue';
+      case 'Payment Problem':
+        return 'payment_issue';
+      case 'Account & Profile':
+        return 'account_issue';
+      case 'Technical Issue':
+        return 'technical_issue';
+      case 'Other':
+      default:
+        return 'general';
+    }
+  }
+
   Future<void> _handleSubmit() async {
     final subject = _selectedSubject;
     final message = _messageController.text.trim();
@@ -77,7 +93,7 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
     try {
       await ref.read(supportServiceProvider).createSupportTicket(
         subject: subject,
-        category: subject,
+        category: _mapSubjectToCategory(subject),
         description: message,
         attachmentPath: _attachedFilePath,
       );
