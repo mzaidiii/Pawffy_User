@@ -215,7 +215,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             color: Theme.of(context).scaffoldBackgroundColor,
             child: SettingsButton(
-              text: 'CONTACT SUPPORT',
+              text: 'CONTACT US',
               onTap: () {
                 Navigator.push(
                   context,
