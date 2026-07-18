@@ -7,12 +7,11 @@ import 'package:pawffy/features/profile/settings/support/help_support_screen.dar
 import 'package:pawffy/features/profile/settings/support/terms_screen.dart';
 import 'package:pawffy/features/profile/settings/support/privacy_policy_screen.dart';
 import 'package:pawffy/features/profile/settings/support/about_pawffy_screen.dart';
-import 'accounts/change_password_screen.dart';
 import 'accounts/email_address_screen.dart';
 import 'accounts/mobile_number_screen.dart';
 import 'accounts/personal_information_screen.dart';
+import 'accounts/personal_information_details_screen.dart';
 
-import 'preferences/language_screen.dart';
 import 'preferences/app_appearance_screen.dart';
 import 'preferences/location_settings_screen.dart';
 
@@ -182,16 +181,8 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const PersonalInformationScreen(),
+                  builder: (_) => const PersonalInformationDetailsScreen(),
                 ),
-              ),
-            ),
-            SettingsTile(
-              icon: Icons.lock_outline,
-              title: 'Change Password',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
               ),
             ),
             SettingsTile(
@@ -213,14 +204,6 @@ class SettingsScreen extends ConsumerWidget {
 
             const SettingsSectionTitle(title: 'Preferences'),
 
-            SettingsTile(
-              icon: Icons.language,
-              title: 'Language',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LanguageScreen()),
-              ),
-            ),
             SettingsTile(
               icon: Icons.dark_mode_outlined,
               title: 'App Appearance',
