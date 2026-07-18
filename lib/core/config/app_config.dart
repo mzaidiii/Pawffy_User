@@ -1,4 +1,4 @@
 class AppConfig {
   static const String stripePublishableKey =
-      'pk_test_51P2UrrK6Jocn2QoW1F2zV9mX3d7c5b6b1234567890abcdef';
+      'pk_test_51RlYQAIsqdtkZFQuIZRkDYOzPxmg5Ao8Euj5WsmguYUZ17CqmdEQ05Qv55WQczYK24LkyEJG6mpRq7WLIadfDRcu00Pt0N4TrT';
 }
