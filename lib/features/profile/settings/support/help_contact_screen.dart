@@ -79,7 +79,7 @@ class HelpContactScreen extends StatelessWidget {
                   const SizedBox(height: 28),
 
                   Text(
-                    'Help Topics',
+                    'Contact Us',
                     style: GoogleFonts.barlow(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -104,7 +104,7 @@ class HelpContactScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             color: Theme.of(context).scaffoldBackgroundColor,
             child: SettingsButton(
-              text: 'CONTACT SUPPORT',
+              text: 'CREATE A TICKET',
               onTap: () {
                 Navigator.push(
                   context,
