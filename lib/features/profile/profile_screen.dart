@@ -80,43 +80,6 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        // Notification bell (already wired in home, can keep placeholder)
-                        Stack(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.07),
-                                    blurRadius: 8,
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.notifications_outlined,
-                                color: Theme.of(context).colorScheme.onSurface,
-                                size: 20,
-                              ),
-                            ),
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: Container(
-                                width: 9,
-                                height: 9,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFE85D04),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ],
