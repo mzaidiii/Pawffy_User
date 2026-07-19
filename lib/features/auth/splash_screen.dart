@@ -14,7 +14,7 @@ class SplashScreen extends StatefulWidget {
     this.backgroundColor = const Color(0xFF111111),
     this.logoPath = 'android/assets/splash_icon.png',
     this.logoSize = 180.0,
-    this.title = 'Pawffy',
+    this.title = 'The Pawffy',
     this.subtitle = 'Premium Care for Your Pets',
     this.showProgress = true,
   });
@@ -212,7 +212,7 @@ class _SplashScreenState extends State<SplashScreen>
               bottom: 24,
               child: Center(
                 child: Text(
-                  'PAWFFY ',
+                  'The PAWFFY ',
                   style: GoogleFonts.barlow(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
