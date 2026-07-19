@@ -98,6 +98,23 @@ class BookingService {
     }
   }
 
+  Future<String> getStripePublishableKey() async {
+    try {
+      final response = await _dio.get(
+        ApiConstants.paymentConfig,
+        options: await _authHeader,
+      );
+      final data = response.data['data'];
+      final key = data is Map
+          ? (data['publishableKey'] ?? data['stripePublishableKey'] ?? data['key'])
+          : null;
+      if (key is String && key.startsWith('pk_')) return key;
+      throw Exception('Stripe configuration is unavailable');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Unable to prepare card payment');
+    }
+  }
+
   Future<Map<String, dynamic>> applyCoupon(
     String bookingId,
     String couponCode,
@@ -189,6 +206,19 @@ class BookingService {
       throw Exception(
         e.response?.data['message'] ?? 'Failed to fetch booking details',
       );
+    }
+  }
+
+  Future<BookingModel> cancelBooking(String bookingId) async {
+    try {
+      final response = await _dio.patch(
+        ApiConstants.updateBookingStatus(bookingId),
+        data: const {'status': 'cancelled'},
+        options: await _authHeader,
+      );
+      return BookingModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Unable to cancel booking');
     }
   }
 
