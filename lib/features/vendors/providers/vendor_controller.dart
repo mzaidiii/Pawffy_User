@@ -1,6 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/vendor_model.dart';
 import 'vendor_provider.dart';
+import '../data/services/vendor_service.dart';
+
+final vendorReviewsProvider = FutureProvider.family<List<VendorReview>, String>((ref, vendorId) {
+  return ref.read(vendorServiceProvider).getReviews(vendorId);
+});
 
 // ── Home screen — fetches all vendors ────────────────────────────────────────
 final vendorControllerProvider =
