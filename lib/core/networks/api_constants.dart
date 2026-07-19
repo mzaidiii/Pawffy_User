@@ -77,6 +77,7 @@ class ApiConstants {
   static String markConversationRead(String id) => '/api/messages/$id/read';
 
   // ── Payments ──────────────────────────────────────
+  static const String paymentConfig = '/api/payments/config';
   static const String createPaymentIntent = '/api/payments/create-intent';
   static const String confirmWalletPayment = '/api/payments/confirm';
   static const String verifyStripePayment = '/api/payments/verify';
