@@ -61,6 +61,20 @@ class BookingController extends Notifier<AsyncValue<BookingModel?>> {
       rethrow;
     }
   }
+
+  Future<BookingModel> cancelBooking(String bookingId) async {
+    state = const AsyncLoading();
+    try {
+      final booking = await ref.read(bookingServiceProvider).cancelBooking(bookingId);
+      state = AsyncData(booking);
+      ref.invalidate(bookingDetailsProvider(bookingId));
+      ref.invalidate(myBookingsProvider);
+      return booking;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
 }
 
 final bookingControllerProvider = NotifierProvider<BookingController, AsyncValue<BookingModel?>>(BookingController.new);
