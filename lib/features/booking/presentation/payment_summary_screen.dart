@@ -101,6 +101,12 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
     } else {
       // Stripe Card Payment
       try {
+        final publishableKey = await ref
+            .read(bookingServiceProvider)
+            .getStripePublishableKey();
+        Stripe.publishableKey = publishableKey;
+        await Stripe.instance.applySettings();
+
         // 1. Create Payment Intent on backend
         final intent = await paymentNotifier.createStripeIntent(
           widget.booking.id,
@@ -132,6 +138,8 @@ class _PaymentSummaryScreenState extends ConsumerState<PaymentSummaryScreen> {
         );
 
         if (verifyResult['success'] == true && mounted) {
+          ref.invalidate(bookingDetailsProvider(widget.booking.id));
+          ref.invalidate(myBookingsProvider);
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
