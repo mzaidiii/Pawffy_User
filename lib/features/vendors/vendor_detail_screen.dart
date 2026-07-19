@@ -300,6 +300,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
   }
 
   Widget _buildContent(VendorModel vet, bool isDark) {
+    final reviewsAsync = ref.watch(vendorReviewsProvider(vet.id));
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -584,47 +585,10 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
 
                 _sectionTitle('Reviews'),
                 const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.star_border_rounded,
-                        size: 40,
-                        color: Colors.grey.shade300,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'No reviews yet',
-                        style: GoogleFonts.barlow(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Be the first to leave a review after your visit!',
-                        style: GoogleFonts.barlow(
-                          fontSize: 12,
-                          color: Colors.grey.shade400,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                reviewsAsync.when(
+                  loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Color(0xFFE85D04)))),
+                  error: (_, __) => _reviewEmptyState(isDark),
+                  data: (reviews) => reviews.isEmpty ? _reviewEmptyState(isDark) : _reviewList(reviews, isDark),
                 ),
               ],
             ),
@@ -633,6 +597,24 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
       ],
     );
   }
+
+  Widget _reviewEmptyState(bool isDark) => Container(
+    width: double.infinity, padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(color: isDark ? const Color(0xFF1E1E1E) : Colors.white, borderRadius: BorderRadius.circular(14)),
+    child: Column(children: [Icon(Icons.star_border_rounded, size: 40, color: Colors.grey.shade300), const SizedBox(height: 8), Text('No reviews yet', style: GoogleFonts.barlow(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.grey.shade500)), const SizedBox(height: 4), Text('Be the first to leave a review after your visit!', style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey.shade400), textAlign: TextAlign.center)]),
+  );
+
+  Widget _reviewList(List<dynamic> reviews, bool isDark) => Container(
+    width: double.infinity, padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(color: isDark ? const Color(0xFF1E1E1E) : Colors.white, borderRadius: BorderRadius.circular(14)),
+    child: Column(children: reviews.take(3).map((review) => Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        CircleAvatar(radius: 17, backgroundColor: const Color(0xFFE85D04).withOpacity(.12), child: Text(review.author.isNotEmpty ? review.author[0].toUpperCase() : 'P', style: GoogleFonts.barlow(color: const Color(0xFFE85D04), fontWeight: FontWeight.w800))),
+        const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Expanded(child: Text(review.author, style: GoogleFonts.barlow(fontWeight: FontWeight.w700))), ...List.generate(5, (i) => Icon(Icons.star_rounded, size: 14, color: i < review.rating ? const Color(0xFFFFB703) : Colors.grey.shade300))]), if (review.comment.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 3), child: Text(review.comment, style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey))) ])),
+      ]),
+    )).toList()),
+  );
 
   Widget _backButton() {
     return Padding(
