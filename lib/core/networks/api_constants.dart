@@ -17,6 +17,7 @@ class ApiConstants {
 
   // ── Users ─────────────────────────────────────────
   static const String updateMe = '/api/users/me';
+  static const String deleteMyAccount = '/api/users/me';
   static const String uploadAvatar = '/api/users/me/avatar';
   static const String users = '/api/users';
   static String userById(String id) => '/api/users/$id';
