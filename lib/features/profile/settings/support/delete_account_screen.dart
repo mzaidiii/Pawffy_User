@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/core/storage/storage_service.dart';
+import 'package:pawffy/features/auth/onboardingScreen.dart';
 
 import '../widgets/settings_appbar.dart';
+import 'support_service.dart';
 
-class DeleteAccountScreen extends StatefulWidget {
+class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
 
   @override
-  State<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
+  ConsumerState<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
 }
 
-class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
+  final _confirmationController = TextEditingController();
+  bool _isDeleting = false;
 
   @override
   void dispose() {
-    _passwordController.dispose();
+    _confirmationController.dispose();
     super.dispose();
   }
 
-  void _showConfirmDialog() {
+  Future<void> _showConfirmDialog() async {
+    if (_confirmationController.text.trim().toUpperCase() != 'DELETE') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Type DELETE exactly to continue.')),
+      );
+      return;
+    }
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -51,9 +61,26 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              // API call later
+              setState(() => _isDeleting = true);
+              try {
+                await ref.read(supportServiceProvider).deleteAccount();
+                await StorageService.clearAll();
+                if (!mounted) return;
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                  (route) => false,
+                );
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                  );
+                }
+              } finally {
+                if (mounted) setState(() => _isDeleting = false);
+              }
             },
             child: Text(
               'Delete',
@@ -163,7 +190,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   const SizedBox(height: 28),
 
                   Text(
-                    'Paste your password to continue.',
+                    'Type DELETE to continue.',
                     style: GoogleFonts.barlow(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -174,8 +201,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   const SizedBox(height: 10),
 
                   TextField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
+                    controller: _confirmationController,
+                    enabled: !_isDeleting,
+                    textCapitalization: TextCapitalization.characters,
                     style: GoogleFonts.barlow(
                       fontSize: 14,
                       color: Theme.of(context).colorScheme.onSurface,
@@ -191,17 +219,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                         vertical: 14,
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -236,7 +253,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: _showConfirmDialog,
+                onPressed: _isDeleting ? null : _showConfirmDialog,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
