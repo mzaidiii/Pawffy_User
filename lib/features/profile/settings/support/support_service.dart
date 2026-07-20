@@ -77,7 +77,8 @@ class SupportService {
     try {
       final token = await StorageService.getToken();
       await _dio.delete(
-        ApiConstants.updateMe,
+        ApiConstants.deleteMyAccount,
+        data: const {'confirm': 'DELETE'},
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
     } on DioException catch (e) {

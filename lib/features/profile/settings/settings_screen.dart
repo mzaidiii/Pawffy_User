@@ -7,6 +7,7 @@ import 'package:pawffy/features/profile/settings/support/help_support_screen.dar
 import 'package:pawffy/features/profile/settings/support/terms_screen.dart';
 import 'package:pawffy/features/profile/settings/support/privacy_policy_screen.dart';
 import 'package:pawffy/features/profile/settings/support/about_pawffy_screen.dart';
+import 'package:pawffy/features/profile/settings/support/delete_account_screen.dart';
 import 'accounts/email_address_screen.dart';
 import 'accounts/mobile_number_screen.dart';
 import 'accounts/personal_information_screen.dart';
@@ -264,6 +265,14 @@ class SettingsScreen extends ConsumerWidget {
                   MaterialPageRoute(builder: (_) => const AboutPawffyScreen()),
                 );
               },
+            ),
+            SettingsTile(
+              icon: Icons.delete_outline_rounded,
+              title: 'Delete Account',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DeleteAccountScreen()),
+              ),
             ),
 
             const SizedBox(height: 20),
