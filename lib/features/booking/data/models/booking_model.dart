@@ -1,3 +1,5 @@
+import 'package:pawffy/core/networks/api_constants.dart';
+
 class VendorServiceModel {
   final String id;
   final String name;
@@ -33,6 +35,7 @@ class BookingPetModel {
   final String species;
   final String? breed;
   final int? age;
+  final String? imageUrl;
 
   BookingPetModel({
     required this.id,
@@ -40,15 +43,47 @@ class BookingPetModel {
     required this.species,
     this.breed,
     this.age,
+    this.imageUrl,
   });
 
   factory BookingPetModel.fromJson(Map<String, dynamic> json) {
+    final rawImage = json['imageUrl'] ?? json['image'] ?? json['photo'] ?? json['photoUrl'] ?? json['petImageUrl'];
+    String? parsedImage;
+    if (rawImage != null && rawImage.toString().trim().isNotEmpty) {
+      String imgStr = rawImage.toString().trim();
+      if (imgStr.startsWith('data:image') || imgStr.startsWith('data:') || imgStr.contains(';base64,')) {
+        parsedImage = imgStr;
+      } else if (!imgStr.startsWith('http') && !imgStr.startsWith('/') && !imgStr.contains('\\') && imgStr.length > 50) {
+        parsedImage = imgStr;
+      } else {
+        if (imgStr.contains('localhost') || imgStr.contains('127.0.0.1') || imgStr.contains('10.0.2.2')) {
+          try {
+            final uri = Uri.parse(imgStr);
+            imgStr = '${ApiConstants.baseUrl}${uri.path}';
+          } catch (_) {
+            imgStr = imgStr
+                .replaceAll(RegExp(r'http://localhost:\d+'), ApiConstants.baseUrl)
+                .replaceAll(RegExp(r'http://127\.0\.0\.1:\d+'), ApiConstants.baseUrl)
+                .replaceAll(RegExp(r'http://10\.0\.2\.2:\d+'), ApiConstants.baseUrl);
+          }
+        }
+        if (imgStr.startsWith('http://') || imgStr.startsWith('https://')) {
+          parsedImage = imgStr;
+        } else if (imgStr.startsWith('/')) {
+          parsedImage = '${ApiConstants.baseUrl}$imgStr';
+        } else {
+          parsedImage = '${ApiConstants.baseUrl}/$imgStr';
+        }
+      }
+    }
+
     return BookingPetModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       species: json['species'] ?? '',
       breed: json['breed'],
       age: json['age'],
+      imageUrl: parsedImage,
     );
   }
 }
@@ -141,6 +176,8 @@ class BookingModel {
   final BookingVendorModel vet;
   final BookingServiceModel service;
   final BookingPaymentModel? payment;
+  final bool isReviewed;
+  final Map<String, dynamic>? review;
 
   BookingModel({
     required this.id,
@@ -155,6 +192,8 @@ class BookingModel {
     required this.vet,
     required this.service,
     this.payment,
+    this.isReviewed = false,
+    this.review,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
@@ -182,6 +221,11 @@ class BookingModel {
 
     final rawService = json['service'] ?? json['selectedService'] ?? json['partnerService'] ?? json['businessService'] ?? <String, dynamic>{};
 
+    final rawReview = json['review'] ?? json['vendorReview'] ?? json['customerReview'];
+    final bool hasReview = json['isReviewed'] == true ||
+        json['hasReviewed'] == true ||
+        (rawReview != null && rawReview is Map && rawReview.isNotEmpty);
+
     return BookingModel(
       id: json['id'] ?? '',
       appointmentId: json['appointmentId'],
@@ -199,6 +243,8 @@ class BookingModel {
       payment: json['payment'] != null
           ? BookingPaymentModel.fromJson(_castMap(json['payment']))
           : null,
+      isReviewed: hasReview,
+      review: rawReview is Map ? Map<String, dynamic>.from(rawReview) : null,
     );
   }
 }
