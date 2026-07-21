@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:pawffy/core/storage/storage_service.dart';
 import '../providers/booking_controller.dart';
 import '../data/models/booking_model.dart';
 import '../../home/home_screen.dart';
@@ -28,7 +29,7 @@ class BookingConfirmationScreen extends ConsumerWidget {
             letterSpacing: 1.2,
           ),
         ),
-        automaticallyImplyLeading: false, // Don't allow going back to payment screens
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: bookingDetailsAsync.when(
@@ -68,7 +69,6 @@ class BookingConfirmationScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Status illustration
                         const SizedBox(height: 10),
                         Container(
                           width: 80,
@@ -106,7 +106,6 @@ class BookingConfirmationScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 32),
 
-                        // Receipt Details
                         _buildReceiptCard(booking, isDark, primaryColor),
                         const SizedBox(height: 24),
                         if (booking.status.toLowerCase() == 'completed')
@@ -116,7 +115,6 @@ class BookingConfirmationScreen extends ConsumerWidget {
                   ),
                 ),
 
-                // Status-aware actions
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -171,16 +169,138 @@ class BookingConfirmationScreen extends ConsumerWidget {
   }
 
   Widget _reviewPrompt(BuildContext context, WidgetRef ref, BookingModel booking, bool isDark) {
-    return Container(
-      width: double.infinity, padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: const Color(0xFFE85D04).withOpacity(.08), borderRadius: BorderRadius.circular(18)),
-      child: Column(children: [
-        const Icon(Icons.star_rounded, size: 38, color: Color(0xFFE85D04)),
-        const SizedBox(height: 6), Text('Enjoyed the service?', style: GoogleFonts.barlow(fontSize: 18, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 4), Text('Share your experience with other pet parents.', textAlign: TextAlign.center, style: GoogleFonts.barlow(color: Colors.grey.shade700)),
-        const SizedBox(height: 12),
-        ElevatedButton.icon(onPressed: () => showModalBottomSheet<bool>(context: context, isScrollControlled: true, backgroundColor: Theme.of(context).scaffoldBackgroundColor, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))), builder: (_) => ReviewVendorSheet(bookingId: booking.id, vendorId: booking.vet.id, vendorName: booking.vet.name)), icon: const Icon(Icons.rate_review_rounded), label: const Text('RATE VENDOR')),
-      ]),
+    return FutureBuilder<bool>(
+      future: StorageService.isBookingReviewed(booking.id),
+      builder: (context, snapshot) {
+        final bool isAlreadyReviewed = booking.isReviewed || (snapshot.data == true);
+
+        if (isAlreadyReviewed) {
+          final reviewRating = int.tryParse(booking.review?['rating']?.toString() ?? '') ?? 5;
+          final reviewComment = booking.review?['comment']?.toString() ?? '';
+
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.green.withOpacity(0.3)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.check_circle_rounded, color: Colors.green, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      'REVIEW SUBMITTED',
+                      style: GoogleFonts.barlow(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.green,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (i) {
+                    return Icon(
+                      Icons.star_rounded,
+                      size: 20,
+                      color: i < reviewRating ? const Color(0xFFFFB703) : Colors.grey.shade300,
+                    );
+                  }),
+                ),
+                if (reviewComment.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '"$reviewComment"',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.barlow(
+                      fontSize: 13,
+                      color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text(
+                  'Thank you for rating ${booking.vet.name}!',
+                  style: GoogleFonts.barlow(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE85D04).withOpacity(.08),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            children: [
+              const Icon(Icons.star_rounded, size: 38, color: Color(0xFFE85D04)),
+              const SizedBox(height: 6),
+              Text(
+                'Enjoyed the service?',
+                style: GoogleFonts.barlow(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Share your experience with other pet parents.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.barlow(
+                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final result = await showModalBottomSheet<bool>(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                    ),
+                    builder: (_) => ReviewVendorSheet(
+                      bookingId: booking.id,
+                      vendorId: booking.vet.id,
+                      vendorName: booking.vet.name,
+                    ),
+                  );
+                  if (result == true) {
+                    ref.invalidate(bookingDetailsProvider(booking.id));
+                  }
+                },
+                icon: const Icon(Icons.rate_review_rounded),
+                label: const Text('RATE VENDOR'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE85D04),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
