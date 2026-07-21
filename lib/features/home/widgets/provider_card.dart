@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 
 class ProviderCard extends StatefulWidget {
   final String name;
@@ -8,7 +9,8 @@ class ProviderCard extends StatefulWidget {
   final String price;
   final double? rating;
   final bool? isOnline;
-  final VoidCallback? onTap; // ← added
+  final String? profileImage;
+  final VoidCallback? onTap;
 
   const ProviderCard({
     super.key,
@@ -18,7 +20,8 @@ class ProviderCard extends StatefulWidget {
     required this.price,
     this.rating,
     this.isOnline,
-    this.onTap, // ← added
+    this.profileImage,
+    this.onTap,
   });
 
   @override
@@ -31,7 +34,7 @@ class _ProviderCardState extends State<ProviderCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: widget.onTap, // ← wired
+      onTap: widget.onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         width: 160,
@@ -49,23 +52,33 @@ class _ProviderCardState extends State<ProviderCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Image Placeholder + badges ──────────────
+            // ── Image + badges ──────────────
             Stack(
               children: [
-                Container(
-                  height: 120,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE0E0E0),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
                   ),
-                  child: const Icon(
-                    Icons.pets,
-                    color: Color(0xFFBBBBBB),
-                    size: 36,
+                  child: Container(
+                    height: 120,
+                    width: double.infinity,
+                    color: const Color(0xFFE0E0E0),
+                    child: widget.profileImage != null && widget.profileImage!.isNotEmpty
+                        ? Image(
+                            image: ImagePickerHelper.getImageProvider(widget.profileImage!),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.pets,
+                              color: Color(0xFFBBBBBB),
+                              size: 36,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.pets,
+                            color: Color(0xFFBBBBBB),
+                            size: 36,
+                          ),
                   ),
                 ),
 
