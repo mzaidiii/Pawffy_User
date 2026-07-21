@@ -499,12 +499,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 itemBuilder: (context, index) {
                   final vet = vets[index];
                   return ProviderCard(
-                    name: vet.clinicName,
-                    service: vet.specialization,
+                    name: vet.clinicName.isNotEmpty ? vet.clinicName : vet.name,
+                    service: vet.specialization.isNotEmpty ? vet.specialization : vet.serviceType.toUpperCase(),
                     location: '${vet.city}, ${vet.state}',
                     price: '\$${vet.consultationFee}',
                     rating: vet.rating,
                     isOnline: vet.availableStatus,
+                    profileImage: vet.profileImage,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
