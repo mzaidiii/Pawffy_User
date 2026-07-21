@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
 import '../providers/booking_controller.dart';
 import '../data/models/booking_model.dart';
@@ -225,10 +226,10 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
           CircleAvatar(
             radius: 32,
             backgroundColor: const Color(0xFFE85D04).withOpacity(0.1),
-            backgroundImage: widget.vendor.profileImage != null
-                ? NetworkImage(widget.vendor.profileImage!)
+            backgroundImage: widget.vendor.profileImage != null && widget.vendor.profileImage!.isNotEmpty
+                ? ImagePickerHelper.getImageProvider(widget.vendor.profileImage!)
                 : null,
-            child: widget.vendor.profileImage == null
+            child: widget.vendor.profileImage == null || widget.vendor.profileImage!.isEmpty
                 ? const Icon(Icons.medical_services_outlined, color: Color(0xFFE85D04), size: 28)
                 : null,
           ),
