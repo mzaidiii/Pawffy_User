@@ -26,6 +26,15 @@ class StorageService {
     return await _storage.read(key: userIdKey);
   }
 
+  static Future<void> markBookingReviewed(String bookingId) async {
+    await _storage.write(key: 'reviewed_booking_$bookingId', value: 'true');
+  }
+
+  static Future<bool> isBookingReviewed(String bookingId) async {
+    final val = await _storage.read(key: 'reviewed_booking_$bookingId');
+    return val == 'true';
+  }
+
   static Future<void> clearAll() async {
     await _storage.deleteAll();
   }
