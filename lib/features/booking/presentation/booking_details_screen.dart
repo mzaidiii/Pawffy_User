@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
 import 'package:pawffy/features/pets/data/models/pet_model.dart';
 import 'package:pawffy/features/pets/data/services/pet_service.dart';
@@ -520,7 +521,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                         ? Colors.white24
                         : primaryColor.withOpacity(0.1),
                     foregroundImage: (pet.imageUrl != null && pet.imageUrl!.trim().isNotEmpty)
-                        ? NetworkImage(pet.imageUrl!)
+                        ? ImagePickerHelper.getImageProvider(pet.imageUrl!)
                         : null,
                     onForegroundImageError: (pet.imageUrl != null && pet.imageUrl!.trim().isNotEmpty)
                         ? (exception, stackTrace) {
