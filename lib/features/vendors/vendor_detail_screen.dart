@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:pawffy/core/utils/image_picker_helper.dart';
 import 'package:pawffy/features/vendors/data/models/vendor_model.dart';
 import 'package:pawffy/features/vendors/providers/vendor_controller.dart';
 import 'package:pawffy/features/message/chat_screen.dart';
@@ -328,9 +329,9 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
             background: Stack(
               fit: StackFit.expand,
               children: [
-                vet.profileImage != null
-                    ? Image.network(
-                        vet.profileImage!,
+                vet.profileImage != null && vet.profileImage!.isNotEmpty
+                    ? Image(
+                        image: ImagePickerHelper.getImageProvider(vet.profileImage!),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => _imageFallback(vet),
                       )
@@ -419,7 +420,6 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
             ),
           ),
         ),
-
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
@@ -439,25 +439,15 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                     ),
                     const SizedBox(width: 12),
                     _statCard(
-                      icon: Icons.work_outline_rounded,
+                      icon: Icons.rate_review_outlined,
                       iconColor: const Color(0xFFE85D04),
-                      label: 'Experience',
-                      value: '${vet.experienceYears} yrs',
-                      isDark: isDark,
-                    ),
-                    const SizedBox(width: 12),
-                    _statCard(
-                      icon: Icons.calendar_today_outlined,
-                      iconColor: Colors.blue,
-                      label: 'Bookings',
-                      value: '${vet.bookingCount}',
+                      label: 'Reviews',
+                      value: '${vet.reviewCount}',
                       isDark: isDark,
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 _sectionTitle('About'),
                 const SizedBox(height: 12),
                 Container(
@@ -477,17 +467,11 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                   child: Column(
                     children: [
                       _infoRow(
-                        Icons.medical_services_outlined,
-                        'Specialization',
-                        vet.specialization,
-                      ),
-                      const SizedBox(height: 10),
-                      _infoRow(
                         Icons.category_outlined,
                         'Service Type',
                         vet.serviceType.toUpperCase(),
                       ),
-                      if (vet.phone != null) ...[
+                      if (vet.phone != null && vet.phone!.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         _infoRow(Icons.phone_outlined, 'Phone', vet.phone!),
                       ],
@@ -498,7 +482,6 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                     ],
                   ),
                 ),
-
                 if (vet.timings != null && vet.timings!['label'] != null) ...[
                   const SizedBox(height: 24),
                   _sectionTitle('Clinic Hours'),
@@ -536,9 +519,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                     ),
                   ),
                 ],
-
                 const SizedBox(height: 24),
-
                 _sectionTitle('Location'),
                 const SizedBox(height: 12),
                 Container(
@@ -580,9 +561,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 _sectionTitle('Reviews'),
                 const SizedBox(height: 12),
                 reviewsAsync.when(
