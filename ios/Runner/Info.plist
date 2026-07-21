@@ -4,9 +4,15 @@
 	<dict>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Pawffy needs access to your photo library to select a profile avatar and pet photo</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Pawffy needs permission to save photos to your photo library</string>
 		<key>NSCameraUsageDescription</key>
 		<string>Pawffy needs access to your camera to capture a profile avatar and pet photo</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Pawffy needs access to your microphone when capturing photos and videos</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Pawffy needs your location to show nearby pet services</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 		<string>Pawffy needs your location to show nearby pet services</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>Pawffy needs your location to show nearby pet services</string>
