@@ -1,3 +1,5 @@
+import 'package:pawffy/core/networks/api_constants.dart';
+
 class PetModel {
   final String id;
   final String ownerId;
@@ -36,6 +38,36 @@ class PetModel {
   });
 
   factory PetModel.fromJson(Map<String, dynamic> json) {
+    final rawImage = json['imageUrl'] ?? json['image'] ?? json['photo'] ?? json['photoUrl'] ?? json['profileImage'] ?? json['avatar'];
+    String? parsedImage;
+    if (rawImage != null && rawImage.toString().trim().isNotEmpty) {
+      String imgStr = rawImage.toString().trim();
+      if (imgStr.startsWith('data:image') || imgStr.startsWith('data:') || imgStr.contains(';base64,')) {
+        parsedImage = imgStr;
+      } else if (!imgStr.startsWith('http') && !imgStr.startsWith('/') && !imgStr.contains('\\') && imgStr.length > 50) {
+        parsedImage = imgStr;
+      } else {
+        if (imgStr.contains('localhost') || imgStr.contains('127.0.0.1') || imgStr.contains('10.0.2.2')) {
+          try {
+            final uri = Uri.parse(imgStr);
+            imgStr = '${ApiConstants.baseUrl}${uri.path}';
+          } catch (_) {
+            imgStr = imgStr
+                .replaceAll(RegExp(r'http://localhost:\d+'), ApiConstants.baseUrl)
+                .replaceAll(RegExp(r'http://127\.0\.0\.1:\d+'), ApiConstants.baseUrl)
+                .replaceAll(RegExp(r'http://10\.0\.2\.2:\d+'), ApiConstants.baseUrl);
+          }
+        }
+        if (imgStr.startsWith('http://') || imgStr.startsWith('https://')) {
+          parsedImage = imgStr;
+        } else if (imgStr.startsWith('/')) {
+          parsedImage = '${ApiConstants.baseUrl}$imgStr';
+        } else {
+          parsedImage = '${ApiConstants.baseUrl}/$imgStr';
+        }
+      }
+    }
+
     return PetModel(
       id: json['id'] ?? '',
       ownerId: json['ownerId'] ?? '',
@@ -48,7 +80,7 @@ class PetModel {
       color: json['color'] ?? '',
       medicalNotes: json['medicalNotes'],
       vaccinationStatus: json['vaccinationStatus'] ?? '',
-      imageUrl: json['imageUrl'],
+      imageUrl: parsedImage,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
