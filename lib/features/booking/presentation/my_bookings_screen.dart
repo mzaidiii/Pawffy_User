@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:pawffy/core/storage/storage_service.dart';
 import '../providers/booking_controller.dart';
 import '../data/models/booking_model.dart';
 import '../../search/search_screen.dart';
@@ -157,91 +158,106 @@ class MyBookingsScreen extends ConsumerWidget {
 
   Widget _buildBookingCard(
       BuildContext context, BookingModel booking, bool isDark, Color primaryColor) {
-    // Determine status color
-    Color statusBgColor;
-    Color statusTextColor;
-    if (booking.status.toLowerCase() == 'confirmed') {
-      statusBgColor = Colors.green.withOpacity(0.12);
-      statusTextColor = Colors.green;
-    } else if (booking.status.toLowerCase() == 'cancelled') {
-      statusBgColor = Colors.red.withOpacity(0.12);
-      statusTextColor = Colors.red;
-    } else {
-      statusBgColor = Colors.orange.withOpacity(0.12);
-      statusTextColor = Colors.orange;
-    }
+    return FutureBuilder<bool>(
+      future: StorageService.isBookingReviewed(booking.id),
+      builder: (context, snapshot) {
+        final bool isReviewed = booking.isReviewed || (snapshot.data == true);
 
-    return InkWell(
-      onTap: () {
-        if (booking.status.toLowerCase() == 'pending') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PaymentSummaryScreen(booking: booking),
-            ),
-          );
+        Color statusBgColor;
+        Color statusTextColor;
+        String statusLabel = booking.status.toUpperCase();
+
+        if (booking.status.toLowerCase() == 'completed') {
+          if (isReviewed) {
+            statusBgColor = Colors.teal.withOpacity(0.15);
+            statusTextColor = Colors.teal;
+            statusLabel = '✓ REVIEWED';
+          } else {
+            statusBgColor = Colors.teal.withOpacity(0.12);
+            statusTextColor = Colors.teal;
+            statusLabel = 'COMPLETED';
+          }
+        } else if (booking.status.toLowerCase() == 'confirmed') {
+          statusBgColor = Colors.green.withOpacity(0.12);
+          statusTextColor = Colors.green;
+        } else if (booking.status.toLowerCase() == 'cancelled') {
+          statusBgColor = Colors.red.withOpacity(0.12);
+          statusTextColor = Colors.red;
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BookingConfirmationScreen(bookingId: booking.id),
-            ),
-          );
+          statusBgColor = Colors.orange.withOpacity(0.12);
+          statusTextColor = Colors.orange;
         }
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Service name + Status Badge + Chevron Icon
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    booking.service.name.toUpperCase(),
-                    style: GoogleFonts.barlow(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: primaryColor,
-                      letterSpacing: 0.5,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+
+        return InkWell(
+          onTap: () {
+            if (booking.status.toLowerCase() == 'pending') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PaymentSummaryScreen(booking: booking),
                 ),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BookingConfirmationScreen(bookingId: booking.id),
+                ),
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusBgColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                    Expanded(
                       child: Text(
-                        booking.status.toUpperCase(),
+                        booking.service.name.toUpperCase(),
                         style: GoogleFonts.barlow(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: statusTextColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: primaryColor,
                           letterSpacing: 0.5,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: statusBgColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            statusLabel,
+                            style: GoogleFonts.barlow(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: statusTextColor,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
                     const SizedBox(width: 4),
                     const Icon(
                       Icons.chevron_right_rounded,
@@ -314,6 +330,8 @@ class MyBookingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  },
+);
   }
 
   Widget _buildSmallCardDetail(String label, String value) {
