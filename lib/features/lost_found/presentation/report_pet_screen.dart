@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:pawffy/core/utils/location_provider.dart';
 import '../providers/lost_found_provider.dart';
 import '../data/models/lost_found_model.dart';
@@ -27,7 +26,8 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
   final _weightController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
-  final _imageController = TextEditingController(); // Simulates image URLs/base64
+  final _imageController =
+      TextEditingController(); // Simulates image URLs/base64
 
   String _gender = 'Male';
   bool _submitting = false;
@@ -99,7 +99,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
         'latitude': lat,
         'longitude': lng,
         'address': _addressController.text.trim(),
-      }
+      },
     };
 
     if (_isLost) {
@@ -136,11 +136,11 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
             content: Text(
               widget.existingReport != null
                   ? (_isLost
-                      ? 'Lost pet report updated successfully!'
-                      : 'Found pet report updated successfully!')
+                        ? 'Lost pet report updated successfully!'
+                        : 'Found pet report updated successfully!')
                   : (_isLost
-                      ? 'Lost pet reported successfully!'
-                      : 'Found pet reported successfully!'),
+                        ? 'Lost pet reported successfully!'
+                        : 'Found pet reported successfully!'),
             ),
           ),
         );
@@ -148,9 +148,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Submission failed: $e')));
       }
     } finally {
       if (mounted) {
@@ -203,7 +203,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                               decoration: BoxDecoration(
                                 color: _isLost
                                     ? const Color(0xFFD90429)
-                                    : (isDark ? const Color(0xFF222222) : const Color(0xFFEEEEEE)),
+                                    : (isDark
+                                          ? const Color(0xFF222222)
+                                          : const Color(0xFFEEEEEE)),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Center(
@@ -230,14 +232,18 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                               decoration: BoxDecoration(
                                 color: !_isLost
                                     ? const Color(0xFF2B9348)
-                                    : (isDark ? const Color(0xFF222222) : const Color(0xFFEEEEEE)),
+                                    : (isDark
+                                          ? const Color(0xFF222222)
+                                          : const Color(0xFFEEEEEE)),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Center(
                                 child: Text(
                                   'FOUND PET',
                                   style: GoogleFonts.barlow(
-                                    color: !_isLost ? Colors.white : Colors.grey,
+                                    color: !_isLost
+                                        ? Colors.white
+                                        : Colors.grey,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.5,
                                   ),
@@ -264,25 +270,37 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
 
                     if (_isLost) ...[
                       // Name
-                      Text('Pet Name *', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                      Text(
+                        'Pet Name *',
+                        style: GoogleFonts.barlow(fontWeight: FontWeight.w600),
+                      ),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _nameController,
-                        decoration: const InputDecoration(hintText: 'e.g., Bruno'),
-                        validator: (val) =>
-                            (val == null || val.isEmpty) ? 'Pet name is required' : null,
+                        decoration: const InputDecoration(
+                          hintText: 'e.g., Bruno',
+                        ),
+                        validator: (val) => (val == null || val.isEmpty)
+                            ? 'Pet name is required'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                     ],
 
                     // Breed
-                    Text('Breed *', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                    Text(
+                      'Breed *',
+                      style: GoogleFonts.barlow(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: _breedController,
-                      decoration: const InputDecoration(hintText: 'e.g., Labrador, Indie, Persian Cat'),
-                      validator: (val) =>
-                          (val == null || val.isEmpty) ? 'Breed is required' : null,
+                      decoration: const InputDecoration(
+                        hintText: 'e.g., Labrador, Indie, Persian Cat',
+                      ),
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Breed is required'
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -294,14 +312,23 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Age (years) *', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                                Text(
+                                  'Age (years) *',
+                                  style: GoogleFonts.barlow(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _ageController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(hintText: 'e.g., 3'),
+                                  decoration: const InputDecoration(
+                                    hintText: 'e.g., 3',
+                                  ),
                                   validator: (val) =>
-                                      (val == null || val.isEmpty) ? 'Age is required' : null,
+                                      (val == null || val.isEmpty)
+                                      ? 'Age is required'
+                                      : null,
                                 ),
                               ],
                             ),
@@ -311,20 +338,37 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Gender *', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                                Text(
+                                  'Gender *',
+                                  style: GoogleFonts.barlow(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<String>(
                                   value: _gender,
                                   decoration: const InputDecoration(
-                                    contentPadding:
-                                        EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 10,
+                                    ),
                                   ),
                                   items: const [
-                                    DropdownMenuItem(value: 'Male', child: Text('Male')),
-                                    DropdownMenuItem(value: 'Female', child: Text('Female')),
-                                    DropdownMenuItem(value: 'Unknown', child: Text('Unknown')),
+                                    DropdownMenuItem(
+                                      value: 'Male',
+                                      child: Text('Male'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Female',
+                                      child: Text('Female'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Unknown',
+                                      child: Text('Unknown'),
+                                    ),
                                   ],
-                                  onChanged: (val) => setState(() => _gender = val ?? 'Male'),
+                                  onChanged: (val) =>
+                                      setState(() => _gender = val ?? 'Male'),
                                 ),
                               ],
                             ),
@@ -332,7 +376,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Height & Weight
                       Row(
                         children: [
@@ -340,11 +384,18 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Height (approx)', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                                Text(
+                                  'Height (approx)',
+                                  style: GoogleFonts.barlow(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _heightController,
-                                  decoration: const InputDecoration(hintText: 'e.g., 45 cm'),
+                                  decoration: const InputDecoration(
+                                    hintText: 'e.g., 45 cm',
+                                  ),
                                 ),
                               ],
                             ),
@@ -354,11 +405,18 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Weight (approx)', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                                Text(
+                                  'Weight (approx)',
+                                  style: GoogleFonts.barlow(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _weightController,
-                                  decoration: const InputDecoration(hintText: 'e.g., 12 kg'),
+                                  decoration: const InputDecoration(
+                                    hintText: 'e.g., 12 kg',
+                                  ),
                                 ),
                               ],
                             ),
@@ -368,31 +426,50 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                       const SizedBox(height: 16),
                     ] else ...[
                       // Gender only (for found pet)
-                      Text('Gender *', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                      Text(
+                        'Gender *',
+                        style: GoogleFonts.barlow(fontWeight: FontWeight.w600),
+                      ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
                         value: _gender,
                         decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
                         ),
                         items: const [
                           DropdownMenuItem(value: 'Male', child: Text('Male')),
-                          DropdownMenuItem(value: 'Female', child: Text('Female')),
-                          DropdownMenuItem(value: 'Unknown', child: Text('Unknown')),
+                          DropdownMenuItem(
+                            value: 'Female',
+                            child: Text('Female'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Unknown',
+                            child: Text('Unknown'),
+                          ),
                         ],
-                        onChanged: (val) => setState(() => _gender = val ?? 'Male'),
+                        onChanged: (val) =>
+                            setState(() => _gender = val ?? 'Male'),
                       ),
                       const SizedBox(height: 16),
                     ],
 
                     // Color
-                    Text('Color *', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                    Text(
+                      'Color *',
+                      style: GoogleFonts.barlow(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: _colorController,
-                      decoration: const InputDecoration(hintText: 'e.g., Brown, White with spots'),
-                      validator: (val) =>
-                          (val == null || val.isEmpty) ? 'Color is required' : null,
+                      decoration: const InputDecoration(
+                        hintText: 'e.g., Brown, White with spots',
+                      ),
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Color is required'
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -406,15 +483,22 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                       controller: _addressController,
                       decoration: const InputDecoration(
                         hintText: 'e.g., Bandra Station, Mumbai',
-                        suffixIcon: Icon(Icons.location_on_rounded, color: primaryColor),
+                        suffixIcon: Icon(
+                          Icons.location_on_rounded,
+                          color: primaryColor,
+                        ),
                       ),
-                      validator: (val) =>
-                          (val == null || val.isEmpty) ? 'Location address is required' : null,
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Location address is required'
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
                     // Image URL
-                    Text('Pet Image URL (optional)', style: GoogleFonts.barlow(fontWeight: FontWeight.w600)),
+                    Text(
+                      'Pet Image URL (optional)',
+                      style: GoogleFonts.barlow(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: _imageController,
@@ -426,7 +510,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
 
                     // Description / Notes
                     Text(
-                      _isLost ? 'Distinguishing Marks / Notes *' : 'Pet Condition / Details *',
+                      _isLost
+                          ? 'Distinguishing Marks / Notes *'
+                          : 'Pet Condition / Details *',
                       style: GoogleFonts.barlow(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 6),
@@ -438,8 +524,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                             ? 'e.g., Friendly labrador wearing a red collar. Last seen near playground.'
                             : 'e.g., Scared but friendly. Currently kept safe in local veterinary clinic.',
                       ),
-                      validator: (val) =>
-                          (val == null || val.isEmpty) ? 'Description is required' : null,
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Description is required'
+                          : null,
                     ),
                     const SizedBox(height: 24),
 
@@ -449,7 +536,9 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                       child: ElevatedButton(
                         onPressed: _submitting ? null : _submitReport,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isLost ? const Color(0xFFD90429) : const Color(0xFF2B9348),
+                          backgroundColor: _isLost
+                              ? const Color(0xFFD90429)
+                              : const Color(0xFF2B9348),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
@@ -457,10 +546,15 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
                               )
                             : Text(
-                                widget.existingReport != null ? 'SAVE CHANGES' : 'SUBMIT REPORT',
+                                widget.existingReport != null
+                                    ? 'SAVE CHANGES'
+                                    : 'SUBMIT REPORT',
                                 style: GoogleFonts.barlow(
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.1,
