@@ -1,10 +1,10 @@
 class ApiConstants {
-  static const String baseUrl = 'https://pawffy-backend-yyed.onrender.com';
+  static const String baseUrl = 'https://pawffy-backend-xsfm.onrender.com';
 
   // Supabase Configuration
-  static const String supabaseUrl = 'https://hnwslusckrzbnulxwgwp.supabase.co';
+  static const String supabaseUrl = 'https://srnqlmsmuuurlcrrgywm.supabase.co';
   static const String supabaseAnonKey =
-      'sb_publishable_nuKdWOHmpNp87YsximpVVw_1Huju3QL';
+      'sb_publishable_hkgdmP70S50oSrWo7P47fw_D4eAZjJ2';
   // ── Auth ──────────────────────────────────────────
   static const String login = '/api/auth/login';
   static const String register = '/api/auth/register';
@@ -56,9 +56,6 @@ class ApiConstants {
   static String vendorSlots(String id) => '/api/vendors/$id/slots';
   static String vendorRequests(String id) => '/api/vendors/$id/requests';
   static const String vendorRequestsAsVendor = '/api/vendor/requests';
-
-  // ── Vets (Booking flow — slots/services) ─────────
-  // These stay on old /api/vets until vendor equivalents exist
 
   // ── Bookings ──────────────────────────────────────
   static const String bookings = '/api/bookings';
