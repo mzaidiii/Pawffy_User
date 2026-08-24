@@ -138,7 +138,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       if (_selectedDuration != null && _selectedDuration!.isNotEmpty) {
         notesParts.add('Duration: $_selectedDuration');
       }
-      finalNotes = notesParts.join('. ') + '.';
+      finalNotes = '${notesParts.join('. ')}.';
     } else {
       finalNotes = _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
@@ -520,10 +520,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                     backgroundColor: isSelected
                         ? Colors.white24
                         : primaryColor.withOpacity(0.1),
-                    foregroundImage: (pet.imageUrl != null && pet.imageUrl!.trim().isNotEmpty)
+                    foregroundImage:
+                        (pet.imageUrl != null &&
+                            pet.imageUrl!.trim().isNotEmpty)
                         ? ImagePickerHelper.getImageProvider(pet.imageUrl!)
                         : null,
-                    onForegroundImageError: (pet.imageUrl != null && pet.imageUrl!.trim().isNotEmpty)
+                    onForegroundImageError:
+                        (pet.imageUrl != null &&
+                            pet.imageUrl!.trim().isNotEmpty)
                         ? (exception, stackTrace) {
                             debugPrint('Error loading pet image: $exception');
                           }
