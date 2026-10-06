@@ -1,10 +1,10 @@
 class ApiConstants {
-  static const String baseUrl = 'https://pawffy-backend-xsfm.onrender.com';
+  static const String baseUrl = 'https://pawffy-backend-tgd9.onrender.com';
 
   // Supabase Configuration
-  static const String supabaseUrl = 'https://srnqlmsmuuurlcrrgywm.supabase.co';
+  static const String supabaseUrl = 'https://grfbnpzcvkngtgwfbvdw.supabase.co';
   static const String supabaseAnonKey =
-      'sb_publishable_hkgdmP70S50oSrWo7P47fw_D4eAZjJ2';
+      'sb_publishable_PaAbEAGhb4tuffWhFNPgxA_S3APuoch';
   // ── Auth ──────────────────────────────────────────
   static const String login = '/api/auth/login';
   static const String register = '/api/auth/register';

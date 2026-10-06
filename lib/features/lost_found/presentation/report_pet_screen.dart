@@ -26,8 +26,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
   final _weightController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
-  final _imageController =
-      TextEditingController(); // Simulates image URLs/base64
+  final _imageController = TextEditingController();
 
   String _gender = 'Male';
   bool _submitting = false;
