@@ -44,14 +44,17 @@ class ReportDetailsScreen extends ConsumerWidget {
         ),
       ),
       body: detailAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: primaryColor),
-        ),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: primaryColor)),
         error: (err, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.warning_amber_rounded, size: 48, color: Colors.grey),
+              const Icon(
+                Icons.warning_amber_rounded,
+                size: 48,
+                color: Colors.grey,
+              ),
               const SizedBox(height: 12),
               Text(
                 'Failed to load details: $err',
@@ -63,7 +66,8 @@ class ReportDetailsScreen extends ConsumerWidget {
         data: (report) {
           final isLost = report.reportType == 'lost';
           final currentUser = ref.watch(currentUserProvider).asData?.value;
-          final isOwner = currentUser != null && report.reporterId == currentUser.id;
+          final isOwner =
+              currentUser != null && report.reporterId == currentUser.id;
 
           return SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -76,7 +80,9 @@ class ReportDetailsScreen extends ConsumerWidget {
                     Container(
                       height: 250,
                       width: double.infinity,
-                      color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEEEEEE),
+                      color: isDark
+                          ? const Color(0xFF1E1E1E)
+                          : const Color(0xFFEEEEEE),
                       child: report.images.isNotEmpty
                           ? Image.network(
                               report.images.first,
@@ -94,7 +100,9 @@ class ReportDetailsScreen extends ConsumerWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: isLost ? const Color(0xFFD90429) : const Color(0xFF2B9348),
+                          color: isLost
+                              ? const Color(0xFFD90429)
+                              : const Color(0xFF2B9348),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -118,7 +126,9 @@ class ReportDetailsScreen extends ConsumerWidget {
                     children: [
                       // Title / Name
                       Text(
-                        isLost ? (report.name ?? 'Bruno') : 'Found ${report.breed}',
+                        isLost
+                            ? (report.name ?? 'Bruno')
+                            : 'Found ${report.breed}',
                         style: GoogleFonts.barlow(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
@@ -153,7 +163,11 @@ class ReportDetailsScreen extends ConsumerWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.location_on_rounded, color: primaryColor, size: 20),
+                          const Icon(
+                            Icons.location_on_rounded,
+                            color: primaryColor,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -190,7 +204,14 @@ class ReportDetailsScreen extends ConsumerWidget {
                       const SizedBox(height: 30),
 
                       // Contact Reporter Action Card
-                      _buildReporterCard(context, ref, report, isDark, primaryColor, isOwner: isOwner),
+                      _buildReporterCard(
+                        context,
+                        ref,
+                        report,
+                        isDark,
+                        primaryColor,
+                        isOwner: isOwner,
+                      ),
                     ],
                   ),
                 ),
@@ -204,11 +225,7 @@ class ReportDetailsScreen extends ConsumerWidget {
 
   Widget _fallbackIcon() {
     return const Center(
-      child: Icon(
-        Icons.pets_rounded,
-        size: 72,
-        color: Color(0xFFCCCCCC),
-      ),
+      child: Icon(Icons.pets_rounded, size: 72, color: Color(0xFFCCCCCC)),
     );
   }
 
@@ -218,11 +235,23 @@ class ReportDetailsScreen extends ConsumerWidget {
       {'label': 'Gender', 'value': report.gender, 'icon': Icons.wc_rounded},
       {'label': 'Color', 'value': report.color, 'icon': Icons.palette_rounded},
       if (report.age != null)
-        {'label': 'Age', 'value': '${report.age} yrs', 'icon': Icons.cake_rounded},
+        {
+          'label': 'Age',
+          'value': '${report.age} yrs',
+          'icon': Icons.cake_rounded,
+        },
       if (report.height != null && report.height!.isNotEmpty)
-        {'label': 'Height', 'value': report.height!, 'icon': Icons.height_rounded},
+        {
+          'label': 'Height',
+          'value': report.height!,
+          'icon': Icons.height_rounded,
+        },
       if (report.weight != null && report.weight!.isNotEmpty)
-        {'label': 'Weight', 'value': report.weight!, 'icon': Icons.monitor_weight_rounded},
+        {
+          'label': 'Weight',
+          'value': report.weight!,
+          'icon': Icons.monitor_weight_rounded,
+        },
     ];
 
     return Wrap(
@@ -236,7 +265,9 @@ class ReportDetailsScreen extends ConsumerWidget {
             color: isDark ? const Color(0xFF262626) : const Color(0xFFF9F9F9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.04),
             ),
           ),
           child: Column(
@@ -273,7 +304,11 @@ class ReportDetailsScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, WidgetRef ref, LostFoundReportModel report) {
+  void _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    LostFoundReportModel report,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -291,17 +326,24 @@ class ReportDetailsScreen extends ConsumerWidget {
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'CANCEL',
-              style: GoogleFonts.barlow(color: Colors.grey, fontWeight: FontWeight.bold),
+              style: GoogleFonts.barlow(
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                await ref.read(lostFoundFeedProvider.notifier).deleteReport(report.id, report.reportType);
+                await ref
+                    .read(lostFoundFeedProvider.notifier)
+                    .deleteReport(report.id, report.reportType);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Report deleted successfully.')),
+                    const SnackBar(
+                      content: Text('Report deleted successfully.'),
+                    ),
                   );
                   Navigator.pop(context);
                 }
@@ -315,7 +357,10 @@ class ReportDetailsScreen extends ConsumerWidget {
             },
             child: Text(
               'DELETE',
-              style: GoogleFonts.barlow(color: Colors.red, fontWeight: FontWeight.bold),
+              style: GoogleFonts.barlow(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -324,7 +369,13 @@ class ReportDetailsScreen extends ConsumerWidget {
   }
 
   Widget _buildReporterCard(
-      BuildContext context, WidgetRef ref, LostFoundReportModel report, bool isDark, Color primaryColor, {required bool isOwner}) {
+    BuildContext context,
+    WidgetRef ref,
+    LostFoundReportModel report,
+    bool isDark,
+    Color primaryColor, {
+    required bool isOwner,
+  }) {
     final String repName = report.reporterName ?? 'Helpful User';
     final String repEmail = report.reporterEmail ?? 'reporter@pawffy.com';
 
@@ -350,7 +401,7 @@ class ReportDetailsScreen extends ConsumerWidget {
           Row(
             children: [
               CircleAvatar(
-                backgroundColor: primaryColor.withOpacity(0.2),
+                backgroundColor: primaryColor.withValues(alpha: 0.2),
                 child: Text(
                   repName.substring(0, 1).toUpperCase(),
                   style: GoogleFonts.barlow(
@@ -395,7 +446,8 @@ class ReportDetailsScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ReportPetScreen(existingReport: report),
+                          builder: (_) =>
+                              ReportPetScreen(existingReport: report),
                         ),
                       );
                     },
@@ -450,7 +502,10 @@ class ReportDetailsScreen extends ConsumerWidget {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+                    icon: const Icon(
+                      Icons.chat_bubble_outline_rounded,
+                      size: 18,
+                    ),
                     label: const Text('MESSAGE'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -471,4 +526,3 @@ class ReportDetailsScreen extends ConsumerWidget {
     );
   }
 }
-

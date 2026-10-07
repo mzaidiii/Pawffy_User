@@ -72,10 +72,7 @@ class _MobileNumberScreenState extends ConsumerState<MobileNumberScreen> {
   void _showSnackbar(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.barlow(),
-        ),
+        content: Text(message, style: GoogleFonts.barlow()),
         backgroundColor: isError ? Colors.redAccent : Colors.green,
         behavior: SnackBarBehavior.floating,
       ),
@@ -89,7 +86,9 @@ class _MobileNumberScreenState extends ConsumerState<MobileNumberScreen> {
     return userAsync.when(
       loading: () => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+        ),
       ),
       error: (_, __) => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -114,7 +113,9 @@ class _MobileNumberScreenState extends ConsumerState<MobileNumberScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Center(child: SettingsHeaderIcon(icon: Icons.smartphone_outlined)),
+                const Center(
+                  child: SettingsHeaderIcon(icon: Icons.smartphone_outlined),
+                ),
                 const SizedBox(height: 14),
                 Center(
                   child: Text(
@@ -122,7 +123,9 @@ class _MobileNumberScreenState extends ConsumerState<MobileNumberScreen> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.barlow(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -138,27 +141,38 @@ class _MobileNumberScreenState extends ConsumerState<MobileNumberScreen> {
                 TextField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: GoogleFonts.barlow(color: Theme.of(context).colorScheme.onSurface),
+                  style: GoogleFonts.barlow(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.12),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 80),
                 _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFE85D04),
+                        ),
                       )
                     : SettingsButton(
                         text: 'Update Mobile Number',

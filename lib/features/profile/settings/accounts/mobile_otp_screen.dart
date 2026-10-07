@@ -32,7 +32,9 @@ class MobileOtpScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.barlow(
                 fontSize: 13,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
 
@@ -63,7 +65,9 @@ class MobileOtpScreen extends StatelessWidget {
                     color: isDark ? const Color(0xFF232323) : Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.12),
                     ),
                   ),
                   child: Text(

@@ -48,7 +48,8 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
     final servicesAsync = ref.watch(vendorServicesProvider(widget.vendor.id));
 
     // Pre-select first service if loaded/available to prevent empty serviceId slot API calls
-    final List<VendorServiceModel> servicesList = widget.vendor.services.isNotEmpty
+    final List<VendorServiceModel> servicesList =
+        widget.vendor.services.isNotEmpty
         ? widget.vendor.services
         : (servicesAsync.asData?.value ?? const []);
 
@@ -57,8 +58,11 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
     }
 
     final dateStr = _formatDateForApi(_selectedDate);
-    final slotsAsync = ref.watch(bookingSlotsProvider(
-        '${widget.vendor.id}|$dateStr|${_selectedService?.id ?? ''}|${widget.vendor.serviceType}'));
+    final slotsAsync = ref.watch(
+      bookingSlotsProvider(
+        '${widget.vendor.id}|$dateStr|${_selectedService?.id ?? ''}|${widget.vendor.serviceType}',
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -92,7 +96,11 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                     _buildSectionHeader('1. SELECT SERVICE'),
                     const SizedBox(height: 12),
                     widget.vendor.services.isNotEmpty
-                        ? _buildServicesList(widget.vendor.services, isDark, primaryColor)
+                        ? _buildServicesList(
+                            widget.vendor.services,
+                            isDark,
+                            primaryColor,
+                          )
                         : servicesAsync.when(
                             loading: () => _buildServicesLoadingShimmer(isDark),
                             error: (err, _) => Center(
@@ -106,18 +114,26 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                                 return Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                                    color: isDark
+                                        ? const Color(0xFF1E1E1E)
+                                        : Colors.white,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Center(
                                     child: Text(
                                       'No specific services available. Using general checkup.',
-                                      style: GoogleFonts.barlow(color: Colors.grey),
+                                      style: GoogleFonts.barlow(
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ),
                                 );
                               }
-                              return _buildServicesList(services, isDark, primaryColor);
+                              return _buildServicesList(
+                                services,
+                                isDark,
+                                primaryColor,
+                              );
                             },
                           ),
                     const SizedBox(height: 24),
@@ -172,7 +188,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
-                  disabledBackgroundColor: primaryColor.withOpacity(0.4),
+                  disabledBackgroundColor: primaryColor.withValues(alpha: 0.4),
                   minimumSize: const Size(double.infinity, 54),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(27),
@@ -215,7 +231,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -225,12 +241,22 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
         children: [
           CircleAvatar(
             radius: 32,
-            backgroundColor: const Color(0xFFE85D04).withOpacity(0.1),
-            backgroundImage: widget.vendor.profileImage != null && widget.vendor.profileImage!.isNotEmpty
-                ? ImagePickerHelper.getImageProvider(widget.vendor.profileImage!)
+            backgroundColor: const Color(0xFFE85D04).withValues(alpha: 0.1),
+            backgroundImage:
+                widget.vendor.profileImage != null &&
+                    widget.vendor.profileImage!.isNotEmpty
+                ? ImagePickerHelper.getImageProvider(
+                    widget.vendor.profileImage!,
+                  )
                 : null,
-            child: widget.vendor.profileImage == null || widget.vendor.profileImage!.isEmpty
-                ? const Icon(Icons.medical_services_outlined, color: Color(0xFFE85D04), size: 28)
+            child:
+                widget.vendor.profileImage == null ||
+                    widget.vendor.profileImage!.isEmpty
+                ? const Icon(
+                    Icons.medical_services_outlined,
+                    color: Color(0xFFE85D04),
+                    size: 28,
+                  )
                 : null,
           ),
           const SizedBox(width: 16),
@@ -247,15 +273,16 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                 ),
                 Text(
                   widget.vendor.specialization,
-                  style: GoogleFonts.barlow(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: GoogleFonts.barlow(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                    const Icon(
+                      Icons.star_rounded,
+                      color: Colors.amber,
+                      size: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       widget.vendor.rating?.toStringAsFixed(1) ?? 'New',
@@ -265,7 +292,11 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.location_on_outlined, color: Colors.grey, size: 14),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      color: Colors.grey,
+                      size: 14,
+                    ),
                     const SizedBox(width: 2),
                     Expanded(
                       child: Text(
@@ -288,7 +319,11 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
     );
   }
 
-  Widget _buildServicesList(List<VendorServiceModel> services, bool isDark, Color primaryColor) {
+  Widget _buildServicesList(
+    List<VendorServiceModel> services,
+    bool isDark,
+    Color primaryColor,
+  ) {
     // Select first service by default if none selected
     if (_selectedService == null && services.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -325,7 +360,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 5,
                   offset: const Offset(0, 2),
                 ),
@@ -334,7 +369,9 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
             child: Row(
               children: [
                 Icon(
-                  isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                  isSelected
+                      ? Icons.radio_button_checked_rounded
+                      : Icons.radio_button_off_rounded,
                   color: isSelected ? primaryColor : Colors.grey,
                   size: 20,
                 ),
@@ -388,7 +425,8 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
           final date = _dates[index];
-          final isSelected = DateFormat('yyyy-MM-dd').format(date) ==
+          final isSelected =
+              DateFormat('yyyy-MM-dd').format(date) ==
               DateFormat('yyyy-MM-dd').format(_selectedDate);
           final dayName = DateFormat('EEE').format(date).toUpperCase();
           final dayNum = DateFormat('dd').format(date);
@@ -410,7 +448,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -479,7 +517,7 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 3,
                   offset: const Offset(0, 2),
                 ),
@@ -543,7 +581,9 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+      child: const Center(
+        child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+      ),
     );
   }
 
@@ -555,7 +595,9 @@ class _BookingSlotsScreenState extends ConsumerState<BookingSlotsScreen> {
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+      child: const Center(
+        child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+      ),
     );
   }
 }

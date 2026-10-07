@@ -322,7 +322,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                             ),
                             const SizedBox(height: 6),
                             DropdownButtonFormField<String>(
-                              value: _selectedDuration,
+                              initialValue: _selectedDuration,
                               hint: Text(
                                 'Select symptoms duration',
                                 style: GoogleFonts.barlow(
@@ -417,7 +417,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
           if (bookingState.isLoading)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               child: const Center(
                 child: CircularProgressIndicator(color: Color(0xFFE85D04)),
               ),
@@ -507,7 +507,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -519,7 +519,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                     radius: 20,
                     backgroundColor: isSelected
                         ? Colors.white24
-                        : primaryColor.withOpacity(0.1),
+                        : primaryColor.withValues(alpha: 0.1),
                     foregroundImage:
                         (pet.imageUrl != null &&
                             pet.imageUrl!.trim().isNotEmpty)

@@ -81,7 +81,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     'Getting location...',
                                     style: GoogleFonts.barlow(
                                       fontSize: 13,
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.6),
                                     ),
                                   ),
                                   error: (_, __) => Text(
@@ -97,7 +100,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 const SizedBox(width: 4),
                                 Icon(
                                   Icons.keyboard_arrow_down_rounded,
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
                                   size: 18,
                                 ),
                               ],
@@ -124,7 +128,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.08),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.08,
+                                        ),
                                         blurRadius: 10,
                                         offset: const Offset(0, 2),
                                       ),
@@ -186,7 +192,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               height: 32,
                               width: 160,
                               decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
+                                color: Colors.grey.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                             ),
@@ -217,7 +223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withValues(alpha: 0.06),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -273,7 +279,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 builder: (_) => const LostFoundFeedScreen(),
                               ),
                             );
-
                           } else {
                             Navigator.push(
                               context,
@@ -500,7 +505,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   final vet = vets[index];
                   return ProviderCard(
                     name: vet.clinicName.isNotEmpty ? vet.clinicName : vet.name,
-                    service: vet.specialization.isNotEmpty ? vet.specialization : vet.serviceType.toUpperCase(),
+                    service: vet.specialization.isNotEmpty
+                        ? vet.specialization
+                        : vet.serviceType.toUpperCase(),
                     location: '${vet.city}, ${vet.state}',
                     price: '\$${vet.consultationFee}',
                     rating: vet.rating,
@@ -539,7 +546,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),

@@ -29,7 +29,7 @@ class _PersonalInformationScreenState
   String _selectedGender = 'Female';
   String _selectedState = '';
   DateTime? _selectedDate = DateTime(1995, 5, 12);
-  
+
   bool _isInitialized = false;
   bool _isLoading = false;
 
@@ -96,7 +96,9 @@ class _PersonalInformationScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'Avatar updated successfully!' : 'Failed to upload avatar.',
+              success
+                  ? 'Avatar updated successfully!'
+                  : 'Failed to upload avatar.',
               style: GoogleFonts.barlow(),
             ),
             backgroundColor: success ? Colors.green : Colors.redAccent,
@@ -140,7 +142,9 @@ class _PersonalInformationScreenState
     return userAsync.when(
       loading: () => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+        ),
       ),
       error: (_, __) => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -159,7 +163,9 @@ class _PersonalInformationScreenState
         return countryAsync.when(
           loading: () => Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            body: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+            body: const Center(
+              child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+            ),
           ),
           error: (_, __) {
             var activeCountry = 'United States';
@@ -220,12 +226,13 @@ class _PersonalInformationScreenState
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
+                                  color: Colors.black.withValues(alpha: 0.05),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
                               ],
-                              image: user.profileImage != null &&
+                              image:
+                                  user.profileImage != null &&
                                       user.profileImage!.isNotEmpty
                                   ? DecorationImage(
                                       image: ImagePickerHelper.getImageProvider(
@@ -235,7 +242,8 @@ class _PersonalInformationScreenState
                                     )
                                   : null,
                             ),
-                            child: user.profileImage == null ||
+                            child:
+                                user.profileImage == null ||
                                     user.profileImage!.isEmpty
                                 ? const Icon(
                                     Icons.person,
@@ -344,25 +352,27 @@ class _PersonalInformationScreenState
                         userState: _selectedState,
                         address: _addressController.text.trim(),
                       );
-                        if (mounted) {
-                          setState(() => _isLoading = false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? 'Changes saved successfully!'
-                                    : 'Failed to save changes.',
-                                style: GoogleFonts.barlow(),
-                              ),
-                              backgroundColor: success ? Colors.green : Colors.redAccent,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                          if (success) {
-                            Navigator.pop(context);
-                          }
-                        }
-                      },
+                  if (mounted) {
+                    setState(() => _isLoading = false);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          success
+                              ? 'Changes saved successfully!'
+                              : 'Failed to save changes.',
+                          style: GoogleFonts.barlow(),
+                        ),
+                        backgroundColor: success
+                            ? Colors.green
+                            : Colors.redAccent,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    if (success) {
+                      Navigator.pop(context);
+                    }
+                  }
+                },
               ),
             ),
           ],
@@ -395,7 +405,10 @@ class _PersonalInformationScreenState
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
+        style: GoogleFonts.barlow(
+          fontSize: 16,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         decoration: InputDecoration(
           filled: true,
           fillColor: Theme.of(context).colorScheme.surface,
@@ -406,11 +419,18 @@ class _PersonalInformationScreenState
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+            borderSide: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.12),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
+            borderSide: BorderSide(
+              color: Theme.of(context).primaryColor,
+              width: 1.5,
+            ),
           ),
         ),
       ),
@@ -423,7 +443,10 @@ class _PersonalInformationScreenState
       child: TextField(
         controller: _addressController,
         maxLines: 3,
-        style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
+        style: GoogleFonts.barlow(
+          fontSize: 16,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         decoration: InputDecoration(
           filled: true,
           fillColor: Theme.of(context).colorScheme.surface,
@@ -431,11 +454,18 @@ class _PersonalInformationScreenState
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+            borderSide: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.12),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
+            borderSide: BorderSide(
+              color: Theme.of(context).primaryColor,
+              width: 1.5,
+            ),
           ),
         ),
       ),
@@ -452,17 +482,29 @@ class _PersonalInformationScreenState
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.12),
+          ),
         ),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 _formattedDate,
-                style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
+                style: GoogleFonts.barlow(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
-            Icon(Icons.calendar_today_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+            Icon(
+              Icons.calendar_today_outlined,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
           ],
         ),
       ),
@@ -476,14 +518,21 @@ class _PersonalInformationScreenState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+        border: Border.all(
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.12),
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedGender,
           isExpanded: true,
           dropdownColor: Theme.of(context).colorScheme.surface,
-          style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
+          style: GoogleFonts.barlow(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           items: const [
             DropdownMenuItem(value: 'Male', child: Text('Male')),
             DropdownMenuItem(value: 'Female', child: Text('Female')),
@@ -506,17 +555,32 @@ class _PersonalInformationScreenState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+        border: Border.all(
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.12),
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedState,
           isExpanded: true,
           dropdownColor: Theme.of(context).colorScheme.surface,
-          style: GoogleFonts.barlow(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
+          style: GoogleFonts.barlow(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           items: states
               .map(
-                (state) => DropdownMenuItem(value: state, child: Text(state, style: GoogleFonts.barlow(color: Theme.of(context).colorScheme.onSurface))),
+                (state) => DropdownMenuItem(
+                  value: state,
+                  child: Text(
+                    state,
+                    style: GoogleFonts.barlow(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
               )
               .toList(),
           onChanged: (value) {

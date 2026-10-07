@@ -12,7 +12,11 @@ class VendorDetailScreen extends ConsumerStatefulWidget {
   final String vendorId;
   final String? heroClinicName;
 
-  const VendorDetailScreen({super.key, required this.vendorId, this.heroClinicName});
+  const VendorDetailScreen({
+    super.key,
+    required this.vendorId,
+    this.heroClinicName,
+  });
 
   @override
   ConsumerState<VendorDetailScreen> createState() => _VendorDetailScreenState();
@@ -23,7 +27,9 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(vendorDetailControllerProvider.notifier).loadVendor(widget.vendorId);
+      ref
+          .read(vendorDetailControllerProvider.notifier)
+          .loadVendor(widget.vendorId);
     });
   }
 
@@ -68,7 +74,9 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
               final rId = vet.userId ?? vet.id;
               if (rId.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Cannot start a chat with this provider')),
+                  const SnackBar(
+                    content: Text('Cannot start a chat with this provider'),
+                  ),
                 );
                 return;
               }
@@ -88,13 +96,10 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF232323) : Colors.white,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: const Color(0xFFE85D04),
-                  width: 1.5,
-                ),
+                border: Border.all(color: const Color(0xFFE85D04), width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -126,7 +131,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
               backgroundColor: const Color(0xFFE85D04),
               foregroundColor: Colors.white,
               elevation: 4,
-              shadowColor: const Color(0xFFE85D04).withOpacity(0.3),
+              shadowColor: const Color(0xFFE85D04).withValues(alpha: 0.3),
             ),
             child: Text(
               'BOOK APPOINTMENT',
@@ -230,7 +235,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE85D04).withOpacity(0.1),
+                        color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -274,7 +279,9 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFE85D04).withOpacity(0.3),
+                              color: const Color(
+                                0xFFE85D04,
+                              ).withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -314,7 +321,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
               onTap: () => Navigator.pop(context),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.35),
+                  color: Colors.black.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -331,7 +338,9 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
               children: [
                 vet.profileImage != null && vet.profileImage!.isNotEmpty
                     ? Image(
-                        image: ImagePickerHelper.getImageProvider(vet.profileImage!),
+                        image: ImagePickerHelper.getImageProvider(
+                          vet.profileImage!,
+                        ),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => _imageFallback(vet),
                       )
@@ -347,7 +356,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
                         ],
                       ),
@@ -458,7 +467,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -494,7 +503,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -512,7 +521,9 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                           _infoRow(
                             Icons.bolt_rounded,
                             'Same Day Booking',
-                            vet.timings!['sameDayRequests'] == true ? 'Supported' : 'Not supported',
+                            vet.timings!['sameDayRequests'] == true
+                                ? 'Supported'
+                                : 'Not supported',
                           ),
                         ],
                       ],
@@ -530,7 +541,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -565,9 +576,18 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
                 _sectionTitle('Reviews'),
                 const SizedBox(height: 12),
                 reviewsAsync.when(
-                  loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Color(0xFFE85D04)))),
+                  loading: () => const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFE85D04),
+                      ),
+                    ),
+                  ),
                   error: (_, __) => _reviewEmptyState(isDark),
-                  data: (reviews) => reviews.isEmpty ? _reviewEmptyState(isDark) : _reviewList(reviews, isDark),
+                  data: (reviews) => reviews.isEmpty
+                      ? _reviewEmptyState(isDark)
+                      : _reviewList(reviews, isDark),
                 ),
               ],
             ),
@@ -578,21 +598,112 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
   }
 
   Widget _reviewEmptyState(bool isDark) => Container(
-    width: double.infinity, padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(color: isDark ? const Color(0xFF1E1E1E) : Colors.white, borderRadius: BorderRadius.circular(14)),
-    child: Column(children: [Icon(Icons.star_border_rounded, size: 40, color: Colors.grey.shade300), const SizedBox(height: 8), Text('No reviews yet', style: GoogleFonts.barlow(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.grey.shade500)), const SizedBox(height: 4), Text('Be the first to leave a review after your visit!', style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey.shade400), textAlign: TextAlign.center)]),
+    width: double.infinity,
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Column(
+      children: [
+        Icon(Icons.star_border_rounded, size: 40, color: Colors.grey.shade300),
+        const SizedBox(height: 8),
+        Text(
+          'No reviews yet',
+          style: GoogleFonts.barlow(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Colors.grey.shade500,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Be the first to leave a review after your visit!',
+          style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey.shade400),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    ),
   );
 
   Widget _reviewList(List<dynamic> reviews, bool isDark) => Container(
-    width: double.infinity, padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(color: isDark ? const Color(0xFF1E1E1E) : Colors.white, borderRadius: BorderRadius.circular(14)),
-    child: Column(children: reviews.take(3).map((review) => Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        CircleAvatar(radius: 17, backgroundColor: const Color(0xFFE85D04).withOpacity(.12), child: Text(review.author.isNotEmpty ? review.author[0].toUpperCase() : 'P', style: GoogleFonts.barlow(color: const Color(0xFFE85D04), fontWeight: FontWeight.w800))),
-        const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Expanded(child: Text(review.author, style: GoogleFonts.barlow(fontWeight: FontWeight.w700))), ...List.generate(5, (i) => Icon(Icons.star_rounded, size: 14, color: i < review.rating ? const Color(0xFFFFB703) : Colors.grey.shade300))]), if (review.comment.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 3), child: Text(review.comment, style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey))) ])),
-      ]),
-    )).toList()),
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Column(
+      children: reviews
+          .take(3)
+          .map(
+            (review) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 17,
+                    backgroundColor: const Color(
+                      0xFFE85D04,
+                    ).withValues(alpha: .12),
+                    child: Text(
+                      review.author.isNotEmpty
+                          ? review.author[0].toUpperCase()
+                          : 'P',
+                      style: GoogleFonts.barlow(
+                        color: const Color(0xFFE85D04),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                review.author,
+                                style: GoogleFonts.barlow(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            ...List.generate(
+                              5,
+                              (i) => Icon(
+                                Icons.star_rounded,
+                                size: 14,
+                                color: i < review.rating
+                                    ? const Color(0xFFFFB703)
+                                    : Colors.grey.shade300,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (review.comment.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 3),
+                            child: Text(
+                              review.comment,
+                              style: GoogleFonts.barlow(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+    ),
   );
 
   Widget _backButton() {
@@ -612,7 +723,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.07),
+                  color: Colors.black.withValues(alpha: 0.07),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -631,12 +742,12 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
 
   Widget _imageFallback(VendorModel vet) {
     return Container(
-      color: const Color(0xFFE85D04).withOpacity(0.1),
+      color: const Color(0xFFE85D04).withValues(alpha: 0.1),
       child: Center(
         child: Icon(
           Icons.medical_services_outlined,
           size: 80,
-          color: const Color(0xFFE85D04).withOpacity(0.3),
+          color: const Color(0xFFE85D04).withValues(alpha: 0.3),
         ),
       ),
     );
@@ -669,7 +780,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

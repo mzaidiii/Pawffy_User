@@ -32,7 +32,9 @@ class EmailAddressScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.barlow(
                 fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 30),
@@ -51,16 +53,22 @@ class EmailAddressScreen extends ConsumerWidget {
               controller: controller,
               readOnly: true,
               style: GoogleFonts.barlow(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surface,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.12),
                   ),
                 ),
                 prefixIcon: const Icon(Icons.lock_outline, size: 18),

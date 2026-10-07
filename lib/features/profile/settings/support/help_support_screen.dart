@@ -46,37 +46,44 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
   static const _faqs = [
     {
       'question': 'How do I book a vet consultation?',
-      'answer': 'Go to the Home tab, select "Vets", choose your preferred vet, pick an available slot, and confirm the booking after payment.',
+      'answer':
+          'Go to the Home tab, select "Vets", choose your preferred vet, pick an available slot, and confirm the booking after payment.',
       'category': 'bookings',
     },
     {
       'question': 'Can I change my appointment slot?',
-      'answer': 'Yes, you can reschedule your booking from the Bookings screen up to 2 hours before the start time.',
+      'answer':
+          'Yes, you can reschedule your booking from the Bookings screen up to 2 hours before the start time.',
       'category': 'bookings',
     },
     {
       'question': 'How can I add records for my pet?',
-      'answer': 'Go to your Profile tab, select your pet, go to "Medical Records" or "Vaccinations", and click the add button at the bottom.',
+      'answer':
+          'Go to your Profile tab, select your pet, go to "Medical Records" or "Vaccinations", and click the add button at the bottom.',
       'category': 'account',
     },
     {
       'question': 'How do I change my mobile number?',
-      'answer': 'Go to Settings -> Mobile Number, enter your new number, and click Update.',
+      'answer':
+          'Go to Settings -> Mobile Number, enter your new number, and click Update.',
       'category': 'account',
     },
     {
       'question': 'Can I cancel my booking and get a refund?',
-      'answer': 'Yes, cancellations made up to 2 hours before the appointment are eligible for a full refund back to your Pawffy wallet.',
+      'answer':
+          'Yes, cancellations made up to 2 hours before the appointment are eligible for a full refund back to your Pawffy wallet.',
       'category': 'payment',
     },
     {
       'question': 'Is my payment secure?',
-      'answer': 'Absolutely. We process payments securely via industry-standard encryption, and card data is never stored on our servers.',
+      'answer':
+          'Absolutely. We process payments securely via industry-standard encryption, and card data is never stored on our servers.',
       'category': 'payment',
     },
     {
       'question': 'The app is running slow, what should I do?',
-      'answer': 'Try clearing the app cache, checking your internet connection, or restarting the application. If issues persist, contact support.',
+      'answer':
+          'Try clearing the app cache, checking your internet connection, or restarting the application. If issues persist, contact support.',
       'category': 'technical',
     },
   ];
@@ -120,7 +127,9 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.barlow(
                         fontSize: 13,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -136,27 +145,25 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  ..._topics.map(
-                    (topic) {
-                      final category = topic['category'] as String;
-                      final isSelected = _selectedCategory == category;
-                      return _HelpTopicTile(
-                        icon: topic['icon'] as IconData,
-                        title: topic['title'] as String,
-                        subtitle: topic['subtitle'] as String,
-                        isSelected: isSelected,
-                        onTap: () {
-                          setState(() {
-                            if (_selectedCategory == category) {
-                              _selectedCategory = null;
-                            } else {
-                              _selectedCategory = category;
-                            }
-                          });
-                        },
-                      );
-                    },
-                  ),
+                  ..._topics.map((topic) {
+                    final category = topic['category'] as String;
+                    final isSelected = _selectedCategory == category;
+                    return _HelpTopicTile(
+                      icon: topic['icon'] as IconData,
+                      title: topic['title'] as String,
+                      subtitle: topic['subtitle'] as String,
+                      isSelected: isSelected,
+                      onTap: () {
+                        setState(() {
+                          if (_selectedCategory == category) {
+                            _selectedCategory = null;
+                          } else {
+                            _selectedCategory = category;
+                          }
+                        });
+                      },
+                    );
+                  }),
                   const SizedBox(height: 28),
 
                   // ── FAQ Section ──
@@ -164,7 +171,9 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _selectedCategory == null ? 'Frequently Asked Questions' : 'FAQs for Selected Topic',
+                        _selectedCategory == null
+                            ? 'Frequently Asked Questions'
+                            : 'FAQs for Selected Topic',
                         style: GoogleFonts.barlow(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -194,7 +203,9 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                           'No questions found in this category.',
                           style: GoogleFonts.barlow(
                             fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
                         ),
                       ),
@@ -251,7 +262,9 @@ class _FAQTileState extends State<_FAQTile> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.12),
         ),
       ),
       child: Column(
@@ -271,7 +284,9 @@ class _FAQTileState extends State<_FAQTile> {
               ),
             ),
             trailing: Icon(
-              _isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+              _isExpanded
+                  ? Icons.keyboard_arrow_up_rounded
+                  : Icons.keyboard_arrow_down_rounded,
               color: Colors.grey,
             ),
           ),
@@ -282,7 +297,9 @@ class _FAQTileState extends State<_FAQTile> {
                 widget.answer,
                 style: GoogleFonts.barlow(
                   fontSize: 13,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
@@ -317,13 +334,15 @@ class _HelpTopicTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFFE85D04).withOpacity(0.08)
+              ? const Color(0xFFE85D04).withValues(alpha: 0.08)
               : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? const Color(0xFFE85D04)
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                : Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.12),
             width: isSelected ? 1.5 : 1.0,
           ),
         ),
@@ -334,8 +353,8 @@ class _HelpTopicTile extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFFE85D04).withOpacity(0.2)
-                    : const Color(0xFFE85D04).withOpacity(0.12),
+                    ? const Color(0xFFE85D04).withValues(alpha: 0.2)
+                    : const Color(0xFFE85D04).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: const Color(0xFFE85D04), size: 18),
@@ -357,7 +376,9 @@ class _HelpTopicTile extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.barlow(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],

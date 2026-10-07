@@ -134,7 +134,7 @@ class NotificationScreen extends ConsumerWidget {
                   Icon(
                     Icons.check_circle_outline_rounded,
                     size: 64,
-                    color: const Color(0xFFE85D04).withOpacity(0.4),
+                    color: const Color(0xFFE85D04).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -230,12 +230,12 @@ class _NotificationTile extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: isUnread
-                ? const Color(0xFFE85D04).withOpacity(0.06)
+                ? const Color(0xFFE85D04).withValues(alpha: 0.06)
                 : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isUnread
-                  ? const Color(0xFFE85D04).withOpacity(0.2)
+                  ? const Color(0xFFE85D04).withValues(alpha: 0.2)
                   : Colors.transparent,
             ),
           ),
@@ -247,7 +247,7 @@ class _NotificationTile extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.12),
+                  color: iconColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(iconData, color: iconColor, size: 20),

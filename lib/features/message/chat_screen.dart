@@ -123,7 +123,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: AppColors.orange.withOpacity(0.1),
+              backgroundColor: AppColors.orange.withValues(alpha: 0.1),
               backgroundImage:
                   widget.receiverProfileImage != null &&
                       widget.receiverProfileImage!.isNotEmpty
@@ -242,7 +242,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           decoration: BoxDecoration(
                             color: isDark
                                 ? AppColors.darkSurface
-                                : AppColors.greyLight.withOpacity(0.4),
+                                : AppColors.greyLight.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -283,7 +283,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withValues(alpha: 0.03),
                               blurRadius: 4,
                               offset: const Offset(0, 1),
                             ),
@@ -313,8 +313,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.08)
-                      : Colors.black.withOpacity(0.08),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.08),
                   width: 0.5,
                 ),
               ),

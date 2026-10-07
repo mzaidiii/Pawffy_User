@@ -103,7 +103,7 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.07),
+                            color: Colors.black.withValues(alpha: 0.07),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -154,7 +154,7 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE85D04).withOpacity(0.12),
+                      color: const Color(0xFFE85D04).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -177,7 +177,7 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -245,7 +245,9 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                       });
                       final placemark = ref.read(placemarkProvider).value;
                       final city = placemark?.locality;
-                      ref.read(vendorListControllerProvider.notifier).setParams(
+                      ref
+                          .read(vendorListControllerProvider.notifier)
+                          .setParams(
                             serviceType: widget.serviceType,
                             search: _searchController.text.isNotEmpty
                                 ? _searchController.text
@@ -267,11 +269,13 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                         border: Border.all(
                           color: _showOnlineOnly
                               ? Colors.transparent
-                              : (isDark ? Colors.white24 : Colors.grey.shade300),
+                              : (isDark
+                                    ? Colors.white24
+                                    : Colors.grey.shade300),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: 0.04),
                             blurRadius: 4,
                           ),
                         ],
@@ -281,7 +285,9 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                         children: [
                           Icon(
                             Icons.circle,
-                            color: _showOnlineOnly ? Colors.white : Colors.green,
+                            color: _showOnlineOnly
+                                ? Colors.white
+                                : Colors.green,
                             size: 8,
                           ),
                           const SizedBox(width: 6),
@@ -292,7 +298,9 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                               fontWeight: FontWeight.w600,
                               color: _showOnlineOnly
                                   ? Colors.white
-                                  : (isDark ? Colors.white70 : Colors.grey.shade700),
+                                  : (isDark
+                                        ? Colors.white70
+                                        : Colors.grey.shade700),
                             ),
                           ),
                         ],
@@ -300,75 +308,87 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                     ),
                   ),
 
-                  Builder(builder: (context) {
-                    final placemark = ref.watch(placemarkProvider).value;
-                    final city = placemark?.locality;
-                    if (city != null && city.isNotEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _filterByCity = !_filterByCity;
-                            });
-                            ref.read(vendorListControllerProvider.notifier).setParams(
-                                  serviceType: widget.serviceType,
-                                  search: _searchController.text.isNotEmpty
-                                      ? _searchController.text
-                                      : null,
-                                  city: _filterByCity ? city : null,
-                                  isOnline: _showOnlineOnly ? true : null,
-                                );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _filterByCity
-                                  ? const Color(0xFFE85D04)
-                                  : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: _filterByCity
-                                    ? Colors.transparent
-                                    : (isDark ? Colors.white24 : Colors.grey.shade300),
+                  Builder(
+                    builder: (context) {
+                      final placemark = ref.watch(placemarkProvider).value;
+                      final city = placemark?.locality;
+                      if (city != null && city.isNotEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _filterByCity = !_filterByCity;
+                              });
+                              ref
+                                  .read(vendorListControllerProvider.notifier)
+                                  .setParams(
+                                    serviceType: widget.serviceType,
+                                    search: _searchController.text.isNotEmpty
+                                        ? _searchController.text
+                                        : null,
+                                    city: _filterByCity ? city : null,
+                                    isOnline: _showOnlineOnly ? true : null,
+                                  );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 7,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
-                                  blurRadius: 4,
+                              decoration: BoxDecoration(
+                                color: _filterByCity
+                                    ? const Color(0xFFE85D04)
+                                    : (isDark
+                                          ? const Color(0xFF1E1E1E)
+                                          : Colors.white),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: _filterByCity
+                                      ? Colors.transparent
+                                      : (isDark
+                                            ? Colors.white24
+                                            : Colors.grey.shade300),
                                 ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.location_on_rounded,
-                                  color: _filterByCity ? Colors.white : const Color(0xFFE85D04),
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  'In $city',
-                                  style: GoogleFonts.barlow(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.04),
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.location_on_rounded,
                                     color: _filterByCity
                                         ? Colors.white
-                                        : (isDark ? Colors.white70 : Colors.grey.shade700),
+                                        : const Color(0xFFE85D04),
+                                    size: 12,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'In $city',
+                                    style: GoogleFonts.barlow(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: _filterByCity
+                                          ? Colors.white
+                                          : (isDark
+                                                ? Colors.white70
+                                                : Colors.grey.shade700),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  }),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -385,8 +405,9 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
                   if (vendors.isEmpty) return _buildEmpty();
                   return RefreshIndicator(
                     color: const Color(0xFFE85D04),
-                    onRefresh: () async =>
-                        ref.read(vendorListControllerProvider.notifier).refresh(),
+                    onRefresh: () async => ref
+                        .read(vendorListControllerProvider.notifier)
+                        .refresh(),
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                       itemCount: vendors.length,
@@ -456,7 +477,8 @@ class _VendorListScreenState extends ConsumerState<VendorListScreen> {
           ),
           const SizedBox(height: 16),
           GestureDetector(
-            onTap: () => ref.read(vendorListControllerProvider.notifier).refresh(),
+            onTap: () =>
+                ref.read(vendorListControllerProvider.notifier).refresh(),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               decoration: BoxDecoration(
@@ -501,8 +523,10 @@ class _ProviderListCardState extends State<_ProviderListCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                VendorDetailScreen(vendorId: vet.id, heroClinicName: vet.clinicName),
+            builder: (_) => VendorDetailScreen(
+              vendorId: vet.id,
+              heroClinicName: vet.clinicName,
+            ),
           ),
         );
       },
@@ -512,7 +536,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -528,7 +552,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
               child: Container(
                 width: 100,
                 height: 110,
-                color: const Color(0xFFE85D04).withOpacity(0.08),
+                color: const Color(0xFFE85D04).withValues(alpha: 0.08),
                 child: vet.profileImage != null
                     ? Image.network(
                         vet.profileImage!,
@@ -617,7 +641,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.15),
+                            color: Colors.amber.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
@@ -668,7 +692,7 @@ class _ProviderListCardState extends State<_ProviderListCard> {
     return Center(
       child: Icon(
         _iconForService(widget.vendor.serviceType),
-        color: const Color(0xFFE85D04).withOpacity(0.4),
+        color: const Color(0xFFE85D04).withValues(alpha: 0.4),
         size: 36,
       ),
     );

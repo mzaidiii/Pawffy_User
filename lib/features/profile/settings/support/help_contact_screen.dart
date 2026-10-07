@@ -93,10 +93,8 @@ class HelpContactScreen extends StatelessWidget {
                       icon: contact['icon'] as IconData,
                       title: contact['title'] as String,
                       subtitle: contact['subtitle'] as String,
-                      onTap: () => _openContactLink(
-                        context,
-                        contact['url'] as String,
-                      ),
+                      onTap: () =>
+                          _openContactLink(context, contact['url'] as String),
                     ),
                   ),
                 ],
@@ -169,7 +167,7 @@ class _ContactTile extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE85D04).withOpacity(0.12),
+                  color: const Color(0xFFE85D04).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: const Color(0xFFE85D04), size: 18),

@@ -140,6 +140,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  String _flag(String code) => code
+      .toUpperCase()
+      .codeUnits
+      .map((c) => String.fromCharCode(0x1F1E6 + c - 65))
+      .join();
+
   String _getFullPhoneNumber() {
     String text = _phoneController.text.trim();
     text = text.replaceAll(RegExp(r'[\s\-\(\)]'), '');
@@ -212,7 +218,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleVerifyOtp() async {
-    final phone = _lastSentPhone.isNotEmpty ? _lastSentPhone : _getFullPhoneNumber();
+    final phone = _lastSentPhone.isNotEmpty
+        ? _lastSentPhone
+        : _getFullPhoneNumber();
     final code = _otpController.text.trim();
     final err = _validateOtp(code);
     setState(() => _otpError = err);
@@ -289,7 +297,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isDark = true; // Always style as dark mode since the screen background is black
+    final isDark =
+        true; // Always style as dark mode since the screen background is black
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
@@ -366,7 +375,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 SizedBox(height: size.height * 0.07),
 
                 if (!_otpSent) ...[
-                  _buildPhoneField(isDark: isDark, screenWidth: size.width),
+                  _buildPhoneField(isDark: isDark),
                   const SizedBox(height: 14),
                   Row(
                     children: [
@@ -375,7 +384,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         height: 22,
                         child: Checkbox(
                           value: _rememberMe,
-                          onChanged: (val) => setState(() => _rememberMe = val!),
+                          onChanged: (val) =>
+                              setState(() => _rememberMe = val!),
                           activeColor: const Color(0xFFE85D04),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
@@ -403,7 +413,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFE85D04),
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: const Color(0xFFE85D04).withOpacity(0.6),
+                      disabledBackgroundColor: const Color(
+                        0xFFE85D04,
+                      ).withValues(alpha: 0.6),
                       minimumSize: const Size(double.infinity, 52),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -443,10 +455,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: GoogleFonts.barlow(
                           fontSize: 12,
                           height: 1.45,
-                          color: Colors.white.withOpacity(0.65),
+                          color: Colors.white.withValues(alpha: 0.65),
                         ),
                         children: [
-                          const TextSpan(text: 'By continuing, you agree to our '),
+                          const TextSpan(
+                            text: 'By continuing, you agree to our ',
+                          ),
                           TextSpan(
                             text: 'Terms of Service',
                             style: GoogleFonts.barlow(
@@ -456,7 +470,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               decorationColor: const Color(0xFFE85D04),
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () => _showTermsDialog(context, 'Terms of Service'),
+                              ..onTap = () =>
+                                  _showTermsDialog(context, 'Terms of Service'),
                           ),
                           const TextSpan(text: ' and '),
                           TextSpan(
@@ -468,7 +483,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               decorationColor: const Color(0xFFE85D04),
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () => _showTermsDialog(context, 'Privacy Policy'),
+                              ..onTap = () =>
+                                  _showTermsDialog(context, 'Privacy Policy'),
                           ),
                           const TextSpan(
                             text:
@@ -522,7 +538,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           _otpController.clear();
                         });
                       },
-                      icon: const Icon(Icons.arrow_back_rounded, size: 16, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       label: Text(
                         'Change phone number',
                         style: GoogleFonts.barlow(
@@ -539,7 +559,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFE85D04),
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: const Color(0xFFE85D04).withOpacity(0.6),
+                      disabledBackgroundColor: const Color(
+                        0xFFE85D04,
+                      ).withValues(alpha: 0.6),
                       minimumSize: const Size(double.infinity, 52),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -566,7 +588,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Icon(Icons.check_circle_outline_rounded, size: 18),
+                              const Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 18,
+                              ),
                             ],
                           ),
                   ),
@@ -613,8 +638,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildPhoneField({required bool isDark, required double screenWidth}) {
-    final fillColor = isDark ? const Color(0xFF232323) : const Color(0xFFF2F2F2);
+  Widget _buildPhoneField({required bool isDark}) {
+    final fillColor = isDark
+        ? const Color(0xFF232323)
+        : const Color(0xFFF2F2F2);
     final textColor = isDark ? Colors.white : Colors.black87;
     final hintColor = Colors.grey;
 
@@ -629,18 +656,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               color: _phoneError != null
                   ? Colors.redAccent
                   : (_phoneFocus.hasFocus
-                      ? const Color(0xFFE85D04)
-                      : Colors.transparent),
+                        ? const Color(0xFFE85D04)
+                        : Colors.transparent),
               width: _phoneError != null ? 1.2 : 1.5,
             ),
           ),
           padding: const EdgeInsets.only(left: 12, right: 12),
           child: Row(
             children: [
-              // Country Code Dropdown
+              // Country Code Dropdown (flag + dial code)
               DropdownButtonHideUnderline(
                 child: DropdownButton<Country>(
                   value: _selectedCountry,
+                  isDense: true,
                   dropdownColor: const Color(0xFF232323),
                   borderRadius: BorderRadius.circular(12),
                   menuMaxHeight: 350,
@@ -649,51 +677,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: Colors.grey,
                     size: 18,
                   ),
-                  selectedItemBuilder: (BuildContext context) {
-                    return _countries.map((Country country) {
-                      return ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: screenWidth * 0.38),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '${country.name} (${country.dialCode})',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: GoogleFonts.barlow(
-                              color: textColor,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList();
-                  },
-                  items: _countries.map((Country country) {
+                  items: _countries.map((country) {
                     return DropdownMenuItem<Country>(
                       value: country,
                       child: Text(
-                        '${country.name} (${country.dialCode})',
+                        '${_flag(country.code)}  ${country.dialCode}',
                         style: GoogleFonts.barlow(
                           color: Colors.white,
                           fontSize: 14,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     );
                   }).toList(),
-                  onChanged: (Country? val) {
-                    if (val != null) {
-                      setState(() => _selectedCountry = val);
-                    }
+                  onChanged: (val) {
+                    if (val != null) setState(() => _selectedCountry = val);
                   },
                 ),
               ),
               Container(
-                height: 24,
+                height: 22,
                 width: 1,
-                color: Colors.grey.withOpacity(0.3),
-                margin: const EdgeInsets.symmetric(horizontal: 6),
+                color: Colors.grey.withValues(alpha: 0.3),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
               ),
               // Phone Input Field
               Expanded(
@@ -711,15 +717,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       fontWeight: FontWeight.w400,
                     ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 16,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   onChanged: (_) {
                     if (_phoneError != null) {
                       setState(() {
-                        _phoneError = _validatePhone(_phoneController.text.trim());
+                        _phoneError = _validatePhone(
+                          _phoneController.text.trim(),
+                        );
                       });
                     }
                   },
@@ -758,7 +763,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ValueChanged<String>? onChanged,
     ValueChanged<String>? onSubmitted,
   }) {
-    final fillColor = isDark ? const Color(0xFF232323) : const Color(0xFFF2F2F2);
+    final fillColor = isDark
+        ? const Color(0xFF232323)
+        : const Color(0xFFF2F2F2);
     final textColor = isDark ? Colors.white : Colors.black87;
     final hintColor = Colors.grey;
 

@@ -11,7 +11,8 @@ class LostFoundFeedScreen extends ConsumerStatefulWidget {
   const LostFoundFeedScreen({super.key});
 
   @override
-  ConsumerState<LostFoundFeedScreen> createState() => _LostFoundFeedScreenState();
+  ConsumerState<LostFoundFeedScreen> createState() =>
+      _LostFoundFeedScreenState();
 }
 
 class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
@@ -54,7 +55,8 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => ref.read(lostFoundFeedProvider.notifier).refreshFeed(),
+            onPressed: () =>
+                ref.read(lostFoundFeedProvider.notifier).refreshFeed(),
           ),
         ],
         bottom: TabBar(
@@ -75,9 +77,8 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
         ),
       ),
       body: reportsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: primaryColor),
-        ),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: primaryColor)),
         error: (err, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -108,13 +109,15 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
             children: [
               _buildFeedList(reports, isDark, primaryColor),
               _buildFeedList(
-                  reports.where((r) => r.reportType == 'lost').toList(),
-                  isDark,
-                  primaryColor),
+                reports.where((r) => r.reportType == 'lost').toList(),
+                isDark,
+                primaryColor,
+              ),
               _buildFeedList(
-                  reports.where((r) => r.reportType == 'found').toList(),
-                  isDark,
-                  primaryColor),
+                reports.where((r) => r.reportType == 'found').toList(),
+                isDark,
+                primaryColor,
+              ),
             ],
           );
         },
@@ -123,9 +126,7 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const ReportPetScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const ReportPetScreen()),
           );
         },
         backgroundColor: primaryColor,
@@ -143,7 +144,10 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
   }
 
   Widget _buildFeedList(
-      List<LostFoundReportModel> reports, bool isDark, Color primaryColor) {
+    List<LostFoundReportModel> reports,
+    bool isDark,
+    Color primaryColor,
+  ) {
     if (reports.isEmpty) {
       return Center(
         child: Column(
@@ -195,7 +199,7 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -258,7 +262,9 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isLost ? (report.name ?? 'Unknown') : 'Found ${report.breed}',
+                        isLost
+                            ? (report.name ?? 'Unknown')
+                            : 'Found ${report.breed}',
                         style: GoogleFonts.barlow(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
@@ -323,11 +329,7 @@ class _LostFoundFeedScreenState extends ConsumerState<LostFoundFeedScreen>
     return Container(
       color: const Color(0xFFE5E5E5),
       child: const Center(
-        child: Icon(
-          Icons.pets_rounded,
-          size: 40,
-          color: Color(0xFFCCCCCC),
-        ),
+        child: Icon(Icons.pets_rounded, size: 40, color: Color(0xFFCCCCCC)),
       ),
     );
   }

@@ -366,7 +366,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
         errorText: errorText,
         counterText: '',
         hintStyle: GoogleFonts.barlow(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 13,
         ),
         filled: true,
@@ -378,13 +378,13 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -411,7 +411,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Theme(

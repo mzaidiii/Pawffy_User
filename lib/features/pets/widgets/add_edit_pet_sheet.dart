@@ -208,7 +208,7 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -232,7 +232,7 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE85D04).withOpacity(0.1),
+                        color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         image: _localImagePath != null
                             ? DecorationImage(
@@ -445,12 +445,12 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
             hintText: hint,
             hintStyle: GoogleFonts.barlow(
               fontSize: 14,
-              color: Colors.grey.withOpacity(0.6),
+              color: Colors.grey.withValues(alpha: 0.6),
             ),
             filled: true,
             fillColor: Theme.of(
               context,
-            ).colorScheme.onSurface.withOpacity(0.05),
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -486,7 +486,9 @@ class _AddEditPetSheetState extends ConsumerState<AddEditPetSheet> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButtonHideUnderline(

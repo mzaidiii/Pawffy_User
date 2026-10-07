@@ -345,7 +345,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                                 ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<String>(
-                                  value: _gender,
+                                  initialValue: _gender,
                                   decoration: const InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(
                                       horizontal: 16,
@@ -431,7 +431,7 @@ class _ReportPetScreenState extends ConsumerState<ReportPetScreen> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        value: _gender,
+                        initialValue: _gender,
                         decoration: const InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,

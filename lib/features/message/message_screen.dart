@@ -90,7 +90,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -135,7 +135,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
             Divider(
               color: isDark
-                  ? Colors.white.withOpacity(0.08)
+                  ? Colors.white.withValues(alpha: 0.08)
                   : const Color(0xFFEEEEEE),
               thickness: 1,
               height: 1,
@@ -209,7 +209,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                       itemCount: filtered.length,
                       separatorBuilder: (context, index) => Divider(
                         color: isDark
-                            ? Colors.white.withOpacity(0.05)
+                            ? Colors.white.withValues(alpha: 0.05)
                             : const Color(0xFFF1F1F1),
                         indent: 76,
                         endIndent: 20,
@@ -234,7 +234,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       leading: CircleAvatar(
         radius: 26,
-        backgroundColor: AppColors.orange.withOpacity(0.1),
+        backgroundColor: AppColors.orange.withValues(alpha: 0.1),
         backgroundImage:
             conversation.otherUserProfileImage != null &&
                 conversation.otherUserProfileImage!.isNotEmpty
@@ -349,7 +349,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               width: 90,
               height: 90,
               decoration: BoxDecoration(
-                color: AppColors.orange.withOpacity(0.08),
+                color: AppColors.orange.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

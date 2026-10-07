@@ -13,10 +13,12 @@ class LocationSettingsScreen extends ConsumerStatefulWidget {
   const LocationSettingsScreen({super.key});
 
   @override
-  ConsumerState<LocationSettingsScreen> createState() => _LocationSettingsScreenState();
+  ConsumerState<LocationSettingsScreen> createState() =>
+      _LocationSettingsScreenState();
 }
 
-class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen> {
+class _LocationSettingsScreenState
+    extends ConsumerState<LocationSettingsScreen> {
   bool _locationAccess = true;
   bool _preciseLocation = true;
   bool _isLoading = false;
@@ -76,10 +78,7 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
   void _showSnackbar(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.barlow(),
-        ),
+        content: Text(message, style: GoogleFonts.barlow()),
         backgroundColor: isError ? Colors.redAccent : Colors.green,
         behavior: SnackBarBehavior.floating,
       ),
@@ -94,7 +93,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
     return userAsync.when(
       loading: () => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+        ),
       ),
       error: (_, __) => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -114,7 +115,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: const SettingsAppBar(title: 'LOCATION'),
           body: countryAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04))),
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+            ),
             error: (_, __) {
               var activeCountry = 'United States';
               if (user.state != null && indiaStates.contains(user.state)) {
@@ -159,7 +162,7 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
               width: 84,
               height: 84,
               decoration: BoxDecoration(
-                color: const Color(0xFFE85D04).withOpacity(0.1),
+                color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -186,7 +189,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
               textAlign: TextAlign.center,
               style: GoogleFonts.barlow(
                 fontSize: 13,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),
@@ -208,7 +213,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.12),
               ),
             ),
             child: Column(
@@ -225,15 +232,21 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
                 const SizedBox(height: 6),
                 TextField(
                   controller: _cityController,
-                  style: GoogleFonts.barlow(color: Theme.of(context).colorScheme.onSurface),
+                  style: GoogleFonts.barlow(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Theme.of(context).scaffoldBackgroundColor,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.12),
                       ),
                     ),
                   ),
@@ -254,7 +267,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.12),
                     ),
                   ),
                   child: DropdownButtonHideUnderline(
@@ -286,7 +301,11 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
                 ),
                 const SizedBox(height: 20),
                 _isLoading
-                    ? const Center(child: CircularProgressIndicator(color: Color(0xFFE85D04)))
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFE85D04),
+                        ),
+                      )
                     : SizedBox(
                         width: double.infinity,
                         height: 48,
@@ -374,7 +393,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.12),
         ),
       ),
       child: Row(
@@ -394,7 +415,9 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
                   subtitle,
                   style: GoogleFonts.barlow(
                     fontSize: 13,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -403,7 +426,7 @@ class _LocationSettingsScreenState extends ConsumerState<LocationSettingsScreen>
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFFE85D04),
+            activeThumbColor: const Color(0xFFE85D04),
           ),
         ],
       ),

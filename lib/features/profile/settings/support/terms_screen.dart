@@ -56,7 +56,9 @@ class TermsScreen extends ConsumerWidget {
                 'Last updated: 15 May 2026',
                 style: GoogleFonts.barlow(
                   fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -118,7 +120,9 @@ class TermsScreen extends ConsumerWidget {
                     content,
                     style: GoogleFonts.barlow(
                       fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                       height: 1.6,
                     ),
                   ),
@@ -185,7 +189,9 @@ class TermsScreen extends ConsumerWidget {
             body,
             style: GoogleFonts.barlow(
               fontSize: 13,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
               height: 1.6,
             ),
           ),

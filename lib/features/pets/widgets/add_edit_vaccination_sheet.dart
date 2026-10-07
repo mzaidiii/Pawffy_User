@@ -42,7 +42,7 @@ class _AddEditVaccinationSheetState
     final v = widget.vaccination;
     _vaccineNameController = TextEditingController(text: v?.vaccineName ?? '');
     _notesController = TextEditingController(text: v?.notes ?? '');
-    
+
     if (v != null) {
       _vaccinationDate = v.vaccinationDate;
       _nextDueDate = v.nextDueDate;
@@ -77,9 +77,9 @@ class _AddEditVaccinationSheetState
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: const Color(0xFFE85D04),
-                ),
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: const Color(0xFFE85D04)),
           ),
           child: child!,
         );
@@ -103,9 +103,9 @@ class _AddEditVaccinationSheetState
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: const Color(0xFFE85D04),
-                ),
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: const Color(0xFFE85D04)),
           ),
           child: child!,
         );
@@ -154,7 +154,9 @@ class _AddEditVaccinationSheetState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isEditMode ? 'Vaccination record updated!' : 'Vaccination record added!',
+            _isEditMode
+                ? 'Vaccination record updated!'
+                : 'Vaccination record added!',
             style: GoogleFonts.barlow(),
           ),
           backgroundColor: const Color(0xFFE85D04),
@@ -204,14 +206,16 @@ class _AddEditVaccinationSheetState
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                _isEditMode ? 'EDIT VACCINATION RECORD' : 'ADD VACCINATION RECORD',
+                _isEditMode
+                    ? 'EDIT VACCINATION RECORD'
+                    : 'ADD VACCINATION RECORD',
                 style: GoogleFonts.barlow(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -220,7 +224,7 @@ class _AddEditVaccinationSheetState
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Vaccine Name
               _buildTextField(
                 controller: _vaccineNameController,
@@ -282,10 +286,9 @@ class _AddEditVaccinationSheetState
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.05),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -296,14 +299,16 @@ class _AddEditVaccinationSheetState
                           'Select a Vet',
                           style: GoogleFonts.barlow(
                             fontSize: 14,
-                            color: Colors.grey.withOpacity(0.6),
+                            color: Colors.grey.withValues(alpha: 0.6),
                           ),
                         ),
                         style: GoogleFonts.barlow(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                        dropdownColor: Theme.of(
+                          context,
+                        ).scaffoldBackgroundColor,
                         items: [
                           DropdownMenuItem<String>(
                             value: null,
@@ -333,10 +338,9 @@ class _AddEditVaccinationSheetState
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const SizedBox(
@@ -350,10 +354,9 @@ class _AddEditVaccinationSheetState
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -444,10 +447,12 @@ class _AddEditVaccinationSheetState
             hintText: hint,
             hintStyle: GoogleFonts.barlow(
               fontSize: 14,
-              color: Colors.grey.withOpacity(0.6),
+              color: Colors.grey.withValues(alpha: 0.6),
             ),
             filled: true,
-            fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+            fillColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -496,10 +501,12 @@ class _AddEditVaccinationSheetState
             hintText: hint,
             hintStyle: GoogleFonts.barlow(
               fontSize: 14,
-              color: Colors.grey.withOpacity(0.6),
+              color: Colors.grey.withValues(alpha: 0.6),
             ),
             filled: true,
-            fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+            fillColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

@@ -40,11 +40,18 @@ class BookingConfirmationScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+                const Icon(
+                  Icons.error_outline_rounded,
+                  size: 48,
+                  color: Colors.red,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Failed to fetch booking details: $err',
-                  style: GoogleFonts.barlow(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.barlow(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -74,7 +81,9 @@ class BookingConfirmationScreen extends ConsumerWidget {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: _statusColor(booking.status).withOpacity(0.12),
+                            color: _statusColor(
+                              booking.status,
+                            ).withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -116,21 +125,60 @@ class BookingConfirmationScreen extends ConsumerWidget {
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    if (booking.status.toLowerCase() == 'pending' || booking.status.toLowerCase() == 'confirmed')
-                      OutlinedButton(
-                        onPressed: () => _cancelBooking(context, ref),
-                        style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 50), foregroundColor: Colors.red, side: const BorderSide(color: Colors.red), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(27))),
-                        child: Text('CANCEL BOOKING', style: GoogleFonts.barlow(fontWeight: FontWeight.w800)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (booking.status.toLowerCase() == 'pending' ||
+                          booking.status.toLowerCase() == 'confirmed')
+                        OutlinedButton(
+                          onPressed: () => _cancelBooking(context, ref),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 50),
+                            foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(27),
+                            ),
+                          ),
+                          child: Text(
+                            'CANCEL BOOKING',
+                            style: GoogleFonts.barlow(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      if (booking.status.toLowerCase() == 'pending' ||
+                          booking.status.toLowerCase() == 'confirmed')
+                        const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
+                          (route) => false,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          minimumSize: const Size(double.infinity, 54),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(27),
+                          ),
+                        ),
+                        child: Text(
+                          'GO TO HOME',
+                          style: GoogleFonts.barlow(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
                       ),
-                    if (booking.status.toLowerCase() == 'pending' || booking.status.toLowerCase() == 'confirmed') const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (route) => false),
-                      style: ElevatedButton.styleFrom(backgroundColor: primaryColor, minimumSize: const Size(double.infinity, 54), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(27))),
-                      child: Text('GO TO HOME', style: GoogleFonts.barlow(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 1.1)),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -142,56 +190,82 @@ class BookingConfirmationScreen extends ConsumerWidget {
 
   static Color _statusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'completed': return Colors.teal;
-      case 'cancelled': case 'rejected': return Colors.red;
-      case 'pending': return Colors.orange;
-      default: return Colors.green;
+      case 'completed':
+        return Colors.teal;
+      case 'cancelled':
+      case 'rejected':
+        return Colors.red;
+      case 'pending':
+        return Colors.orange;
+      default:
+        return Colors.green;
     }
   }
 
   static IconData _statusIcon(String status) {
     switch (status.toLowerCase()) {
-      case 'completed': return Icons.celebration_rounded;
-      case 'cancelled': case 'rejected': return Icons.cancel_rounded;
-      case 'pending': return Icons.hourglass_top_rounded;
-      default: return Icons.check_circle_rounded;
+      case 'completed':
+        return Icons.celebration_rounded;
+      case 'cancelled':
+      case 'rejected':
+        return Icons.cancel_rounded;
+      case 'pending':
+        return Icons.hourglass_top_rounded;
+      default:
+        return Icons.check_circle_rounded;
     }
   }
 
   static String _statusTitle(String status) {
     switch (status.toLowerCase()) {
-      case 'completed': return 'Service completed!';
-      case 'cancelled': return 'Booking cancelled';
-      case 'rejected': return 'Booking rejected';
-      case 'pending': return 'Payment pending';
-      default: return 'Appointment confirmed!';
+      case 'completed':
+        return 'Service completed!';
+      case 'cancelled':
+        return 'Booking cancelled';
+      case 'rejected':
+        return 'Booking rejected';
+      case 'pending':
+        return 'Payment pending';
+      default:
+        return 'Appointment confirmed!';
     }
   }
 
-  Widget _reviewPrompt(BuildContext context, WidgetRef ref, BookingModel booking, bool isDark) {
+  Widget _reviewPrompt(
+    BuildContext context,
+    WidgetRef ref,
+    BookingModel booking,
+    bool isDark,
+  ) {
     return FutureBuilder<bool>(
       future: StorageService.isBookingReviewed(booking.id),
       builder: (context, snapshot) {
-        final bool isAlreadyReviewed = booking.isReviewed || (snapshot.data == true);
+        final bool isAlreadyReviewed =
+            booking.isReviewed || (snapshot.data == true);
 
         if (isAlreadyReviewed) {
-          final reviewRating = int.tryParse(booking.review?['rating']?.toString() ?? '') ?? 5;
+          final reviewRating =
+              int.tryParse(booking.review?['rating']?.toString() ?? '') ?? 5;
           final reviewComment = booking.review?['comment']?.toString() ?? '';
 
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.08),
+              color: Colors.green.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.green.withOpacity(0.3)),
+              border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
             ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle_rounded, color: Colors.green, size: 22),
+                    const Icon(
+                      Icons.check_circle_rounded,
+                      color: Colors.green,
+                      size: 22,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'REVIEW SUBMITTED',
@@ -211,7 +285,9 @@ class BookingConfirmationScreen extends ConsumerWidget {
                     return Icon(
                       Icons.star_rounded,
                       size: 20,
-                      color: i < reviewRating ? const Color(0xFFFFB703) : Colors.grey.shade300,
+                      color: i < reviewRating
+                          ? const Color(0xFFFFB703)
+                          : Colors.grey.shade300,
                     );
                   }),
                 ),
@@ -222,7 +298,9 @@ class BookingConfirmationScreen extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.barlow(
                       fontSize: 13,
-                      color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                      color: isDark
+                          ? Colors.grey.shade300
+                          : Colors.grey.shade700,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -230,10 +308,7 @@ class BookingConfirmationScreen extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Thank you for rating ${booking.vet.name}!',
-                  style: GoogleFonts.barlow(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -244,12 +319,16 @@ class BookingConfirmationScreen extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: const Color(0xFFE85D04).withOpacity(.08),
+            color: const Color(0xFFE85D04).withValues(alpha: .08),
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
             children: [
-              const Icon(Icons.star_rounded, size: 38, color: Color(0xFFE85D04)),
+              const Icon(
+                Icons.star_rounded,
+                size: 38,
+                color: Color(0xFFE85D04),
+              ),
               const SizedBox(height: 6),
               Text(
                 'Enjoyed the service?',
@@ -275,7 +354,9 @@ class BookingConfirmationScreen extends ConsumerWidget {
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(28),
+                      ),
                     ),
                     builder: (_) => ReviewVendorSheet(
                       bookingId: booking.id,
@@ -305,17 +386,47 @@ class BookingConfirmationScreen extends ConsumerWidget {
   }
 
   Future<void> _cancelBooking(BuildContext context, WidgetRef ref) async {
-    final allowed = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(title: const Text('Cancel booking?'), content: const Text('This will cancel your booking. Any eligible refund is handled by Pawffy.'), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('KEEP')), TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('CANCEL BOOKING'))]));
+    final allowed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cancel booking?'),
+        content: const Text(
+          'This will cancel your booking. Any eligible refund is handled by Pawffy.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('KEEP'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('CANCEL BOOKING'),
+          ),
+        ],
+      ),
+    );
     if (allowed != true) return;
     try {
-      await ref.read(bookingControllerProvider.notifier).cancelBooking(bookingId);
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking cancelled successfully')));
+      await ref
+          .read(bookingControllerProvider.notifier)
+          .cancelBooking(bookingId);
+      if (context.mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Booking cancelled successfully')),
+        );
     } catch (e) {
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+      if (context.mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
     }
   }
 
-  Widget _buildReceiptCard(BookingModel booking, bool isDark, Color primaryColor) {
+  Widget _buildReceiptCard(
+    BookingModel booking,
+    bool isDark,
+    Color primaryColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -323,7 +434,7 @@ class BookingConfirmationScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -375,10 +486,7 @@ class BookingConfirmationScreen extends ConsumerWidget {
           ),
           Text(
             '${booking.vet.clinicName}${booking.vet.clinicAddress != null ? " • ${booking.vet.clinicAddress}" : ""}',
-            style: GoogleFonts.barlow(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+            style: GoogleFonts.barlow(fontSize: 12, color: Colors.grey),
           ),
           if (booking.vet.phone != null) ...[
             const SizedBox(height: 4),
@@ -416,7 +524,8 @@ class BookingConfirmationScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      booking.dateTimeFormatted ?? DateFormat('dd MMM yyyy').format(booking.bookingDate),
+                      booking.dateTimeFormatted ??
+                          DateFormat('dd MMM yyyy').format(booking.bookingDate),
                       style: GoogleFonts.barlow(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

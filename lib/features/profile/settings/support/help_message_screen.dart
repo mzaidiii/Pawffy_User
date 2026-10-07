@@ -46,12 +46,14 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
         _attachedFileName = 'screenshot.png';
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mock screenshot.png attached successfully.')),
+        const SnackBar(
+          content: Text('Mock screenshot.png attached successfully.'),
+        ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to attach file: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to attach file: $e')));
     }
   }
 
@@ -76,9 +78,9 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
     final message = _messageController.text.trim();
 
     if (subject == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a subject')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a subject')));
       return;
     }
     if (message.isEmpty) {
@@ -91,12 +93,14 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(supportServiceProvider).createSupportTicket(
-        subject: subject,
-        category: _mapSubjectToCategory(subject),
-        description: message,
-        attachmentPath: _attachedFilePath,
-      );
+      await ref
+          .read(supportServiceProvider)
+          .createSupportTicket(
+            subject: subject,
+            category: _mapSubjectToCategory(subject),
+            description: message,
+            attachmentPath: _attachedFilePath,
+          );
 
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -145,7 +149,9 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
                         const SizedBox(height: 20),
 
                         const Center(
-                          child: SettingsHeaderIcon(icon: Icons.headset_mic_outlined),
+                          child: SettingsHeaderIcon(
+                            icon: Icons.headset_mic_outlined,
+                          ),
                         ),
 
                         const SizedBox(height: 30),
@@ -163,7 +169,7 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
                         const SizedBox(height: 8),
 
                         DropdownButtonFormField<String>(
-                          value: _selectedSubject,
+                          initialValue: _selectedSubject,
                           style: GoogleFonts.barlow(
                             fontSize: 14,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -183,11 +189,15 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE0E0E0),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE0E0E0),
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -237,11 +247,15 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
                             contentPadding: const EdgeInsets.all(14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE0E0E0),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE0E0E0),
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -299,8 +313,12 @@ class _HelpMessageScreenState extends ConsumerState<HelpMessageScreen> {
                                   style: GoogleFonts.barlow(
                                     fontSize: 14,
                                     color: _attachedFileName != null
-                                        ? Theme.of(context).colorScheme.onSurface
-                                        : Theme.of(context).colorScheme.onSurface,
+                                        ? Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface
+                                        : Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                   ),
                                 ),
                                 if (_attachedFileName != null) ...[

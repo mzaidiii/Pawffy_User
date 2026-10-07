@@ -61,7 +61,7 @@ class SettingsScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -76,11 +76,15 @@ class SettingsScreen extends ConsumerWidget {
                         backgroundColor: isDark
                             ? const Color(0xFF3A2A2A)
                             : const Color(0xFFF3E8E2),
-                        backgroundImage: user?.profileImage != null &&
+                        backgroundImage:
+                            user?.profileImage != null &&
                                 user!.profileImage!.isNotEmpty
-                            ? ImagePickerHelper.getImageProvider(user.profileImage!)
+                            ? ImagePickerHelper.getImageProvider(
+                                user.profileImage!,
+                              )
                             : null,
-                        child: user?.profileImage == null ||
+                        child:
+                            user?.profileImage == null ||
                                 user!.profileImage!.isEmpty
                             ? const Icon(
                                 Icons.person,
@@ -160,7 +164,7 @@ class SettingsScreen extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE85D04).withOpacity(0.1),
+                        color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -252,7 +256,9 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const PrivacyPolicyScreen(),
+                  ),
                 );
               },
             ),
@@ -295,7 +301,9 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(ctx, true),
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.red,
+                          ),
                           child: const Text('Log Out'),
                         ),
                       ],
@@ -317,10 +325,12 @@ class SettingsScreen extends ConsumerWidget {
 
                     if (context.mounted) {
                       // Close loading dialog
-                      Navigator.pop(context); 
+                      Navigator.pop(context);
                       // Redirect to Onboarding
                       Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const OnboardingScreen(),
+                        ),
                         (route) => false,
                       );
                     }

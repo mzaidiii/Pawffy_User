@@ -36,7 +36,9 @@ class _AddEditMedicalRecordSheetState
     super.initState();
     final r = widget.record;
     _diagnosisController = TextEditingController(text: r?.diagnosis ?? '');
-    _prescriptionController = TextEditingController(text: r?.prescription ?? '');
+    _prescriptionController = TextEditingController(
+      text: r?.prescription ?? '',
+    );
     _allergiesController = TextEditingController(text: r?.allergies ?? '');
     _symptomsController = TextEditingController(text: r?.symptoms ?? '');
     _reportUrlController = TextEditingController(text: r?.reportUrl ?? '');
@@ -143,7 +145,7 @@ class _AddEditMedicalRecordSheetState
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -273,10 +275,12 @@ class _AddEditMedicalRecordSheetState
             hintText: hint,
             hintStyle: GoogleFonts.barlow(
               fontSize: 14,
-              color: Colors.grey.withOpacity(0.6),
+              color: Colors.grey.withValues(alpha: 0.6),
             ),
             filled: true,
-            fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+            fillColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

@@ -24,8 +24,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _stateFocus = FocusNode();
   final _addressFocus = FocusNode();
 
-
-
   String? _phoneError;
   String? _cityError;
   String? _stateError;
@@ -288,15 +286,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
               const SizedBox(height: 28),
               ElevatedButton(
-                onPressed: authState.isLoading
-                    ? null
-                    : _handleSubmit,
+                onPressed: authState.isLoading ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFE85D04),
                   foregroundColor: Colors.white,
                   disabledBackgroundColor: const Color(
                     0xFFE85D04,
-                  ).withOpacity(0.6),
+                  ).withValues(alpha: 0.6),
                   minimumSize: const Size(double.infinity, 52),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),

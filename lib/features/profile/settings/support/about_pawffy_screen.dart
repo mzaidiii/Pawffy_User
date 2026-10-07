@@ -24,7 +24,7 @@ class AboutPawffyScreen extends StatelessWidget {
                 width: 90,
                 height: 90,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE85D04).withOpacity(0.12),
+                  color: const Color(0xFFE85D04).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -50,7 +50,9 @@ class AboutPawffyScreen extends StatelessWidget {
               'Version 1.0.0',
               style: GoogleFonts.barlow(
                 fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 8),
@@ -82,7 +84,9 @@ class AboutPawffyScreen extends StatelessWidget {
               style: GoogleFonts.barlow(
                 fontSize: 14,
                 height: 1.5,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: 32),
@@ -93,7 +97,9 @@ class AboutPawffyScreen extends StatelessWidget {
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.12),
                 ),
               ),
               child: Column(
@@ -114,7 +120,9 @@ class AboutPawffyScreen extends StatelessWidget {
                     icon: Icons.privacy_tip_outlined,
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacyPolicyScreen(),
+                      ),
                     ),
                   ),
                   _buildDivider(context),
@@ -160,16 +168,33 @@ class AboutPawffyScreen extends StatelessWidget {
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.12),
                 ),
               ),
               child: Column(
                 children: [
-                  _buildSocialRow(context, icon: Icons.camera_alt_outlined, name: 'Instagram', handle: '@pawffy'),
+                  _buildSocialRow(
+                    context,
+                    icon: Icons.camera_alt_outlined,
+                    name: 'Instagram',
+                    handle: '@pawffy',
+                  ),
                   _buildDivider(context),
-                  _buildSocialRow(context, icon: Icons.alternate_email_outlined, name: 'Twitter (X)', handle: '@pawffy'),
+                  _buildSocialRow(
+                    context,
+                    icon: Icons.alternate_email_outlined,
+                    name: 'Twitter (X)',
+                    handle: '@pawffy',
+                  ),
                   _buildDivider(context),
-                  _buildSocialRow(context, icon: Icons.facebook_outlined, name: 'Facebook', handle: 'Pawffy India'),
+                  _buildSocialRow(
+                    context,
+                    icon: Icons.facebook_outlined,
+                    name: 'Facebook',
+                    handle: 'Pawffy India',
+                  ),
                 ],
               ),
             ),
@@ -181,7 +206,9 @@ class AboutPawffyScreen extends StatelessWidget {
               '© 2026 Pawffy. All rights reserved.',
               style: GoogleFonts.barlow(
                 fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
             const SizedBox(height: 20),
@@ -208,7 +235,11 @@ class AboutPawffyScreen extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 14,
+        color: Colors.grey,
+      ),
     );
   }
 
@@ -222,7 +253,13 @@ class AboutPawffyScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), size: 20),
+          Icon(
+            icon,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
+            size: 20,
+          ),
           const SizedBox(width: 12),
           Text(
             name,
@@ -250,7 +287,7 @@ class AboutPawffyScreen extends StatelessWidget {
     return Divider(
       height: 1,
       thickness: 1,
-      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
     );
   }
 }

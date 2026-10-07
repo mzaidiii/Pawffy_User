@@ -11,7 +11,8 @@ class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
 
   @override
-  ConsumerState<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
+  ConsumerState<DeleteAccountScreen> createState() =>
+      _DeleteAccountScreenState();
 }
 
 class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
@@ -75,7 +76,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               } catch (e) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                    SnackBar(
+                      content: Text(
+                        e.toString().replaceFirst('Exception: ', ''),
+                      ),
+                    ),
                   );
                 }
               } finally {
@@ -116,7 +121,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                       width: 84,
                       height: 84,
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
+                        color: Colors.red.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -158,9 +163,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.06),
+                      color: Colors.red.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.withOpacity(0.2)),
+                      border: Border.all(
+                        color: Colors.red.withValues(alpha: 0.2),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +219,9 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                       hintText: '••••••••••',
                       hintStyle: GoogleFonts.barlow(
                         fontSize: 18,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       filled: true,
                       fillColor: Theme.of(context).colorScheme.surface,
@@ -223,13 +232,17 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.12),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.12),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(

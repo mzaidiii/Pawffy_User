@@ -51,7 +51,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               style: GoogleFonts.barlow(),
               decoration: InputDecoration(
                 prefixText: '\$ ',
@@ -68,7 +70,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'CANCEL',
-              style: GoogleFonts.barlow(color: Colors.grey, fontWeight: FontWeight.bold),
+              style: GoogleFonts.barlow(
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           TextButton(
@@ -85,7 +90,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             },
             child: Text(
               'PROCEED',
-              style: GoogleFonts.barlow(color: const Color(0xFFE85D04), fontWeight: FontWeight.bold),
+              style: GoogleFonts.barlow(
+                color: const Color(0xFFE85D04),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -113,7 +121,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               style: GoogleFonts.barlow(),
               decoration: InputDecoration(
                 prefixText: '\$ ',
@@ -130,7 +140,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'CANCEL',
-              style: GoogleFonts.barlow(color: Colors.grey, fontWeight: FontWeight.bold),
+              style: GoogleFonts.barlow(
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           TextButton(
@@ -153,7 +166,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             },
             child: Text(
               'WITHDRAW',
-              style: GoogleFonts.barlow(color: const Color(0xFFE85D04), fontWeight: FontWeight.bold),
+              style: GoogleFonts.barlow(
+                color: const Color(0xFFE85D04),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -171,7 +187,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     if (!mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Wallet topped up successfully!'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Wallet topped up successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
     } else {
       final errorState = ref.read(walletControllerProvider);
@@ -194,7 +213,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     if (!mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Withdrawal request processed successfully!'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Withdrawal request processed successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
     } else {
       final errorState = ref.read(walletControllerProvider);
@@ -224,7 +246,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   child: Text(
                     'Failed to load wallet data: $err',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.barlow(color: Colors.red, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.barlow(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -249,7 +274,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFE85D04).withOpacity(0.3),
+                              color: const Color(
+                                0xFFE85D04,
+                              ).withValues(alpha: 0.3),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
                             ),
@@ -266,10 +293,14 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                                   style: GoogleFonts.barlow(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withValues(alpha: 0.8),
                                   ),
                                 ),
-                                const Icon(Icons.pets, color: Colors.white, size: 24),
+                                const Icon(
+                                  Icons.pets,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -286,7 +317,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                               'Active Wallet / Secure',
                               style: GoogleFonts.barlow(
                                 fontSize: 12,
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -315,7 +346,11 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                               label: 'Refunds',
                               onTap: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Refund history is loaded inside the transactions below.')),
+                                  const SnackBar(
+                                    content: Text(
+                                      'Refund history is loaded inside the transactions below.',
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -326,7 +361,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                               context,
                               icon: Icons.account_balance,
                               label: 'Send to Bank',
-                              onTap: () => _showWithdrawDialog(context, wallet.balance),
+                              onTap: () =>
+                                  _showWithdrawDialog(context, wallet.balance),
                             ),
                           ),
                         ],
@@ -363,7 +399,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                                   context,
                                   title: tx.description,
                                   date: _formatTxDate(tx.date),
-                                  amount: '${isCredit ? '+' : '-'}\$${tx.amount.toStringAsFixed(2)}',
+                                  amount:
+                                      '${isCredit ? '+' : '-'}\$${tx.amount.toStringAsFixed(2)}',
                                   isCredit: isCredit,
                                 );
                               }).toList(),
@@ -390,7 +427,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.12),
           ),
         ),
         child: Column(
@@ -425,7 +464,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.08),
         ),
       ),
       child: Row(
@@ -435,13 +476,15 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             height: 42,
             decoration: BoxDecoration(
               color: isCredit
-                  ? const Color(0xFF22C55E).withOpacity(0.12)
-                  : const Color(0xFFEF4444).withOpacity(0.12),
+                  ? const Color(0xFF22C55E).withValues(alpha: 0.12)
+                  : const Color(0xFFEF4444).withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
               isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-              color: isCredit ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
+              color: isCredit
+                  ? const Color(0xFF22C55E)
+                  : const Color(0xFFEF4444),
               size: 20,
             ),
           ),
@@ -463,7 +506,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   date,
                   style: GoogleFonts.barlow(
                     fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               ],
@@ -474,7 +519,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             style: GoogleFonts.barlow(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: isCredit ? const Color(0xFF22C55E) : Theme.of(context).colorScheme.onSurface,
+              color: isCredit
+                  ? const Color(0xFF22C55E)
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

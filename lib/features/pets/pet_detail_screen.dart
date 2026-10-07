@@ -13,7 +13,6 @@ import 'widgets/add_edit_medical_record_sheet.dart';
 import 'widgets/add_edit_vaccination_sheet.dart';
 import '../vendors/providers/vendor_controller.dart';
 
-
 class PetDetailScreen extends ConsumerStatefulWidget {
   final PetModel pet;
   const PetDetailScreen({super.key, required this.pet});
@@ -28,7 +27,8 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final petsAsync = ref.watch(petControllerProvider);
-    final pet = petsAsync.asData?.value.firstWhere(
+    final pet =
+        petsAsync.asData?.value.firstWhere(
           (p) => p.id == widget.pet.id,
           orElse: () => widget.pet,
         ) ??
@@ -85,11 +85,13 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE85D04).withOpacity(0.1),
+                      color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                       image: pet.imageUrl != null && pet.imageUrl!.isNotEmpty
                           ? DecorationImage(
-                              image: ImagePickerHelper.getImageProvider(pet.imageUrl!),
+                              image: ImagePickerHelper.getImageProvider(
+                                pet.imageUrl!,
+                              ),
                               fit: BoxFit.cover,
                             )
                           : null,
@@ -102,7 +104,6 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                           )
                         : null,
                   ),
-
                 ],
               ),
             ),
@@ -173,7 +174,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -200,7 +201,8 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                             fontWeight: FontWeight.w700,
                             color: _selectedTab == 0
                                 ? Colors.white
-                                : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                : Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -225,7 +227,8 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                             fontWeight: FontWeight.w700,
                             color: _selectedTab == 1
                                 ? Colors.white
-                                : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                : Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -241,7 +244,9 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _selectedTab == 0 ? 'PET MEDICAL HISTORY' : 'VACCINATION LOGS',
+                  _selectedTab == 0
+                      ? 'PET MEDICAL HISTORY'
+                      : 'VACCINATION LOGS',
                   style: GoogleFonts.barlow(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -256,7 +261,8 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (_) => AddEditMedicalRecordSheet(petId: pet.id),
+                        builder: (_) =>
+                            AddEditMedicalRecordSheet(petId: pet.id),
                       );
                     } else {
                       showModalBottomSheet(
@@ -268,9 +274,12 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE85D04).withOpacity(0.1),
+                      color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -371,7 +380,11 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
     );
   }
 
-  Widget _buildMedicalRecordsSection(BuildContext context, WidgetRef ref, PetModel pet) {
+  Widget _buildMedicalRecordsSection(
+    BuildContext context,
+    WidgetRef ref,
+    PetModel pet,
+  ) {
     final recordsAsync = ref.watch(medicalRecordControllerProvider(pet.id));
 
     return recordsAsync.when(
@@ -400,7 +413,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                   Icon(
                     Icons.folder_open_outlined,
                     size: 48,
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.grey.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -431,7 +444,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -463,7 +476,11 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                             ),
                           ),
                           PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                            icon: const Icon(
+                              Icons.more_vert,
+                              size: 18,
+                              color: Colors.grey,
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onSelected: (val) {
@@ -478,7 +495,12 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                                   ),
                                 );
                               } else if (val == 'delete') {
-                                _confirmDeleteMedicalRecord(context, ref, pet.id, record.id);
+                                _confirmDeleteMedicalRecord(
+                                  context,
+                                  ref,
+                                  pet.id,
+                                  record.id,
+                                );
                               }
                             },
                             itemBuilder: (context) => [
@@ -488,7 +510,10 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                               ),
                               const PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.redAccent),
+                                ),
                               ),
                             ],
                           ),
@@ -496,7 +521,8 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                       ),
                     ],
                   ),
-                  if (record.symptoms != null && record.symptoms!.isNotEmpty) ...[
+                  if (record.symptoms != null &&
+                      record.symptoms!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     RichText(
                       text: TextSpan(
@@ -507,14 +533,18 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         children: [
                           const TextSpan(
                             text: 'Symptoms: ',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
                           ),
                           TextSpan(text: record.symptoms),
                         ],
                       ),
                     ),
                   ],
-                  if (record.prescription != null && record.prescription!.isNotEmpty) ...[
+                  if (record.prescription != null &&
+                      record.prescription!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     RichText(
                       text: TextSpan(
@@ -525,14 +555,18 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         children: [
                           const TextSpan(
                             text: 'Prescription: ',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
                           ),
                           TextSpan(text: record.prescription),
                         ],
                       ),
                     ),
                   ],
-                  if (record.allergies != null && record.allergies!.isNotEmpty) ...[
+                  if (record.allergies != null &&
+                      record.allergies!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     RichText(
                       text: TextSpan(
@@ -543,18 +577,26 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         children: [
                           const TextSpan(
                             text: 'Allergies: ',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
                           ),
                           TextSpan(text: record.allergies),
                         ],
                       ),
                     ),
                   ],
-                  if (record.createdByVet != null && record.createdByVet!.isNotEmpty) ...[
+                  if (record.createdByVet != null &&
+                      record.createdByVet!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.verified_user_outlined, size: 14, color: Color(0xFFE85D04)),
+                        const Icon(
+                          Icons.verified_user_outlined,
+                          size: 14,
+                          color: Color(0xFFE85D04),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Created by Veterinarian',
@@ -567,11 +609,14 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                       ],
                     ),
                   ],
-                  if (record.reportUrl != null && record.reportUrl!.isNotEmpty) ...[
+                  if (record.reportUrl != null &&
+                      record.reportUrl!.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     GestureDetector(
                       onTap: () {
-                        Clipboard.setData(ClipboardData(text: record.reportUrl!));
+                        Clipboard.setData(
+                          ClipboardData(text: record.reportUrl!),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -584,16 +629,29 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE85D04).withOpacity(0.08),
+                          color: const Color(
+                            0xFFE85D04,
+                          ).withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE85D04).withOpacity(0.2)),
+                          border: Border.all(
+                            color: const Color(
+                              0xFFE85D04,
+                            ).withValues(alpha: 0.2),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.picture_as_pdf_outlined, size: 16, color: Color(0xFFE85D04)),
+                            const Icon(
+                              Icons.picture_as_pdf_outlined,
+                              size: 16,
+                              color: Color(0xFFE85D04),
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               'Copy Lab Report URL',
@@ -617,7 +675,11 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
     );
   }
 
-  Widget _buildVaccinationsSection(BuildContext context, WidgetRef ref, PetModel pet) {
+  Widget _buildVaccinationsSection(
+    BuildContext context,
+    WidgetRef ref,
+    PetModel pet,
+  ) {
     final vaccinationsAsync = ref.watch(vaccinationControllerProvider(pet.id));
     final vetsAsync = ref.watch(vendorControllerProvider);
 
@@ -647,7 +709,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                   Icon(
                     Icons.vaccines_outlined,
                     size: 48,
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.grey.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -671,12 +733,14 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
           separatorBuilder: (_, __) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             final vaccination = vaccinations[index];
-            
+
             Color statusColor = Colors.grey;
             String statusText = '';
-            
+
             if (vaccination.nextDueDate != null) {
-              final difference = vaccination.nextDueDate!.difference(DateTime.now()).inDays;
+              final difference = vaccination.nextDueDate!
+                  .difference(DateTime.now())
+                  .inDays;
               if (difference < 0) {
                 statusColor = Colors.redAccent;
                 statusText = 'Overdue';
@@ -696,7 +760,7 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -721,14 +785,20 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                       Row(
                         children: [
                           Text(
-                            DateFormat('MMM dd, yyyy').format(vaccination.vaccinationDate),
+                            DateFormat(
+                              'MMM dd, yyyy',
+                            ).format(vaccination.vaccinationDate),
                             style: GoogleFonts.barlow(
                               fontSize: 12,
                               color: Colors.grey,
                             ),
                           ),
                           PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                            icon: const Icon(
+                              Icons.more_vert,
+                              size: 18,
+                              color: Colors.grey,
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onSelected: (val) {
@@ -743,7 +813,12 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                                   ),
                                 );
                               } else if (val == 'delete') {
-                                _confirmDeleteVaccination(context, ref, pet.id, vaccination.id);
+                                _confirmDeleteVaccination(
+                                  context,
+                                  ref,
+                                  pet.id,
+                                  vaccination.id,
+                                );
                               }
                             },
                             itemBuilder: (context) => [
@@ -753,7 +828,10 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                               ),
                               const PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.redAccent),
+                                ),
                               ),
                             ],
                           ),
@@ -775,9 +853,12 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.1),
+                            color: statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -796,7 +877,11 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.person_outline, size: 14, color: Colors.grey.shade500),
+                        Icon(
+                          Icons.person_outline,
+                          size: 14,
+                          color: Colors.grey.shade500,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Administered by: Dr. ${vaccination.vet!.name} (${vaccination.vet!.clinicName ?? 'Clinic'})',
@@ -807,16 +892,23 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                         ),
                       ],
                     ),
-                  ] else if (vaccination.vetId != null && vaccination.vetId!.isNotEmpty) ...[
+                  ] else if (vaccination.vetId != null &&
+                      vaccination.vetId!.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.person_outline, size: 14, color: Colors.grey.shade500),
+                        Icon(
+                          Icons.person_outline,
+                          size: 14,
+                          color: Colors.grey.shade500,
+                        ),
                         const SizedBox(width: 4),
                         Builder(
                           builder: (context) {
                             final vets = vetsAsync.asData?.value ?? [];
-                            final matchingVets = vets.where((v) => v.id == vaccination.vetId);
+                            final matchingVets = vets.where(
+                              (v) => v.id == vaccination.vetId,
+                            );
                             final String vetText = matchingVets.isNotEmpty
                                 ? 'Dr. ${matchingVets.first.name} (${matchingVets.first.clinicName})'
                                 : 'Registered Veterinarian';
@@ -832,22 +924,31 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
                       ],
                     ),
                   ],
-                  if (vaccination.notes != null && vaccination.notes!.isNotEmpty) ...[
+                  if (vaccination.notes != null &&
+                      vaccination.notes!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.02),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.05),
+                        ),
                       ),
                       child: Text(
                         vaccination.notes!,
                         style: GoogleFonts.barlow(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -861,12 +962,19 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
     );
   }
 
-  void _confirmDeleteMedicalRecord(BuildContext context, WidgetRef ref, String petId, String recordId) {
+  void _confirmDeleteMedicalRecord(
+    BuildContext context,
+    WidgetRef ref,
+    String petId,
+    String recordId,
+  ) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Medical Record?'),
-        content: const Text('Are you sure you want to delete this record? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this record? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -901,12 +1009,19 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
     );
   }
 
-  void _confirmDeleteVaccination(BuildContext context, WidgetRef ref, String petId, String vaccinationId) {
+  void _confirmDeleteVaccination(
+    BuildContext context,
+    WidgetRef ref,
+    String petId,
+    String vaccinationId,
+  ) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Vaccination Log?'),
-        content: const Text('Are you sure you want to delete this vaccination record? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this vaccination record? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),

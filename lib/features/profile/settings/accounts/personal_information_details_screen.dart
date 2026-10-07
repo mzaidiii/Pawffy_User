@@ -22,12 +22,13 @@ class PersonalInformationDetailsScreen extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: Color(0xFFE85D04)),
         ),
-        error: (_, __) => const Center(
-          child: Text('Unable to load personal information.'),
-        ),
+        error: (_, __) =>
+            const Center(child: Text('Unable to load personal information.')),
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('User information is unavailable.'));
+            return const Center(
+              child: Text('User information is unavailable.'),
+            );
           }
 
           return RefreshIndicator(
@@ -102,7 +103,11 @@ class _ProfileHeader extends StatelessWidget {
               : null,
           child: hasImage
               ? null
-              : const Icon(Icons.person_outline, size: 52, color: Color(0xFFE85D04)),
+              : const Icon(
+                  Icons.person_outline,
+                  size: 52,
+                  color: Color(0xFFE85D04),
+                ),
         ),
         const SizedBox(height: 14),
         Text(
@@ -118,7 +123,9 @@ class _ProfileHeader extends StatelessWidget {
           'Your account information',
           style: GoogleFonts.barlow(
             fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -139,7 +146,7 @@ class _InformationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -166,7 +173,9 @@ class _InformationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = Theme.of(context).colorScheme.onSurface;
-    final displayValue = value?.trim().isNotEmpty == true ? value!.trim() : 'Not provided';
+    final displayValue = value?.trim().isNotEmpty == true
+        ? value!.trim()
+        : 'Not provided';
 
     return Column(
       children: [
@@ -179,7 +188,7 @@ class _InformationRow extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE85D04).withOpacity(0.1),
+                  color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: const Color(0xFFE85D04), size: 20),
@@ -193,7 +202,7 @@ class _InformationRow extends StatelessWidget {
                       label,
                       style: GoogleFonts.barlow(
                         fontSize: 12,
-                        color: textColor.withOpacity(0.6),
+                        color: textColor.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -204,7 +213,7 @@ class _InformationRow extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: value?.trim().isNotEmpty == true
                             ? textColor
-                            : textColor.withOpacity(0.5),
+                            : textColor.withValues(alpha: 0.5),
                       ),
                     ),
                   ],

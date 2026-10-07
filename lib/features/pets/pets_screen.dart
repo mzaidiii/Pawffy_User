@@ -83,7 +83,7 @@ class PetsScreen extends ConsumerWidget {
                   Icon(
                     Icons.pets_rounded,
                     size: 64,
-                    color: const Color(0xFFE85D04).withOpacity(0.4),
+                    color: const Color(0xFFE85D04).withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -154,7 +154,7 @@ class _PetCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -167,11 +167,13 @@ class _PetCard extends ConsumerWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: const Color(0xFFE85D04).withOpacity(0.1),
+                color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 image: pet.imageUrl != null && pet.imageUrl!.isNotEmpty
                     ? DecorationImage(
-                        image: ImagePickerHelper.getImageProvider(pet.imageUrl!),
+                        image: ImagePickerHelper.getImageProvider(
+                          pet.imageUrl!,
+                        ),
                         fit: BoxFit.cover,
                       )
                     : null,
@@ -269,7 +271,7 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.06),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -302,7 +304,7 @@ class _CountBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

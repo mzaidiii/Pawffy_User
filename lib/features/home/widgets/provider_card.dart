@@ -43,7 +43,7 @@ class _ProviderCardState extends State<ProviderCard> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.07),
+              color: Colors.black.withValues(alpha: 0.07),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -64,9 +64,13 @@ class _ProviderCardState extends State<ProviderCard> {
                     height: 120,
                     width: double.infinity,
                     color: const Color(0xFFE0E0E0),
-                    child: widget.profileImage != null && widget.profileImage!.isNotEmpty
+                    child:
+                        widget.profileImage != null &&
+                            widget.profileImage!.isNotEmpty
                         ? Image(
-                            image: ImagePickerHelper.getImageProvider(widget.profileImage!),
+                            image: ImagePickerHelper.getImageProvider(
+                              widget.profileImage!,
+                            ),
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => const Icon(
                               Icons.pets,
@@ -135,7 +139,7 @@ class _ProviderCardState extends State<ProviderCard> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
+                            color: Colors.black.withValues(alpha: 0.15),
                             blurRadius: 4,
                             offset: const Offset(0, 1),
                           ),

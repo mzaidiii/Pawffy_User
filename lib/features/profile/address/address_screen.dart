@@ -59,11 +59,7 @@ class AddressScreen extends ConsumerWidget {
                     itemCount: list.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
-                      return _buildAddressCard(
-                        context,
-                        ref,
-                        list[index],
-                      );
+                      return _buildAddressCard(context, ref, list[index]);
                     },
                   );
                 },
@@ -138,7 +134,7 @@ class AddressScreen extends ConsumerWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -170,7 +166,9 @@ class AddressScreen extends ConsumerWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF22C55E).withOpacity(0.12),
+                          color: const Color(
+                            0xFF22C55E,
+                          ).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: const Color(0xFF22C55E),
@@ -346,7 +344,7 @@ class AddressScreen extends ConsumerWidget {
           Icon(
             Icons.location_off_outlined,
             size: 60,
-            color: Colors.grey.withOpacity(0.4),
+            color: Colors.grey.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 16),
           Text(

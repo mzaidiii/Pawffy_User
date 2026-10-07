@@ -100,26 +100,37 @@ class ImagePickerHelper {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(title, style: GoogleFonts.barlow(fontWeight: FontWeight.w700)),
+        title: Text(
+          title,
+          style: GoogleFonts.barlow(fontWeight: FontWeight.w700),
+        ),
         content: Text(content, style: GoogleFonts.barlow()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Cancel', style: GoogleFonts.barlow(color: Colors.grey)),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.barlow(color: Colors.grey),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               openAppSettings();
             },
-            child: Text('Settings', style: GoogleFonts.barlow(color: const Color(0xFFE85D04))),
+            child: Text(
+              'Settings',
+              style: GoogleFonts.barlow(color: const Color(0xFFE85D04)),
+            ),
           ),
         ],
       ),
     );
   }
 
-  static Future<ImageSource?> showSourceBottomSheet(BuildContext context) async {
+  static Future<ImageSource?> showSourceBottomSheet(
+    BuildContext context,
+  ) async {
     return await showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -140,7 +151,7 @@ class ImagePickerHelper {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -160,10 +171,13 @@ class ImagePickerHelper {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE85D04).withOpacity(0.1),
+                    color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt_outlined, color: Color(0xFFE85D04)),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Color(0xFFE85D04),
+                  ),
                 ),
                 title: Text(
                   'Take a Photo',
@@ -184,10 +198,13 @@ class ImagePickerHelper {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE85D04).withOpacity(0.1),
+                    color: const Color(0xFFE85D04).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_library_outlined, color: Color(0xFFE85D04)),
+                  child: const Icon(
+                    Icons.photo_library_outlined,
+                    color: Color(0xFFE85D04),
+                  ),
                 ),
                 title: Text(
                   'Choose from Gallery',
@@ -218,7 +235,8 @@ class ImagePickerHelper {
     }
 
     // 1. Base64 data URL
-    if (cleanedPath.startsWith('data:image') || cleanedPath.contains(';base64,')) {
+    if (cleanedPath.startsWith('data:image') ||
+        cleanedPath.contains(';base64,')) {
       try {
         final base64String = cleanedPath.split(',').last;
         final bytes = base64.decode(base64String.trim());
@@ -244,7 +262,9 @@ class ImagePickerHelper {
 
     // 3. Web URL
     final uri = Uri.tryParse(cleanedPath);
-    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https') && uri.hasAuthority) {
+    if (uri != null &&
+        (uri.scheme == 'http' || uri.scheme == 'https') &&
+        uri.hasAuthority) {
       return CachedNetworkImageProvider(cleanedPath);
     }
 

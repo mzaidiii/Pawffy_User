@@ -10,7 +10,8 @@ class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() =>
+      _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
@@ -47,7 +48,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   bool get _hasEightChars => _newPassword.length >= 8;
   bool get _hasUppercase => _newPassword.contains(RegExp(r'[A-Z]'));
   bool get _hasNumber => _newPassword.contains(RegExp(r'[0-9]'));
-  bool get _hasSpecialChar => _newPassword.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+  bool get _hasSpecialChar =>
+      _newPassword.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
 
   Future<void> _updatePassword() async {
     if (currentController.text.isEmpty) {
@@ -65,7 +67,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     setState(() => _isLoading = true);
 
-    final success = await ref.read(authControllerProvider.notifier).changePassword(
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .changePassword(
           currentPassword: currentController.text,
           newPassword: newController.text,
         );
@@ -76,7 +80,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         _showSnackbar('Password changed successfully!', isError: false);
         Navigator.pop(context);
       } else {
-        _showSnackbar('Current password is incorrect or failed to change', isError: true);
+        _showSnackbar(
+          'Current password is incorrect or failed to change',
+          isError: true,
+        );
       }
     }
   }
@@ -84,10 +91,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   void _showSnackbar(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.barlow(),
-        ),
+        content: Text(message, style: GoogleFonts.barlow()),
         backgroundColor: isError ? Colors.redAccent : Colors.green,
         behavior: SnackBarBehavior.floating,
       ),
@@ -115,7 +119,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.barlow(
                     fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -131,25 +137,17 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 },
               ),
               const SizedBox(height: 14),
-              _passwordField(
-                'New Password',
-                newController,
-                obscureNew,
-                () {
-                  setState(() {
-                    obscureNew = !obscureNew;
-                  });
-                },
-              ),
+              _passwordField('New Password', newController, obscureNew, () {
+                setState(() {
+                  obscureNew = !obscureNew;
+                });
+              }),
               const SizedBox(height: 12),
               _RequirementTile(
                 text: 'At least 8 Characters',
                 isMet: _hasEightChars,
               ),
-              _RequirementTile(
-                text: 'Include a number',
-                isMet: _hasNumber,
-              ),
+              _RequirementTile(text: 'Include a number', isMet: _hasNumber),
               _RequirementTile(
                 text: 'Includes an Upper Case letter',
                 isMet: _hasUppercase,
@@ -172,7 +170,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               const SizedBox(height: 40),
               _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(color: Color(0xFFE85D04)),
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFE85D04),
+                      ),
                     )
                   : SettingsButton(
                       text: 'Update Password',
@@ -205,7 +205,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         TextField(
           controller: controller,
           obscureText: obscure,
-          style: GoogleFonts.barlow(color: Theme.of(context).colorScheme.onSurface),
+          style: GoogleFonts.barlow(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             filled: true,
             fillColor: Theme.of(context).colorScheme.surface,
@@ -215,19 +217,26 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 obscure
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.12),
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 1.5,
+              ),
             ),
           ),
         ),
@@ -240,10 +249,7 @@ class _RequirementTile extends StatelessWidget {
   final String text;
   final bool isMet;
 
-  const _RequirementTile({
-    required this.text,
-    required this.isMet,
-  });
+  const _RequirementTile({required this.text, required this.isMet});
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +269,9 @@ class _RequirementTile extends StatelessWidget {
               fontSize: 13,
               color: isMet
                   ? Colors.green
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
